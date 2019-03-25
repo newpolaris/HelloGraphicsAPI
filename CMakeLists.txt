@@ -19,10 +19,17 @@ include(UsebackportedModules)
 include(CreateLaunchers)
 include(MSVCMultipleProcessCompile) # /MP
 
+set(GLAD "${GLFW_SOURCE_DIR}/deps/glad/glad.h"
+         "${GLFW_SOURCE_DIR}/deps/glad.c")
+
+link_libraries(glfw)
+
 include_directories(
 	source/
 	external/
 	external/glm/
+	${glfw_INCLUDE_DIRS} 
+	"${GLFW_SOURCE_DIR}/deps"
 	.
 )
 
@@ -40,9 +47,11 @@ add_definitions(
 	-D_CRT_SECURE_NO_WARNINGS
 )
 
-add_executable(${APP_TARGET} ${SOURCE})
+add_executable(${APP_TARGET} ${SOURCE} ${GLAD})
 target_link_libraries(${APP_TARGET} ${ALL_LIBS})
 
 # Xcode and Visual working directories
-set_target_properties(${APP_TARGET} PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/")
+if (APPLE)
+	set_target_properties(${APP_TARGET} PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/")
+endif()
 create_target_launcher(${APP_TARGET} WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/")
