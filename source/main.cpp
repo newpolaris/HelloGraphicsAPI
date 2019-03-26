@@ -36,6 +36,7 @@
 
 #include "getopt.h"
 #include "linmath.h"
+#include "program_gl.h"
 
 static const char* vertex_shader_text =
 "#version 110\n"
@@ -229,6 +230,7 @@ int main(int argc, char** argv)
         glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
         glCompileShader(fragment_shader);
 
+
         program = glCreateProgram();
         glAttachShader(program, vertex_shader);
         glAttachShader(program, fragment_shader);
@@ -252,8 +254,7 @@ int main(int argc, char** argv)
 
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(vertices[0]), (void*) 0);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (void*) 0);
 
     windows[1] = glfwCreateWindow(400, 400, "Second", NULL, windows[0]);
     if (!windows[1])
@@ -279,7 +280,6 @@ int main(int argc, char** argv)
 
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
-
     glUseProgram(program);
 
     glEnable(GL_TEXTURE_2D);

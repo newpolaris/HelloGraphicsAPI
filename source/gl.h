@@ -42,6 +42,7 @@ namespace gl {
 
 #define _EMPTY_OUT_ 0
 
+namespace el {
 namespace gl {
 	const GLubyte* GetString(GLenum name);
 
@@ -54,8 +55,8 @@ namespace gl {
 	void ShaderSource(GLuint shader, GLsizei count, const GLchar *const* string, const GLint* length);
 	void CompileShader(GLuint shader);
 	GLuint CreateProgram(void);
-	void DeleteProgram (GLuint program);
-	void AttachShader (GLuint program, GLuint shader);
+	void DeleteProgram(GLuint program);
+	void AttachShader(GLuint program, GLuint shader);
 	void DetachShader(GLuint program, GLuint shader);
 	void UseProgram(GLuint program);
 	void LinkProgram(GLuint program);
@@ -72,7 +73,7 @@ namespace gl {
 	void BindFramebuffer(GLenum target, GLuint framebuffer);
 	void BindRenderbuffer(GLenum target, GLuint renderbuffer);
 	void FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
-	
+
 	void TexParameteri(GLuint texture, GLenum pname, GLint param);
 	void TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
 
@@ -86,20 +87,20 @@ namespace gl {
 
 	void VertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer);
 	void ReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, void *pixels);
-	void DrawArrays (GLenum mode, GLint first, GLsizei count);
-	void DrawElements (GLenum mode, GLsizei count, GLenum type, const void *indices);
+	void DrawArrays(GLenum mode, GLint first, GLsizei count);
+	void DrawElements(GLenum mode, GLsizei count, GLenum type, const void *indices);
 
 	void CullFace(GLenum mode);
 	void BlendFunc(GLenum sfactor, GLenum dfactor);
 	void Clear(GLbitfield mask);
 	void ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
-	
+
 #ifndef OPENGL_ES
 	void ClearDepth(GLclampd depth);
 #else
 	void ClearDepthf(GLclampf depth);
 #endif
-	
+
 	void Uniform1f(GLint location, GLfloat v0);
 	void Uniform2f(GLint location, GLfloat v0, GLfloat v1);
 	void Uniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
@@ -108,5 +109,5 @@ namespace gl {
 	void Uniform1i(GLint location, GLint v0);
 	void UniformMatrix4(GLint location, const GLfloat* value);
 	void UniformMatrix4fv(GLint location, GLsizei count, const GLfloat* value);
-}
-
+} // namespace gl {
+} // namespace el {
