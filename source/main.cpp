@@ -23,11 +23,16 @@
 //
 //========================================================================
 
-#include <glad/glad.h>
+#include "predefine.h"
+#include "debug.h"
+#include "gl.h"
+
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
+#include <sstream>
 
 #include "getopt.h"
 #include "linmath.h"
@@ -72,6 +77,81 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+static void APIENTRY gl_debug_callback(GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	const void* userParam)
+{
+	// ignore these non-significant error codes
+	if (id == 131169 || id == 131185 || id == 131218 || id == 131204 || id == 131184) 
+		return;
+
+	std::stringstream output;
+	output << "---------- OPENGL CALLBACK -----------" << std::endl;
+	output << "SOURCE: ";
+	switch (source) {
+	case GL_DEBUG_SOURCE_API:
+		output << "WINDOW_SYSTEM";
+		break;
+	case GL_DEBUG_SOURCE_SHADER_COMPILER:
+		output << "SHADER_COMPILER";
+		break;
+	case GL_DEBUG_SOURCE_THIRD_PARTY:
+		output << "THIRD_PARTY";
+		break;
+	case GL_DEBUG_SOURCE_APPLICATION:
+		output << "APPLICATION";
+		break;
+	case GL_DEBUG_SOURCE_OTHER:
+		output << "OTHER";
+		break;
+	}
+	output << std::endl;
+
+	output << "TYPE: ";
+	switch (type) {
+	case GL_DEBUG_TYPE_ERROR:
+		output << "ERROR";
+		break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+		output << "DEPRECATED_BEHAVIOR";
+		break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+		output << "UNDEFINED_BEHAVIOR";
+		break;
+	case GL_DEBUG_TYPE_PORTABILITY:
+		output << "PORTABILITY";
+		break;
+	case GL_DEBUG_TYPE_PERFORMANCE:
+		output << "PERFORMANCE";
+		break;
+	case GL_DEBUG_TYPE_OTHER:
+		output << "OTHER";
+		break;
+	}
+	output << std::endl;
+
+	output << "SEVERITY : ";
+	switch (severity) {
+	case GL_DEBUG_SEVERITY_LOW:
+		output << "LOW";
+		break;
+	case GL_DEBUG_SEVERITY_MEDIUM:
+		output << "MEDIUM";
+		break;
+	case GL_DEBUG_SEVERITY_HIGH:
+		output << "HIGH";
+		break;
+	}
+	output << std::endl;
+	output << message << std::endl;
+
+	EL_TRACE("%s", output.str().c_str());
+}
+
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
@@ -83,8 +163,13 @@ int main(int argc, char** argv)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#ifdef __APPLE__
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
 
     windows[0] = glfwCreateWindow(400, 400, "First", NULL, NULL);
     if (!windows[0])
@@ -103,7 +188,16 @@ int main(int argc, char** argv)
 
     // The contexts are created with the same APIs so the function
     // pointers should be re-usable between them
-    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+#if _DEBUG
+	glEnable(GL_DEBUG_OUTPUT);
+	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+	if (glDebugMessageCallback) {
+		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+		glDebugMessageCallback(gl_debug_callback, nullptr);
+	}
+#endif
 
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
@@ -224,7 +318,7 @@ int main(int argc, char** argv)
             glfwSwapBuffers(windows[i]);
         }
 
-        glfwWaitEvents();
+        glfwPollEvents();
     }
 
     glfwTerminate();
