@@ -156,16 +156,5 @@ void MSLShader::destroy()
 
 #endif // #if EL_PLAT_IOS || EL_PLAT_OSX
 
-GraphicsProgram::GraphicsProgram()
-{
-}
-
-GraphicsProgram::~GraphicsProgram()
-{
-}
-
-GraphicsProgramDesc::GraphicsProgramDesc()
-{
-}
 
 } // namespace el {

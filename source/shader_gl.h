@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "predefine.h"
 #include "gl.h"
@@ -8,9 +9,14 @@
 
 namespace el {
 
+typedef std::shared_ptr<class GraphicsShader> GraphicsShaderPtr;
+typedef std::shared_ptr<class GraphicsProgram> GraphicsProgramPtr;
+typedef std::vector<GraphicsShaderPtr> GraphicsShaders;
+
 // From vulkan spec.
 enum GraphicsShaderStageFlagBits
 {
+	GraphicsShaderStageNoneBit = 0x00000000,
     GraphicsShaderStageVertexBit = 0x00000001,
     GraphicsShaderStageTessellationControlBit = 0x00000002,
     GraphicsShaderStageTessellationEvaluationBit = 0x00000004,
@@ -93,7 +99,6 @@ private:
 
 #if EL_PLAT_IOS || EL_PLAT_OSX
 
-// Metal Shaing Language
 class MSLShader final : public GraphicsShader
 {
 public:
@@ -111,22 +116,5 @@ private:
 };
 
 #endif
-
-class GraphicsProgramDesc final
-{
-public:
-
-	GraphicsProgramDesc();
-};
-
-class GraphicsProgram
-{
-public:
-
-	GraphicsProgram();
-	virtual ~GraphicsProgram();
-
-	virtual const GraphicsProgramDesc& getGraphicsProgramDesc() const noexcept = 0;
-};
 
 } // namespace el {

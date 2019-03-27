@@ -3,43 +3,53 @@
 #include <stdint.h>
 
 #include "gl.h"
+#include "shader_gl.h"
 
 namespace el {
-namespace gl {
 
-namespace shader {
-	typedef GLuint Handle;
-}
-
-namespace program
+class GraphicsProgramDesc final
 {
-#if 0
-	struct Handle {
-		Handle(uint32_t idx) : _index(idx) {}
-		uint32_t _index;
-	};
-#else
-	typedef GLuint Handle;
-#endif
+public:
 
-	const Handle kUninitialized = Handle(0);
+	GraphicsProgramDesc();
 
-	bool isInitialized(const Handle& h);
-	Handle create(const shader::Handle& vertex, const shader::Handle& fragment);
-	void destroy(Handle& handle);
+	void addShader(GraphicsShaderPtr ptr);
 
-#if 0
-	inline bool operator==(const program::Handle& a, const program::Handle& b)
-	{
-		return a._index == b._index;
-	}
+	const GraphicsShaders& getShaders() const;
 
-	inline bool operator!=(const program::Handle& a, const program::Handle& b)
-	{
-		return !(a == b);
-	}
-#endif
-} // namespace program {
+private:
+
+	GraphicsShaders _shaders;
+};
+
+class GraphicsProgram
+{
+public:
+
+	GraphicsProgram();
+	virtual ~GraphicsProgram();
+
+	virtual const GraphicsProgramDesc& getGraphicsProgramDesc() const noexcept = 0;
+};
+
+class GLProgram final : public GraphicsProgram
+{
+public:
+
+	GLProgram();
+	~GLProgram();
+
+	bool create(const GraphicsProgramDesc& desc);
+	void destory();
+
+	GLuint GetID() const;
+
+	const GraphicsProgramDesc& getGraphicsProgramDesc() const noexcept;
+
+private:
+
+	GraphicsProgramDesc _desc;
+	GLuint _id;
+};
 
 } // namespace el {
-} // namespace gl {

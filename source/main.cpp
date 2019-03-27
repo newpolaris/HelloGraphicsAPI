@@ -158,7 +158,7 @@ static void APIENTRY gl_debug_callback(GLenum source,
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
-    GLuint texture, program, vertex_buffer;
+    GLuint texture, vertex_buffer;
     GLint mvp_location, vpos_location, color_location, texture_location;
 
     glfwSetErrorCallback(error_callback);
@@ -204,10 +204,9 @@ int main(int argc, char** argv)
 
 	using namespace el;
 
-	typedef std::shared_ptr<GraphicsShader> GraphicsShaderPtr;
-
 	GraphicsShaderPtr vertex_shader;
 	GraphicsShaderPtr fragment_shader;
+	GraphicsProgramPtr program;
 
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
@@ -247,22 +246,31 @@ int main(int argc, char** argv)
 		vertex_shader = createShader(vertex_desc);
 		fragment_shader = createShader(fragment_desc);
 
-        program = glCreateProgram();
-		glAttachShader(program, std::dynamic_pointer_cast<GLShader>(vertex_shader)->getID());
-        glAttachShader(program, std::dynamic_pointer_cast<GLShader>(fragment_shader)->getID());
-        glLinkProgram(program);
+		GraphicsProgramDesc program_desc;
+		program_desc.addShader(vertex_shader);
+		program_desc.addShader(fragment_shader);
 
-        mvp_location = glGetUniformLocation(program, "MVP");
-        color_location = glGetUniformLocation(program, "color");
-        texture_location = glGetUniformLocation(program, "texture");
-        vpos_location = glGetAttribLocation(program, "vPos");
+		auto createProgram = [](const GraphicsProgramDesc& desc) {
+			auto program = std::make_shared<GLProgram>();
+			program->create(desc);
+			return program;
+		};
+
+		program = createProgram(program_desc);
+		auto program_id = std::static_pointer_cast<GLProgram>(program)->GetID();
+
+        mvp_location = glGetUniformLocation(program_id, "MVP");
+        color_location = glGetUniformLocation(program_id, "color");
+        texture_location = glGetUniformLocation(program_id, "texture");
+        vpos_location = glGetAttribLocation(program_id, "vPos");
 
         glGenBuffers(1, &vertex_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     }
 
-    glUseProgram(program);
+	auto program_id = std::static_pointer_cast<GLProgram>(program)->GetID();
+    glUseProgram(program_id);
     glUniform1i(texture_location, 0);
 
     glEnable(GL_TEXTURE_2D);
@@ -296,7 +304,7 @@ int main(int argc, char** argv)
 
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
-    glUseProgram(program);
+    glUseProgram(program_id);
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -336,6 +344,9 @@ int main(int argc, char** argv)
 
         glfwPollEvents();
     }
+
+	std::static_pointer_cast<GLShader>(vertex_shader)->destroy(program_id);
+	std::static_pointer_cast<GLShader>(fragment_shader)->destroy(program_id);
 
     glfwTerminate();
     exit(EXIT_SUCCESS);
