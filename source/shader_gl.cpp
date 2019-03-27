@@ -6,9 +6,24 @@
 #include <cassert>
 
 namespace el {
-namespace gl {
+
+GLenum gl::getShaderStage(GraphicsShaderStageFlagBits stage)
+{
+	switch (stage) {
+	case GraphicsShaderStageVertexBit:
+		return GL_VERTEX_SHADER;
+	case GraphicsShaderStageFragmentBit:
+		return GL_FRAGMENT_SHADER;
+	default:
+		assert(false);
+	}
+	return GraphicsShaderStageAll;
+}
+
+namespace shader {
 
 	typedef GLuint Handle;
+
 	const Handle kUninitialized = 0;
 
 	bool isInitialized(const Handle& handle);
@@ -54,8 +69,7 @@ namespace gl {
 			handle = 0;
 		}
 	}
-} // namespace gl {
-
+} // namespace shader {
 
 GraphicsShaderDesc::GraphicsShaderDesc() : _stage(GraphicsShaderStageFlagBitsMaxEnum)
 {
@@ -100,23 +114,12 @@ GLShader::~GLShader()
 void GLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
 {
 	_stage = stage;
-	auto getShaderStage = [](GraphicsShaderStageFlagBits stage) -> GLenum {
-		switch (stage) {
-		case GraphicsShaderStageVertexBit:
-			return GL_VERTEX_SHADER;
-		case GraphicsShaderStageFragmentBit:
-			return GL_FRAGMENT_SHADER;
-		default:
-			assert(false);
-		}
-		return GraphicsShaderStageAll;
-	};
-	_id = gl::create(getShaderStage(stage), shaderCode);
+	_id = shader::create(gl::getShaderStage(stage), shaderCode);
 }
 
 void GLShader::destroy(gl::program::Handle program)
 {
-	gl::destroy(program, _id);
+	shader::destroy(program, _id);
 }
 
 GLuint GLShader::getID() const

@@ -5,41 +5,33 @@
 
 namespace el {
 namespace gl {
+namespace program {
 	typedef GLuint Handle;
 	const Handle kUninitialized = Handle(0);
-
-	bool isInitialized(const Handle& h);
-	Handle create(const GLuint vertex, const GLuint fragment);
-	void destroy(Handle& handle);
-
 
 	bool isInitialized(const Handle& h)
 	{
 		return h != kUninitialized;
 	}
 
-	Handle create(const GLuint vertex, const GLuint fragment)
+	Handle create(const std::vector<GLuint>& shaderIDs)
 	{
 		GLuint id = gl::CreateProgram();
 
 		GLint status = 0;
-		if (vertex != 0)
+
+		for (auto& shader : shaderIDs)
+			gl::AttachShader(id, shader);
+		gl::LinkProgram(id);
+
+		GL_CHECK(glGetProgramiv(id, GL_LINK_STATUS, &status));
+		if (status == GL_FALSE || EL_CONFIG_DEBUG)
 		{
-			gl::AttachShader(id, vertex);
-			if (fragment != 0)
-				gl::AttachShader(id, fragment);
-			gl::LinkProgram(id);
-			GL_CHECK(glGetProgramiv(id, GL_LINK_STATUS, &status));
-
-			if (status == GL_FALSE || EL_CONFIG_DEBUG)
-			{
-				const uint32_t kBufferSize = 512u;
-				char log[kBufferSize];
-				GL_CHECK(glGetProgramInfoLog(id, sizeof(log), nullptr, log));
-				EL_TRACE("%d: %s", status, log);
-			}
+			const uint32_t kBufferSize = 512u;
+			char log[kBufferSize];
+			GL_CHECK(glGetProgramInfoLog(id, sizeof(log), nullptr, log));
+			EL_TRACE("%d: %s", status, log);
 		}
-
 		if (status == GL_FALSE)
 		{
 			gl::DeleteProgram(id);
@@ -57,6 +49,7 @@ namespace gl {
 		}
 	}
 
+} // namespace program {
 } // namespace gl {
 
 GraphicsProgram::GraphicsProgram()
@@ -91,13 +84,17 @@ GLProgram::~GLProgram()
 
 bool GLProgram::create(const GraphicsProgramDesc& desc)
 {
-	// GLuint shaders[GraphicsShaderStageAll];
+	std::vector<GLuint> shaderIDs;
 	for (auto& s : desc.getShaders())
 	{
 		auto shader = std::static_pointer_cast<GLShader>(s);
-		// gl::create()
+		shaderIDs.push_back(shader->getID());
 	}
+	GLuint id = gl::program::create(shaderIDs);
+	if (id == 0)
+		return false;
 
+	_id = id;
 	_desc = desc;
 
 	return true;
@@ -112,9 +109,8 @@ GLuint GLProgram::GetID() const
 	return _id;
 }
 
-const GraphicsProgramDesc & GLProgram::getGraphicsProgramDesc() const noexcept
+const GraphicsProgramDesc& GLProgram::getGraphicsProgramDesc() const noexcept
 {
 	return _desc;
 }
 } // namespace el {
-

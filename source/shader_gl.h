@@ -37,6 +37,9 @@ enum GraphicsShaderStageFlagBits
 };
 
 namespace gl {
+
+	GLenum getShaderStage(GraphicsShaderStageFlagBits stage);
+
 	namespace program
 	{
 		typedef GLuint Handle;
