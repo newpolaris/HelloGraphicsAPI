@@ -33,9 +33,11 @@
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
+#include <memory>
 
 #include "getopt.h"
 #include "linmath.h"
+#include "shader_gl.h"
 #include "program_gl.h"
 
 static const char* vertex_shader_text =
@@ -200,12 +202,18 @@ int main(int argc, char** argv)
 	}
 #endif
 
+	using namespace el;
+
+	typedef std::shared_ptr<GraphicsShader> GraphicsShaderPtr;
+
+	GraphicsShaderPtr vertex_shader;
+	GraphicsShaderPtr fragment_shader;
+
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
         int x, y;
         char pixels[16 * 16];
-        GLuint vertex_shader, fragment_shader;
 
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
@@ -222,18 +230,26 @@ int main(int argc, char** argv)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-        vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertex_shader, 1, &vertex_shader_text, NULL);
-        glCompileShader(vertex_shader);
+		GraphicsShaderDesc vertex_desc;
+		vertex_desc.setStage(GraphicsShaderStageVertexBit);
+		vertex_desc.setShaderCode(vertex_shader_text);
 
-        fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragment_shader, 1, &fragment_shader_text, NULL);
-        glCompileShader(fragment_shader);
+		GraphicsShaderDesc fragment_desc;
+		fragment_desc.setStage(GraphicsShaderStageFragmentBit);
+		fragment_desc.setShaderCode(fragment_shader_text);
 
+		auto createShader = [](const GraphicsShaderDesc& desc) {
+			auto shader = std::make_shared<GLShader>();
+			shader->create(desc.getStage(), desc.getShaderCode());
+			return shader;
+		};
+
+		vertex_shader = createShader(vertex_desc);
+		fragment_shader = createShader(fragment_desc);
 
         program = glCreateProgram();
-        glAttachShader(program, vertex_shader);
-        glAttachShader(program, fragment_shader);
+		glAttachShader(program, std::dynamic_pointer_cast<GLShader>(vertex_shader)->getID());
+        glAttachShader(program, std::dynamic_pointer_cast<GLShader>(fragment_shader)->getID());
         glLinkProgram(program);
 
         mvp_location = glGetUniformLocation(program, "MVP");

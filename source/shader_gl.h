@@ -1,24 +1,132 @@
 #pragma once
 
+#include <memory>
+
+#include "predefine.h"
 #include "gl.h"
+#include "mtlpp.hpp"
 
 namespace el {
-namespace gl {
 
+// From vulkan spec.
+enum GraphicsShaderStageFlagBits
+{
+    GraphicsShaderStageVertexBit = 0x00000001,
+    GraphicsShaderStageTessellationControlBit = 0x00000002,
+    GraphicsShaderStageTessellationEvaluationBit = 0x00000004,
+    GraphicsShaderStageGeometryBit = 0x00000008,
+    GraphicsShaderStageFragmentBit = 0x00000010,
+    GraphicsShaderStageComputeBit = 0x00000020,
+    GraphicsShaderStageAllGraphics = 0x0000001F,
+    GraphicsShaderStageAll = 0x7FFFFFFF,
+    GraphicsShaderStageRaygenBit = 0x00000100,
+    GraphicsShaderStageAnyHitBit = 0x00000200,
+    GraphicsShaderStageClosestHitBit = 0x00000400,
+    GraphicsShaderStageMissBit = 0x00000800,
+    GraphicsShaderStageIntersectionBit = 0x00001000,
+    GraphicsShaderStageCallableBit = 0x00002000,
+    GraphicsShaderStageTaskBit = 0x00000040,
+    GraphicsShaderStageMeshBit = 0x00000080,
+    GraphicsShaderStageFlagBitsMaxEnum = 0x7FFFFFFF
+};
+
+namespace gl {
 	namespace program
 	{
 		typedef GLuint Handle;
 	}
+}
 
-	namespace shader
-	{
-		typedef GLuint Handle;
-		const Handle kUninitialized = 0;
+class GraphicsShaderDesc final
+{
+public:
 
-		bool isInitialized(const Handle& handle);
-		Handle create(GLenum type, const char* shaderCode);
-		void destroy(const program::Handle& phandle, Handle& handle);
-	}
+	GraphicsShaderDesc();
+
+	void setStage(GraphicsShaderStageFlagBits stage);
+	GraphicsShaderStageFlagBits getStage() const;
+
+	void setShaderCode(const char* code);
+	const char* getShaderCode() const;
+
+private:
+
+	GraphicsShaderStageFlagBits _stage;
+	const char* _shaderCode;
+};
+
+class GraphicsShader
+{
+public:
+
+	GraphicsShader();
+	virtual ~GraphicsShader();
+
+	virtual const GraphicsShaderDesc& getGraphicsShaderDesc() const noexcept = 0;
+
+private:
+
+	GraphicsShader(const GraphicsShader&) noexcept = delete;
+	GraphicsShader& operator=(const GraphicsShader&) noexcept = delete;
+};
+
+class GLShader final : public GraphicsShader
+{
+public:
+
+	GLShader();
+	~GLShader();
+
+	void create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
+	void destroy(gl::program::Handle program);
+
+	GLuint getID() const;
+
+	virtual const GraphicsShaderDesc& getGraphicsShaderDesc() const noexcept;
+
+private:
+
+	GLuint _id;
+	GraphicsShaderStageFlagBits _stage;
+	GraphicsShaderDesc _desc;
+};
+
+#if EL_PLAT_IOS || EL_PLAT_OSX
+
+// Metal Shaing Language
+class MSLShader final : public GraphicsShader
+{
+public:
+
+	MSLShader();
+	~MSLShader();
+
+	void create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
+	void destroy();
+
+private:
+
+	mtlpp::Library _library;
+	mtlpp::Function _function;
+};
+
+#endif
+
+class GraphicsProgramDesc final
+{
+public:
+
+	GraphicsProgramDesc();
+};
+
+class GraphicsProgram
+{
+public:
+
+	GraphicsProgram();
+	virtual ~GraphicsProgram();
+
+	virtual const GraphicsProgramDesc& getGraphicsProgramDesc() const noexcept = 0;
+};
 
 } // namespace el {
-} // namespace gl {
