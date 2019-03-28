@@ -1,4 +1,4 @@
-#include "Shader_gl.h"
+#include "gl_shader.h"
 #include "gl.h"
 #include "predefine.h"
 #include "debug.h"

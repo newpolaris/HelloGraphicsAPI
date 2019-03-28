@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #include "gl.h"
-#include "shader_gl.h"
+#include "gl_shader.h"
 
 namespace el {
 
@@ -42,7 +42,8 @@ public:
 	bool create(const GraphicsProgramDesc& desc);
 	void destory();
 
-	GLuint GetID() const;
+	GLuint getID() const;
+	void use() const;
 
 	const GraphicsProgramDesc& getGraphicsProgramDesc() const noexcept;
 
