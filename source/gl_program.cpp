@@ -1,4 +1,4 @@
-#include "program_gl.h"
+#include "gl_program.h"
 
 #include "gl.h"
 #include "debug.h"
@@ -102,11 +102,17 @@ bool GLProgram::create(const GraphicsProgramDesc& desc)
 
 void GLProgram::destory()
 {
+	gl::program::destroy(_id);
 }
 
-GLuint GLProgram::GetID() const
+GLuint GLProgram::getID() const
 {
 	return _id;
+}
+
+void GLProgram::use() const
+{
+	GL_CHECK(glUseProgram(_id));
 }
 
 const GraphicsProgramDesc& GLProgram::getGraphicsProgramDesc() const noexcept

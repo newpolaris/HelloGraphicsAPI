@@ -37,8 +37,8 @@
 
 #include "getopt.h"
 #include "linmath.h"
-#include "shader_gl.h"
-#include "program_gl.h"
+#include "gl_shader.h"
+#include "gl_program.h"
 
 static const char* vertex_shader_text =
 "#version 110\n"
@@ -196,7 +196,6 @@ namespace el
 		{
 		}
 
-		void 
 	};
 }
 
@@ -290,8 +289,9 @@ int main(int argc, char** argv)
 		GraphicsProgramDesc program_desc;
 		program_desc.addShader(vertex_shader);
 		program_desc.addShader(fragment_shader);
+
 		program = device->createProgram(program_desc);
-		auto program_id = std::static_pointer_cast<GLProgram>(program)->GetID();
+		auto program_id = std::static_pointer_cast<GLProgram>(program)->getID();
 
         mvp_location = glGetUniformLocation(program_id, "MVP");
         color_location = glGetUniformLocation(program_id, "color");
@@ -303,8 +303,10 @@ int main(int argc, char** argv)
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     }
 
-	auto program_id = std::static_pointer_cast<GLProgram>(program)->GetID();
-    glUseProgram(program_id);
+	auto gl_program = std::static_pointer_cast<GLProgram>(program);
+
+	gl_program->use();
+
     glUniform1i(texture_location, 0);
 
     glEnable(GL_TEXTURE_2D);
@@ -338,7 +340,7 @@ int main(int argc, char** argv)
 
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
-    glUseProgram(program_id);
+	gl_program->use();
 
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -369,7 +371,7 @@ int main(int argc, char** argv)
             glViewport(0, 0, width, height);
 
             mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
-            glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+            glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*)mvp);
             glUniform3fv(color_location, 1, colors[i]);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
@@ -379,8 +381,8 @@ int main(int argc, char** argv)
         glfwPollEvents();
     }
 
-	std::static_pointer_cast<GLShader>(vertex_shader)->destroy(program_id);
-	std::static_pointer_cast<GLShader>(fragment_shader)->destroy(program_id);
+	std::static_pointer_cast<GLShader>(vertex_shader)->destroy(gl_program->getID());
+	std::static_pointer_cast<GLShader>(fragment_shader)->destroy(gl_program->getID());
 
     glfwTerminate();
     exit(EXIT_SUCCESS);

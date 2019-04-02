@@ -3,7 +3,8 @@
 #include "debug.h"
 
 namespace el {
-	bool gl::error_handler(const char* file, int line) {
+	bool gl::error_handler(const char* file, int line) 
+	{
 		GLenum error = glGetError();
 		if (error == GL_NO_ERROR)
 			return true;
