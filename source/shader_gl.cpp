@@ -111,10 +111,13 @@ GLShader::~GLShader()
 {
 }
 
-void GLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
+bool GLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
 {
 	_stage = stage;
 	_id = shader::create(gl::getShaderStage(stage), shaderCode);
+	if (_id == 0)
+		return false;
+	return true;
 }
 
 void GLShader::destroy(gl::program::Handle program)
@@ -142,7 +145,7 @@ MSLShader::~MSLShader()
 {
 }
 
-void MSLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
+bool MSLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
 {
 	mtlpp::Device device = mtlpp::Device::CreateSystemDefaultDevice();
 
@@ -151,6 +154,7 @@ void MSLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode
 
     _function = _library.NewFunction("vertFunc");
     assert(_function);
+	return true;
 }
 
 void MSLShader::destroy()

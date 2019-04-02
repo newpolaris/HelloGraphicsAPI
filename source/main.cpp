@@ -155,6 +155,51 @@ static void APIENTRY gl_debug_callback(GLenum source,
 	EL_TRACE("%s", output.str().c_str());
 }
 
+namespace el
+{
+	typedef std::shared_ptr<class GraphicsDevice> GraphicsDevicePtr;
+	typedef std::shared_ptr<class GraphicsContext> GraphicsContextPtr;
+
+	class GraphicsDevice
+	{
+	public:
+
+		GraphicsProgramPtr createProgram(const GraphicsProgramDesc& desc)
+		{
+			auto program = std::make_shared<GLProgram>();
+			if (program->create(desc))
+				return program;
+			return nullptr;
+		};
+
+
+		GraphicsShaderPtr createShader(const GraphicsShaderDesc& desc) 
+		{
+			auto shader = std::make_shared<GLShader>();
+			if (shader->create(desc.getStage(), desc.getShaderCode()))
+				return shader;
+			return nullptr;
+		};
+
+	};
+
+	GraphicsDevicePtr createDevice()
+	{
+		return std::make_shared<GraphicsDevice>();
+	}
+
+	class GraphicsContext
+	{
+	public:
+
+		GraphicsContext()
+		{
+		}
+
+		void 
+	};
+}
+
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
@@ -204,6 +249,8 @@ int main(int argc, char** argv)
 
 	using namespace el;
 
+	GraphicsDevicePtr device = createDevice();
+
 	GraphicsShaderPtr vertex_shader;
 	GraphicsShaderPtr fragment_shader;
 	GraphicsProgramPtr program;
@@ -237,26 +284,13 @@ int main(int argc, char** argv)
 		fragment_desc.setStage(GraphicsShaderStageFragmentBit);
 		fragment_desc.setShaderCode(fragment_shader_text);
 
-		auto createShader = [](const GraphicsShaderDesc& desc) {
-			auto shader = std::make_shared<GLShader>();
-			shader->create(desc.getStage(), desc.getShaderCode());
-			return shader;
-		};
-
-		vertex_shader = createShader(vertex_desc);
-		fragment_shader = createShader(fragment_desc);
+		vertex_shader = device->createShader(vertex_desc);
+		fragment_shader = device->createShader(fragment_desc);
 
 		GraphicsProgramDesc program_desc;
 		program_desc.addShader(vertex_shader);
 		program_desc.addShader(fragment_shader);
-
-		auto createProgram = [](const GraphicsProgramDesc& desc) {
-			auto program = std::make_shared<GLProgram>();
-			program->create(desc);
-			return program;
-		};
-
-		program = createProgram(program_desc);
+		program = device->createProgram(program_desc);
 		auto program_id = std::static_pointer_cast<GLProgram>(program)->GetID();
 
         mvp_location = glGetUniformLocation(program_id, "MVP");

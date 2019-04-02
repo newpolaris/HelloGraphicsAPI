@@ -86,7 +86,7 @@ public:
 	GLShader();
 	~GLShader();
 
-	void create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
+	bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
 	void destroy(gl::program::Handle program);
 
 	GLuint getID() const;
