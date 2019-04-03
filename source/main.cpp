@@ -181,6 +181,13 @@ namespace el
 			return nullptr;
 		};
 
+		GraphicsTexturePtr createTexture(const GraphicsTextureDesc& desc)
+		{
+			auto texture = std::make_shared<GLTexture>();
+			if (texture->create(desc))
+				return texture;
+			return nullptr;
+		}
 	};
 
 	GraphicsDevicePtr createDevice()
@@ -198,6 +205,183 @@ namespace el
 
 	};
 }
+
+namespace el
+{
+	enum GraphicsDeviceType
+	{
+		GraphicsDeviceTypeD3D9 = 0,
+		GraphicsDeviceTypeD3D11 = 1,
+		GraphicsDeviceTypeD3D12 = 2,
+		GraphicsDeviceTypeOpenGL = 3,
+		GraphicsDeviceTypeOpenGLCore = 4,
+		GraphicsDeviceTypeOpenGLES2 = 5,
+		GraphicsDeviceTypeOpenGLES3 = 6,
+		GraphicsDeviceTypeOpenGLES31 = 7,
+		GraphicsDeviceTypeOpenGLES32 = 8,
+		GraphicsDeviceTypeVulkan = 9,
+		GraphicsDeviceTypeFirst = GraphicsDeviceTypeD3D9,
+		GraphicsDeviceTypeLast = GraphicsDeviceTypeVulkan,
+	};
+
+	enum GraphicsTextureTarget {
+		GraphicsTextureTarget1D = 0,
+		GraphicsTextureTarget1DArray,
+		GraphicsTextureTarget2D,
+		GraphicsTextureTarget2DArray,
+		GraphicsTextureTarget3D,
+		GraphicsTextureTargetRect,
+		GraphicsTextureTargetRectArray,
+		GraphicsTextureTargetCube,
+		GraphicsTextureTargetCubeArray,
+		GraphicsTextureTargetFirst = GraphicsTextureTarget1D,
+		GraphicsTextureTargetLast = GraphicsTextureTargetCubeArray
+	};
+
+	enum GraphicsDataType
+	{
+		GraphicsDataTypeNone = 0,
+		GraphicsDataTypeTransferSrc = 1,
+		GraphicsDataTypeTransferDst = 2,
+		GraphicsDataTypeUniformTexelBuffer = 3,
+		GraphicsDataTypeUniformBuffer = 4,
+		GraphicsDataTypeStorageTexelBuffer = 5,
+		GraphicsDataTypeStorageBuffer = 6,
+		GraphicsDataTypeStorageVertexBuffer = 7,
+		GraphicsDataTypeStorageIndexBuffer = 8,
+	};
+
+	enum GraphicsUsageFlagBits
+	{
+		GraphicsUsageFlagReadBit = 0x00000001,
+		GraphicsUsageFlagWriteBit = 0x00000002,
+		GraphicsUsageFlagPersistentBit = 0x00000004,
+		GraphicsUsageFlagCoherentBit = 0x00000008,
+		GraphicsUsageFlagFlushExplicitBit = 0x00000010,
+		GraphicsUsageFlagDynamicStorageBit = 0x00000020,
+		GraphicsUsageFlagClientStorageBit = 0x00000040
+	};
+
+	typedef std::uint32_t GraphicsUsageFlags;
+
+	typedef std::shared_ptr<class GraphicsTexture> GraphicsTexturePtr;
+
+	class GraphicsTexture
+	{
+	public:
+
+		GraphicsTexture();
+		virtual ~GraphicsTexture();
+	};
+
+	GraphicsTexture::GraphicsTexture()
+	{
+	}
+
+	GraphicsTexture::~GraphicsTexture()
+	{
+	}
+
+	class GraphicsTextureDesc final
+	{
+	public:
+
+		GraphicsTextureDesc();
+
+	private:
+
+		size_t _width;
+		size_t _height;
+		size_t _depth;
+	};
+
+	GraphicsTextureDesc::GraphicsTextureDesc() :
+		_width(0),
+		_height(0),
+		_depth(1)
+	{
+	}
+
+	class GLTexture final : public GraphicsTexture
+	{
+	public:
+
+		GLTexture();
+		~GLTexture();
+
+		bool create(const GraphicsTextureDesc& desc);
+		void destroy();
+
+		void bind(GLuint unit) const; 
+		void unbind(GLuint unit) const; 
+
+	private:
+		
+		GLuint _textureID;
+		GLenum _target;
+	};
+
+	GLTexture::GLTexture() : 
+		_textureID(0u), 
+		_target(0u)
+	{
+	}
+
+	GLTexture::~GLTexture()
+	{
+	}
+
+	bool GLTexture::create(const GraphicsTextureDesc& desc)
+	{
+		_target = GL_TEXTURE_2D;
+
+		GL_CHECK(glGenTextures(1, &_textureID));
+		GL_CHECK(glBindTexture(GL_TEXTURE_2D, _textureID));
+
+        int x, y;
+        char pixels[16 * 16];
+
+        srand((unsigned int)glfwGetTimerValue());
+
+        for (y = 0;  y < 16;  y++)
+        {
+            for (x = 0;  x < 16;  x++)
+                pixels[y * 16 + x] = rand() % 256;
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 16, 16, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	}
+
+	void GLTexture::destroy()
+	{
+		// No need to unboud before deleting and silently ignores 0
+		if (!_textureID)
+		{
+			GL_CHECK(glDeleteTextures(1, &_textureID));
+			_textureID = 0;
+		}
+
+		// m_Format = GL_INVALID_ENUM;
+		// m_Target = GL_INVALID_ENUM;
+	}
+
+	void GLTexture::bind(GLuint unit) const
+	{
+		EL_ASSERT(_textureID != 0u);
+		GL_CHECK(glActiveTexture(GL_TEXTURE0 + unit));
+		GL_CHECK(glBindTexture(_target, _textureID));
+	}
+
+	void GLTexture::unbind(GLuint unit) const
+	{
+		EL_ASSERT(_textureID != 0u);
+		GL_CHECK(glActiveTexture(GL_TEXTURE0 + unit));
+		GL_CHECK(glBindTexture(_target, 0));
+	}
+
+} // namespace el
 
 int main(int argc, char** argv)
 {
@@ -253,23 +437,19 @@ int main(int argc, char** argv)
 	GraphicsShaderPtr vertex_shader;
 	GraphicsShaderPtr fragment_shader;
 	GraphicsProgramPtr program;
+	GraphicsTexturePtr texture;
 
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
-        int x, y;
-        char pixels[16 * 16];
+		GraphicsTextureDesc texture_desc;
+		texture_desc.setTarget(GraphicsTextureTarget2D);
+		texture_desc.setWidth(16);
+		texture_desc.setHeight(16);
 
+		texture = device->createTexture(texture_desc);
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
-
-        srand((unsigned int) glfwGetTimerValue());
-
-        for (y = 0;  y < 16;  y++)
-        {
-            for (x = 0;  x < 16;  x++)
-                pixels[y * 16 + x] = rand() % 256;
-        }
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 16, 16, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -310,6 +490,8 @@ int main(int argc, char** argv)
     glUniform1i(texture_location, 0);
 
     glEnable(GL_TEXTURE_2D);
+
+	glActiveTexture(GL_TEXTURE0 + 0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
