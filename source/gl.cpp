@@ -22,7 +22,7 @@ namespace el {
 			case GL_CONTEXT_LOST:					message = "GL_CONTEXT_LOST"; break;
 			}
 
-			EL_TRACE("GL_ERROR: %d %s %s:%d\n", error, message.c_str(), file, line);
+			EL_TRACE("GL_ERROR: %d %s %s(%d)\n", error, message.c_str(), file, line);
 			debug_break();
 
 		} while (GL_NO_ERROR != (error = glGetError()));

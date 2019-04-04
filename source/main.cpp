@@ -39,6 +39,7 @@
 #include "linmath.h"
 #include "gl_shader.h"
 #include "gl_program.h"
+#include "graphics_device.h"
 
 static const char* vertex_shader_text =
 "#version 110\n"
@@ -157,37 +158,6 @@ static void APIENTRY gl_debug_callback(GLenum source,
 
 namespace el
 {
-	typedef std::shared_ptr<class GraphicsDevice> GraphicsDevicePtr;
-	typedef std::shared_ptr<class GraphicsContext> GraphicsContextPtr;
-
-	class GraphicsDevice
-	{
-	public:
-
-		GraphicsProgramPtr createProgram(const GraphicsProgramDesc& desc)
-		{
-			auto program = std::make_shared<GLProgram>();
-			if (program->create(desc))
-				return program;
-			return nullptr;
-		};
-
-
-		GraphicsShaderPtr createShader(const GraphicsShaderDesc& desc) 
-		{
-			auto shader = std::make_shared<GLShader>();
-			if (shader->create(desc.getStage(), desc.getShaderCode()))
-				return shader;
-			return nullptr;
-		};
-
-	};
-
-	GraphicsDevicePtr createDevice()
-	{
-		return std::make_shared<GraphicsDevice>();
-	}
-
 	class GraphicsContext
 	{
 	public:
@@ -196,6 +166,9 @@ namespace el
 		{
 		}
 
+		void setPipeline()
+		{
+		}
 	};
 }
 
@@ -248,7 +221,10 @@ int main(int argc, char** argv)
 
 	using namespace el;
 
-	GraphicsDevicePtr device = createDevice();
+	GraphicsDeviceDesc deviceDesc;
+	deviceDesc.setType(GraphicsDeviceTypeOpenGL);
+
+	GraphicsDevicePtr device = createDevice(deviceDesc);
 
 	GraphicsShaderPtr vertex_shader;
 	GraphicsShaderPtr fragment_shader;

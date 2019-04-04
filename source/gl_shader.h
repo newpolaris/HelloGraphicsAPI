@@ -6,12 +6,9 @@
 #include "predefine.h"
 #include "gl.h"
 #include "mtlpp.hpp"
+#include "graphics_types.h"
 
 namespace el {
-
-typedef std::shared_ptr<class GraphicsShader> GraphicsShaderPtr;
-typedef std::shared_ptr<class GraphicsProgram> GraphicsProgramPtr;
-typedef std::vector<GraphicsShaderPtr> GraphicsShaders;
 
 // From vulkan spec.
 enum GraphicsShaderStageFlagBits
