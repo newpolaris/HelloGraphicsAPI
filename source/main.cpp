@@ -173,17 +173,20 @@ namespace el {
 		{
 		}
 
-		void setPipeline()
-		{
-		}
+		void setViewport();
 	};
-} // namespace el; {
+
+	void GraphicsContext::setViewport()
+	{
+	}
+
+} // namespace e {
 
 
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
-    GLuint texture_, vertex_buffer;
+    GLuint vertex_buffer;
     GLint mvp_location, vpos_location, color_location, texture_location;
 
     glfwSetErrorCallback(error_callback);
@@ -248,7 +251,6 @@ int main(int argc, char** argv)
 		texture_desc.setHeight(16);
 
 		texture = device->createTexture(texture_desc);
-		texture_ = std::static_pointer_cast<GLTexture>(texture)->getTextureID();
 
 		GraphicsShaderDesc vertex_desc;
 		vertex_desc.setStage(GraphicsShaderStageVertexBit);
@@ -278,16 +280,11 @@ int main(int argc, char** argv)
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     }
 
+	const GLint slot0 = 0;
+
 	auto gl_program = std::static_pointer_cast<GLProgram>(program);
-
 	gl_program->use();
-
-    glUniform1i(texture_location, 0);
-
-    glEnable(GL_TEXTURE_2D);
-
-	glActiveTexture(GL_TEXTURE0 + 0);
-    glBindTexture(GL_TEXTURE_2D, texture_);
+	gl_program->setTexture(texture, texture_location, slot0);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glEnableVertexAttribArray(vpos_location);
@@ -318,10 +315,7 @@ int main(int argc, char** argv)
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
 	gl_program->use();
-
-    glEnable(GL_TEXTURE_2D);
-	glActiveTexture(GL_TEXTURE0 + 0);
-    glBindTexture(GL_TEXTURE_2D, texture_);
+	gl_program->setTexture(texture, texture_location, slot0);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glEnableVertexAttribArray(vpos_location);
@@ -349,8 +343,8 @@ int main(int argc, char** argv)
             glViewport(0, 0, width, height);
 
             mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
-            glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*)mvp);
-            glUniform3fv(color_location, 1, colors[i]);
+			gl_program->setUniform(mvp_location, mvp);
+			gl_program->setUniform(color_location, colors[i]);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
             glfwSwapBuffers(windows[i]);

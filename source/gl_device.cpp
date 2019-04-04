@@ -7,6 +7,9 @@ using namespace el;
 
 bool GLDevice::create(const GraphicsDeviceDesc& desc)
 {
+	// https://www.khronos.org/opengl/wiki/GLSL_:_common_mistakes#Enable_Or_Not_To_Enable
+	// For fixed pipeline
+	// glEnable(GL_TEXTURE_2D);
 	return true;
 }
 

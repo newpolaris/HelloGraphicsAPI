@@ -3,6 +3,7 @@
 #include "debug.h"
 #include "gl.h"
 #include "gl_shader.h"
+#include "gl_texture.h"
 
 namespace el {
 	namespace gl {
@@ -51,7 +52,8 @@ namespace el {
 			}
 
 		} // namespace program {
-	} // namespace gl {
+	}
+	// namespace gl {
 } // namespace el {
 
 using namespace el;
@@ -101,4 +103,30 @@ void GLProgram::use() const
 const GraphicsProgramDesc& GLProgram::getProgramDesc() const
 {
 	return _programDesc;
+}
+
+void GLProgram::setUniform(GLint location, const GLint& v0)
+{
+	GL_CHECK(glUniform1i(location, v0));
+}
+
+void GLProgram::setUniform(GLint location, const vec3& v0)
+{
+	GL_CHECK(glUniform3fv(location, 1, v0));
+}
+
+void GLProgram::setUniform(GLint location, const mat4x4& m0)
+{
+	GL_CHECK(glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat*)m0));
+}
+
+void GLProgram::setTexture(const GraphicsTexturePtr& texture, GLint location, GLenum unit)
+{
+	auto gl_texture = std::static_pointer_cast<GLTexture>(texture);
+	if (gl_texture != nullptr)
+	{
+		gl_texture->bind(unit);
+		setUniform(location, unit);
+	}
+	EL_ASSERT(gl_texture != nullptr);
 }
