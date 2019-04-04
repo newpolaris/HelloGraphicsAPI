@@ -37,9 +37,17 @@
 
 #include "getopt.h"
 #include "linmath.h"
-#include "gl_shader.h"
-#include "gl_program.h"
+
 #include "graphics_device.h"
+#include "graphics_texture.h"
+#include "graphics_types.h"
+#include "graphics_shader.h"
+#include "graphics_program.h"
+
+// TODO:
+#include "gl_program.h"
+#include "gl_shader.h"
+#include "gl_texture.h"
 
 static const char* vertex_shader_text =
 "#version 110\n"
@@ -156,8 +164,7 @@ static void APIENTRY gl_debug_callback(GLenum source,
 	EL_TRACE("%s", output.str().c_str());
 }
 
-namespace el
-{
+namespace el {
 	class GraphicsContext
 	{
 	public:
@@ -170,12 +177,13 @@ namespace el
 		{
 		}
 	};
-}
+} // namespace el; {
+
 
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
-    GLuint texture, vertex_buffer;
+    GLuint texture_, vertex_buffer;
     GLint mvp_location, vpos_location, color_location, texture_location;
 
     glfwSetErrorCallback(error_callback);
@@ -229,27 +237,18 @@ int main(int argc, char** argv)
 	GraphicsShaderPtr vertex_shader;
 	GraphicsShaderPtr fragment_shader;
 	GraphicsProgramPtr program;
+	GraphicsTexturePtr texture;
 
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
-        int x, y;
-        char pixels[16 * 16];
+		GraphicsTextureDesc texture_desc;
+		texture_desc.setTarget(GraphicsTextureTarget2D);
+		texture_desc.setWidth(16);
+		texture_desc.setHeight(16);
 
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-
-        srand((unsigned int) glfwGetTimerValue());
-
-        for (y = 0;  y < 16;  y++)
-        {
-            for (x = 0;  x < 16;  x++)
-                pixels[y * 16 + x] = rand() % 256;
-        }
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 16, 16, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		texture = device->createTexture(texture_desc);
+		texture_ = std::static_pointer_cast<GLTexture>(texture)->getTextureID();
 
 		GraphicsShaderDesc vertex_desc;
 		vertex_desc.setStage(GraphicsShaderStageVertexBit);
@@ -267,7 +266,7 @@ int main(int argc, char** argv)
 		program_desc.addShader(fragment_shader);
 
 		program = device->createProgram(program_desc);
-		auto program_id = std::static_pointer_cast<GLProgram>(program)->getID();
+		auto program_id = std::static_pointer_cast<GLProgram>(program)->getProgramID();
 
         mvp_location = glGetUniformLocation(program_id, "MVP");
         color_location = glGetUniformLocation(program_id, "color");
@@ -286,7 +285,9 @@ int main(int argc, char** argv)
     glUniform1i(texture_location, 0);
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texture);
+
+	glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, texture_);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glEnableVertexAttribArray(vpos_location);
@@ -319,7 +320,8 @@ int main(int argc, char** argv)
 	gl_program->use();
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texture);
+	glActiveTexture(GL_TEXTURE0 + 0);
+    glBindTexture(GL_TEXTURE_2D, texture_);
 
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glEnableVertexAttribArray(vpos_location);
@@ -357,8 +359,8 @@ int main(int argc, char** argv)
         glfwPollEvents();
     }
 
-	std::static_pointer_cast<GLShader>(vertex_shader)->destroy(gl_program->getID());
-	std::static_pointer_cast<GLShader>(fragment_shader)->destroy(gl_program->getID());
+	std::static_pointer_cast<GLShader>(vertex_shader)->destroy(gl_program->getProgramID());
+	std::static_pointer_cast<GLShader>(fragment_shader)->destroy(gl_program->getProgramID());
 
     glfwTerminate();
     exit(EXIT_SUCCESS);

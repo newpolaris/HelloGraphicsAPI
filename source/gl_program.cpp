@@ -1,80 +1,63 @@
 #include "gl_program.h"
 
-#include "gl.h"
 #include "debug.h"
+#include "gl.h"
+#include "gl_shader.h"
 
 namespace el {
-namespace gl {
-namespace program {
-	typedef GLuint Handle;
-	const Handle kUninitialized = Handle(0);
+	namespace gl {
+		namespace program {
+			typedef GLuint Handle;
+			const Handle kUninitialized = Handle(0);
 
-	bool isInitialized(const Handle& h)
-	{
-		return h != kUninitialized;
-	}
+			bool isInitialized(const Handle& h)
+			{
+				return h != kUninitialized;
+			}
 
-	Handle create(const std::vector<GLuint>& shaderIDs)
-	{
-		GLuint id = gl::CreateProgram();
+			Handle create(const std::vector<GLuint>& shaderIDs)
+			{
+				GLuint id = gl::CreateProgram();
 
-		GLint status = 0;
+				GLint status = 0;
 
-		for (auto& shader : shaderIDs)
-			gl::AttachShader(id, shader);
-		gl::LinkProgram(id);
+				for (auto& shader : shaderIDs)
+					gl::AttachShader(id, shader);
+				gl::LinkProgram(id);
 
-		GL_CHECK(glGetProgramiv(id, GL_LINK_STATUS, &status));
-		if (status == GL_FALSE || EL_CONFIG_DEBUG)
-		{
-			const uint32_t kBufferSize = 512u;
-			char log[kBufferSize];
-			GL_CHECK(glGetProgramInfoLog(id, sizeof(log), nullptr, log));
-			EL_TRACE("%d: %s", status, log);
-		}
-		if (status == GL_FALSE)
-		{
-			gl::DeleteProgram(id);
-			id = 0;
-		}
-		return Handle(id);
-	}
+				GL_CHECK(glGetProgramiv(id, GL_LINK_STATUS, &status));
+				if (status == GL_FALSE || EL_CONFIG_DEBUG)
+				{
+					const uint32_t kBufferSize = 512u;
+					char log[kBufferSize];
+					GL_CHECK(glGetProgramInfoLog(id, sizeof(log), nullptr, log));
+					EL_TRACE("%d: %s", status, log);
+				}
+				if (status == GL_FALSE)
+				{
+					gl::DeleteProgram(id);
+					id = 0;
+				}
+				return Handle(id);
+			}
 
-	void destroy(Handle& handle)
-	{
-		if (isInitialized(handle))
-		{
-			gl::DeleteProgram(handle);
-			handle = 0;
-		}
-	}
+			void destroy(Handle& handle)
+			{
+				if (isInitialized(handle))
+				{
+					gl::DeleteProgram(handle);
+					handle = 0;
+				}
+			}
 
-} // namespace program {
-} // namespace gl {
+		} // namespace program {
+	} // namespace gl {
+} // namespace el {
 
-GraphicsProgram::GraphicsProgram()
-{
-}
+using namespace el;
 
-GraphicsProgram::~GraphicsProgram()
-{
-}
-
-GraphicsProgramDesc::GraphicsProgramDesc()
-{
-}
-
-void GraphicsProgramDesc::addShader(GraphicsShaderPtr ptr) 
-{
-	_shaders.push_back(std::move(ptr));
-}
-
-const GraphicsShaders& GraphicsProgramDesc::getShaders() const
-{
-	return _shaders;
-}
-
-GLProgram::GLProgram() : _id(0)
+GLProgram::GLProgram() : 
+	_programID(0)
 {
 }
 
@@ -94,29 +77,28 @@ bool GLProgram::create(const GraphicsProgramDesc& desc)
 	if (id == 0)
 		return false;
 
-	_id = id;
-	_desc = desc;
+	_programID = id;
+	_programDesc = desc;
 
 	return true;
 }
 
 void GLProgram::destory()
 {
-	gl::program::destroy(_id);
+	gl::program::destroy(_programID);
 }
 
-GLuint GLProgram::getID() const
+GLuint GLProgram::getProgramID() const
 {
-	return _id;
+	return _programID;
 }
 
 void GLProgram::use() const
 {
-	GL_CHECK(glUseProgram(_id));
+	GL_CHECK(glUseProgram(_programID));
 }
 
-const GraphicsProgramDesc& GLProgram::getGraphicsProgramDesc() const noexcept
+const GraphicsProgramDesc& GLProgram::getProgramDesc() const
 {
-	return _desc;
+	return _programDesc;
 }
-} // namespace el {

@@ -2,55 +2,32 @@
 
 #include <stdint.h>
 
-#include "gl.h"
-#include "gl_shader.h"
+#include "graphics_types.h"
+#include "graphics_program.h"
+#include "gl_types.h"
 
 namespace el {
 
-class GraphicsProgramDesc final
-{
-public:
+	class GLProgram final : public GraphicsProgram
+	{
+	public:
 
-	GraphicsProgramDesc();
+		GLProgram();
+		~GLProgram();
 
-	void addShader(GraphicsShaderPtr ptr);
+		bool create(const GraphicsProgramDesc &desc);
+		void destory();
 
-	const GraphicsShaders& getShaders() const;
+		GLuint getProgramID() const;
 
-private:
+		void use() const;
 
-	GraphicsShaders _shaders;
-};
+		const GraphicsProgramDesc& getProgramDesc() const override;
 
-class GraphicsProgram
-{
-public:
+	private:
 
-	GraphicsProgram();
-	virtual ~GraphicsProgram();
-
-	virtual const GraphicsProgramDesc& getGraphicsProgramDesc() const noexcept = 0;
-};
-
-class GLProgram final : public GraphicsProgram
-{
-public:
-
-	GLProgram();
-	~GLProgram();
-
-	bool create(const GraphicsProgramDesc& desc);
-	void destory();
-
-	GLuint getID() const;
-	void use() const;
-
-	const GraphicsProgramDesc& getGraphicsProgramDesc() const noexcept;
-
-private:
-
-	GraphicsProgramDesc _desc;
-	GLuint _id;
-};
+		GLuint _programID;
+		GraphicsProgramDesc _programDesc;
+	};
 
 } // namespace el {

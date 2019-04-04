@@ -397,5 +397,5 @@ namespace el {
 	}
 #endif // _EMPTY_OUT
 
-} // namespace el
+} // namespace el {
 

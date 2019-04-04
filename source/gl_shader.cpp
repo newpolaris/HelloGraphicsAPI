@@ -1,34 +1,15 @@
 #include "gl_shader.h"
+#include "gl_types.h"
 #include "gl.h"
 #include "predefine.h"
 #include "debug.h"
-#include <vector>
-#include <cassert>
 
 namespace el {
-
-GLenum gl::getShaderStage(GraphicsShaderStageFlagBits stage)
-{
-	switch (stage) {
-	case GraphicsShaderStageVertexBit:
-		return GL_VERTEX_SHADER;
-	case GraphicsShaderStageFragmentBit:
-		return GL_FRAGMENT_SHADER;
-	default:
-		assert(false);
-	}
-	return GraphicsShaderStageAll;
-}
-
 namespace shader {
 
 	typedef GLuint Handle;
 
 	const Handle kUninitialized = 0;
-
-	bool isInitialized(const Handle& handle);
-	Handle create(GLenum type, const char* shaderCode);
-	void destroy(const el::gl::program::Handle& phandle, Handle& handle);
 
 	bool isInitialized(const Handle& handle)
 	{
@@ -38,7 +19,7 @@ namespace shader {
 	Handle create(GLenum type, const char* shaderCode)
 	{
 		GLuint id = gl::CreateShader(type);
-		assert(id != 0);
+		EL_ASSERT(id != 0);
 		if (id != 0)
 		{
 			gl::ShaderSource(id, 1, &shaderCode, nullptr);
@@ -70,38 +51,9 @@ namespace shader {
 		}
 	}
 } // namespace shader {
+} // namespace el {
 
-GraphicsShaderDesc::GraphicsShaderDesc() : _stage(GraphicsShaderStageFlagBitsMaxEnum)
-{
-}
-
-void GraphicsShaderDesc::setStage(GraphicsShaderStageFlagBits stage)
-{
-	_stage = stage;
-}
-
-GraphicsShaderStageFlagBits GraphicsShaderDesc::getStage() const
-{
-	return _stage;
-}
-
-void GraphicsShaderDesc::setShaderCode(const char* code)
-{
-	_shaderCode = code;
-}
-
-const char* GraphicsShaderDesc::getShaderCode() const
-{
-	return _shaderCode;
-}
-
-GraphicsShader::GraphicsShader()
-{
-}
-
-GraphicsShader::~GraphicsShader()
-{
-}
+using namespace el;
 
 GLShader::GLShader() : _id(0)
 {
@@ -114,7 +66,7 @@ GLShader::~GLShader()
 bool GLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
 {
 	_stage = stage;
-	_id = shader::create(gl::getShaderStage(stage), shaderCode);
+	_id = shader::create(getShaderStage(stage), shaderCode);
 	if (_id == 0)
 		return false;
 	return true;
@@ -130,38 +82,7 @@ GLuint GLShader::getID() const
 	return _id;
 }
 
-const GraphicsShaderDesc& GLShader::getGraphicsShaderDesc() const noexcept
+const GraphicsShaderDesc& GLShader::getDesc() const noexcept
 {
-	return _desc;
+	return _shaderDesc;
 }
-
-#if EL_PLAT_IOS || EL_PLAT_OSX
-
-MSLShader::MSLShader()
-{
-}
-
-MSLShader::~MSLShader()
-{
-}
-
-bool MSLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
-{
-	mtlpp::Device device = mtlpp::Device::CreateSystemDefaultDevice();
-
-    _library = device.NewLibrary(shaderCode, mtlpp::CompileOptions(), nullptr);
-    assert(_library);
-
-    _function = _library.NewFunction("vertFunc");
-    assert(_function);
-	return true;
-}
-
-void MSLShader::destroy()
-{
-}
-
-#endif // #if EL_PLAT_IOS || EL_PLAT_OSX
-
-
-} // namespace el {

@@ -1,6 +1,7 @@
 #include "graphics_device.h"
 
 #include "gl_device.h"
+#include "gl_texture.h"
 
 using namespace el;
 
@@ -25,6 +26,14 @@ GraphicsDevice::GraphicsDevice()
 
 GraphicsDevice::~GraphicsDevice()
 {
+}
+
+GraphicsTexturePtr GraphicsDevice::createTexture(const GraphicsTextureDesc& desc)
+{
+	auto texture = std::make_shared<GLTexture>();
+	if (texture->create(desc))
+		return texture;
+	return nullptr;
 }
 
 GraphicsDevicePtr el::createDevice(const GraphicsDeviceDesc& desc)
