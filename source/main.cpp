@@ -164,29 +164,62 @@ static void APIENTRY gl_debug_callback(GLenum source,
 	EL_TRACE("%s", output.str().c_str());
 }
 
-namespace el {
-	class GraphicsContext
-	{
-	public:
+class GraphicsBuffer
+{
+};
 
-		GraphicsContext()
-		{
-		}
+class GLBuffer final
+{
+public:
 
-		void setViewport();
-	};
+	GLBuffer();
+	~GLBuffer();
 
-	void GraphicsContext::setViewport()
-	{
-	}
+	void create(GLenum target, int32_t size, const int8_t* data, GLenum flag);
+	void destroy();
 
-} // namespace e {
+	void bind() const;
 
+private:
+
+	GLenum _target;
+	GLuint _bufferID;
+};
+
+GLBuffer::GLBuffer() :
+	_target(0),
+	_bufferID(0)
+{
+}
+
+GLBuffer::~GLBuffer()
+{
+}
+
+void GLBuffer::create(GLenum target, int32_t size, const int8_t* data, GLenum flag)
+{
+	_target = target;
+
+	GL_CHECK(glGenBuffers(1, &_bufferID));
+	GL_CHECK(glBindBuffer(_target, _bufferID));
+	GL_CHECK(glBufferData(_target, size, data, flag));
+}
+
+void GLBuffer::destroy()
+{
+	GL_CHECK(glDeleteBuffers(1, &_bufferID));
+	_bufferID = 0;
+	_target = 0;
+}
+
+void GLBuffer::bind() const
+{
+    GL_CHECK(glBindBuffer(_target, _bufferID));
+}
 
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
-    GLuint vertex_buffer;
     GLint mvp_location, vpos_location, color_location, texture_location;
 
     glfwSetErrorCallback(error_callback);
@@ -242,6 +275,8 @@ int main(int argc, char** argv)
 	GraphicsProgramPtr program;
 	GraphicsTexturePtr texture;
 
+	GLBuffer vertex_buffer;
+
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
@@ -275,20 +310,15 @@ int main(int argc, char** argv)
         texture_location = glGetUniformLocation(program_id, "texture");
         vpos_location = glGetAttribLocation(program_id, "vPos");
 
-        glGenBuffers(1, &vertex_buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		vertex_buffer.create(GL_ARRAY_BUFFER, sizeof(vertices), (const int8_t*)vertices, GL_STATIC_DRAW);
     }
 
 	const GLint slot0 = 0;
 
 	auto gl_program = std::static_pointer_cast<GLProgram>(program);
 	gl_program->use();
-	gl_program->setTexture(texture, texture_location, slot0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]), (void*) 0);
+	gl_program->setTexture(texture_location, texture, slot0);
+	gl_program->setVertexBuffer(vpos_location, vertex_buffer, GL_FLOAT, 2, sizeof(vertices[0]), 0);
 
     windows[1] = glfwCreateWindow(400, 400, "Second", NULL, windows[0]);
     if (!windows[1])
@@ -315,12 +345,8 @@ int main(int argc, char** argv)
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
 	gl_program->use();
-	gl_program->setTexture(texture, texture_location, slot0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE,
-                          sizeof(vertices[0]), (void*) 0);
+	gl_program->setTexture(texture_location, texture, slot0);
+	gl_program->setVertexBuffer(vpos_location, vertex_buffer, GL_FLOAT, 2, sizeof(vertices[0]), 0);
 
     while (!glfwWindowShouldClose(windows[0]) &&
            !glfwWindowShouldClose(windows[1]))
@@ -359,3 +385,19 @@ int main(int argc, char** argv)
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }
+
+#if 0
+{
+	// Load the coordinate
+	gl::VertexAttribPointer(m_aPositionHandle, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(FLOAT), vtxs);
+	gl::VertexAttribPointer(m_aTexHandle, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(FLOAT), &vtxs[3]);
+
+	if (bTriangleFan)
+		gl::DrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	else {
+		std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
+		gl::DrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()); 
+	}
+}
+
+#endif

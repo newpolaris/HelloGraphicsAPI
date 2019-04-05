@@ -120,7 +120,21 @@ void GLProgram::setUniform(GLint location, const mat4x4& m0)
 	GL_CHECK(glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat*)m0));
 }
 
-void GLProgram::setTexture(const GraphicsTexturePtr& texture, GLint location, GLenum unit)
+void GLProgram::setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void * pointer)
+{
+    glEnableVertexAttribArray(location);
+    glVertexAttribPointer(location, size, type, GL_FALSE, stride, (void*)pointer);
+}
+
+void GLProgram::setVertexBuffer(GLint location, const GLVertexBuffer& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset)
+{
+	buffer.bind();
+
+    glEnableVertexAttribArray(location);
+    glVertexAttribPointer(location, size, type, GL_FALSE, stride, (void*)offset);
+}
+
+void GLProgram::setTexture(GLint location, const GraphicsTexturePtr& texture, GLenum unit)
 {
 	auto gl_texture = std::static_pointer_cast<GLTexture>(texture);
 	if (gl_texture != nullptr)

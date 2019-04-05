@@ -26,12 +26,12 @@ namespace el {
 		GraphicsProgram();
 		virtual ~GraphicsProgram();
 
+		GraphicsProgram(const GraphicsProgram&) = delete;
+		GraphicsProgram& operator=(const GraphicsProgram&) = delete;
+
 		virtual const GraphicsProgramDesc& getProgramDesc() const = 0;
 
 	private:
-
-		GraphicsProgram(const GraphicsProgram&) = delete;
-		const GraphicsProgram& operator=(const GraphicsProgram&) = delete;
 	};
 
 } // namespace el {
