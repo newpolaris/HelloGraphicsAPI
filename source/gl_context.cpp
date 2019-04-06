@@ -8,5 +8,3 @@ GLContext::GLContext()
 }
 
 GLContext::~GLContext()
-{
-}

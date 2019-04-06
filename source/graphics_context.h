@@ -11,9 +11,9 @@ namespace el {
 		GraphicsContext();
 		~GraphicsContext();
 
+	private:
+
 		GraphicsContext(const GraphicsContext&) = delete;
 		GraphicsContext& operator=(const GraphicsContext&) = delete;
-
-	private:
 	};
 } // namespace el {
