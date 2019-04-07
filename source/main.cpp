@@ -44,6 +44,8 @@
 #include "graphics_shader.h"
 #include "graphics_program.h"
 
+#include "gl_buffer.h"
+
 // TODO:
 #include "gl_program.h"
 #include "gl_shader.h"
@@ -164,59 +166,6 @@ static void APIENTRY gl_debug_callback(GLenum source,
 	EL_TRACE("%s", output.str().c_str());
 }
 
-class GraphicsBuffer
-{
-};
-
-class GLBuffer final
-{
-public:
-
-	GLBuffer();
-	~GLBuffer();
-
-	void create(GLenum target, int32_t size, const int8_t* data, GLenum flag);
-	void destroy();
-
-	void bind() const;
-
-private:
-
-	GLenum _target;
-	GLuint _bufferID;
-};
-
-GLBuffer::GLBuffer() :
-	_target(0),
-	_bufferID(0)
-{
-}
-
-GLBuffer::~GLBuffer()
-{
-}
-
-void GLBuffer::create(GLenum target, int32_t size, const int8_t* data, GLenum flag)
-{
-	_target = target;
-
-	GL_CHECK(glGenBuffers(1, &_bufferID));
-	GL_CHECK(glBindBuffer(_target, _bufferID));
-	GL_CHECK(glBufferData(_target, size, data, flag));
-}
-
-void GLBuffer::destroy()
-{
-	GL_CHECK(glDeleteBuffers(1, &_bufferID));
-	_bufferID = 0;
-	_target = 0;
-}
-
-void GLBuffer::bind() const
-{
-    GL_CHECK(glBindBuffer(_target, _bufferID));
-}
-
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
@@ -275,7 +224,7 @@ int main(int argc, char** argv)
 	GraphicsProgramPtr program;
 	GraphicsTexturePtr texture;
 
-	GLBuffer vertex_buffer;
+	GraphicsBufferPtr vertex_buffer;
 
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
@@ -288,11 +237,11 @@ int main(int argc, char** argv)
 		texture = device->createTexture(texture_desc);
 
 		GraphicsShaderDesc vertex_desc;
-		vertex_desc.setStage(GraphicsShaderStageVertexBit);
+		vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
 		vertex_desc.setShaderCode(vertex_shader_text);
 
 		GraphicsShaderDesc fragment_desc;
-		fragment_desc.setStage(GraphicsShaderStageFragmentBit);
+		fragment_desc.setStageFlag(GraphicsShaderStageFragmentBit);
 		fragment_desc.setShaderCode(fragment_shader_text);
 
 		vertex_shader = device->createShader(vertex_desc);
@@ -310,7 +259,11 @@ int main(int argc, char** argv)
         texture_location = glGetUniformLocation(program_id, "texture");
         vpos_location = glGetAttribLocation(program_id, "vPos");
 
-		vertex_buffer.create(GL_ARRAY_BUFFER, sizeof(vertices), (const int8_t*)vertices, GL_STATIC_DRAW);
+		GraphicsBufferDesc vertices_buffer_desc;
+		vertices_buffer_desc.setData((const char*)vertices);
+		vertices_buffer_desc.setDataSize(sizeof(vertices));
+
+		vertex_buffer = device->createBuffer(vertices_buffer_desc);
     }
 
 	const GLint slot0 = 0;
@@ -318,7 +271,7 @@ int main(int argc, char** argv)
 	auto gl_program = std::static_pointer_cast<GLProgram>(program);
 	gl_program->use();
 	gl_program->setTexture(texture_location, texture, slot0);
-	gl_program->setVertexBuffer(vpos_location, vertex_buffer, GL_FLOAT, 2, sizeof(vertices[0]), 0);
+	gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
 
     windows[1] = glfwCreateWindow(400, 400, "Second", NULL, windows[0]);
     if (!windows[1])
@@ -346,7 +299,7 @@ int main(int argc, char** argv)
     // need to be set up for each context
 	gl_program->use();
 	gl_program->setTexture(texture_location, texture, slot0);
-	gl_program->setVertexBuffer(vpos_location, vertex_buffer, GL_FLOAT, 2, sizeof(vertices[0]), 0);
+	gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
 
     while (!glfwWindowShouldClose(windows[0]) &&
            !glfwWindowShouldClose(windows[1]))

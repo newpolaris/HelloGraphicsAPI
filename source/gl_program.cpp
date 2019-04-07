@@ -4,6 +4,7 @@
 #include "gl.h"
 #include "gl_shader.h"
 #include "gl_texture.h"
+#include "gl_buffer.h"
 
 namespace el {
 	namespace gl {
@@ -122,25 +123,28 @@ void GLProgram::setUniform(GLint location, const mat4x4& m0)
 
 void GLProgram::setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void * pointer)
 {
-    glEnableVertexAttribArray(location);
-    glVertexAttribPointer(location, size, type, GL_FALSE, stride, (void*)pointer);
+    GL_CHECK(glEnableVertexAttribArray(location));
+    GL_CHECK(glVertexAttribPointer(location, size, type, GL_FALSE, stride, (void*)pointer));
 }
 
-void GLProgram::setVertexBuffer(GLint location, const GLVertexBuffer& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset)
+void GLProgram::setVertexBuffer(GLint location, const GraphicsBufferPtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset)
 {
-	buffer.bind();
+	auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
+	if (glBuffer != nullptr)
+		glBuffer->bind();
+	EL_ASSERT(glBuffer != nullptr);
 
-    glEnableVertexAttribArray(location);
-    glVertexAttribPointer(location, size, type, GL_FALSE, stride, (void*)offset);
+    GL_CHECK(glEnableVertexAttribArray(location));
+    GL_CHECK(glVertexAttribPointer(location, size, type, GL_FALSE, stride, (void*)offset));
 }
 
 void GLProgram::setTexture(GLint location, const GraphicsTexturePtr& texture, GLenum unit)
 {
-	auto gl_texture = std::static_pointer_cast<GLTexture>(texture);
-	if (gl_texture != nullptr)
+	auto glTexture = std::static_pointer_cast<GLTexture>(texture);
+	if (glTexture != nullptr)
 	{
-		gl_texture->bind(unit);
+		glTexture->bind(unit);
 		setUniform(location, unit);
 	}
-	EL_ASSERT(gl_texture != nullptr);
+	EL_ASSERT(glTexture != nullptr);
 }

@@ -2,6 +2,7 @@
 #include "gl_program.h"
 #include "gl_shader.h"
 #include "gl_texture.h"
+#include "gl_buffer.h"
 
 using namespace el;
 
@@ -21,11 +22,10 @@ GraphicsProgramPtr GLDevice::createProgram(const GraphicsProgramDesc& desc)
 	return nullptr;
 }
 
-
 GraphicsShaderPtr GLDevice::createShader(const GraphicsShaderDesc& desc) 
 {
 	auto shader = std::make_shared<GLShader>();
-	if (shader->create(desc.getStage(), desc.getShaderCode()))
+	if (shader->create(desc.getStageFlag(), desc.getShaderCode()))
 		return shader;
 	return nullptr;
 }
@@ -38,3 +38,10 @@ GraphicsTexturePtr GLDevice::createTexture(const GraphicsTextureDesc& desc)
 	return nullptr;
 }
 
+GraphicsBufferPtr GLDevice::createBuffer(const GraphicsBufferDesc& desc)
+{
+	auto buffer = std::make_shared<GLBuffer>();
+	if (buffer->create(desc))
+		return buffer;
+	return nullptr;
+}

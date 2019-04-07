@@ -3,6 +3,7 @@
 #include "predefine.h"
 #include <memory>
 #include <vector>
+#include <cstdint>
 
 namespace el {
 
@@ -10,13 +11,15 @@ namespace el {
 	class GraphicsProgramDesc;
 	class GraphicsShaderDesc;
 	class GraphicsTextureDesc;
+	class GraphicsBufferDesc;
 
 	typedef std::shared_ptr<class GraphicsDevice> GraphicsDevicePtr;
 	typedef std::shared_ptr<class GraphicsContext> GraphicsContextPtr;
 	typedef std::shared_ptr<class GraphicsShader> GraphicsShaderPtr;
 	typedef std::shared_ptr<class GraphicsProgram> GraphicsProgramPtr;
 	typedef std::shared_ptr<class GraphicsTexture> GraphicsTexturePtr;
-
+	typedef std::shared_ptr<class GraphicsBuffer> GraphicsBufferPtr;
+	
 	typedef std::vector<GraphicsShaderPtr> GraphicsShaders;
 
 	enum GraphicsDeviceType

@@ -29,6 +29,7 @@ namespace el {
 		virtual GraphicsProgramPtr createProgram(const GraphicsProgramDesc& desc) = 0;
 		virtual GraphicsShaderPtr createShader(const GraphicsShaderDesc& desc) = 0;
 		virtual GraphicsTexturePtr createTexture(const GraphicsTextureDesc& desc) = 0;
+		virtual GraphicsBufferPtr createBuffer(const GraphicsBufferDesc& desc) = 0;
 	};
 
 	GraphicsDevicePtr createDevice(const GraphicsDeviceDesc& desc);

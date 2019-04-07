@@ -13,4 +13,3 @@ GLenum el::getShaderStage(GraphicsShaderStageFlagBits stage)
 	}
 	return GraphicsShaderStageAll;
 }
-

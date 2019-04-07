@@ -10,16 +10,20 @@ public:
 
 	GraphicsShaderDesc();
 
-	void setStage(GraphicsShaderStageFlagBits stage);
-	GraphicsShaderStageFlagBits getStage() const;
+	void setStageFlag(GraphicsShaderStageFlagBits stage);
+	GraphicsShaderStageFlagBits getStageFlag() const;
 
 	void setShaderCode(const char* code);
+	void setShaderCodeSize(size_t length);
+
 	const char* getShaderCode() const;
+	size_t getShaderCodeSize() const;
 
 private:
 
 	GraphicsShaderStageFlagBits _stage;
 	const char* _shaderCode;
+	size_t _shaderCodeSize;
 };
 
 class GraphicsShader

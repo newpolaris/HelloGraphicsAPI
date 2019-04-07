@@ -9,7 +9,6 @@
 
 namespace el {
 
-	class GLVertexBuffer;
 	class GLProgram final : public GraphicsProgram
 	{
 	public:
@@ -29,7 +28,7 @@ namespace el {
 		void setUniform(GLint location, const mat4x4& m0);
 
 		void setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void *pointer);
-		void setVertexBuffer(GLint location, const GLVertexBuffer& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset);
+		void setVertexBuffer(GLint location, const GraphicsBufferPtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset);
 		void setTexture(GLint location, const GraphicsTexturePtr& texture, GLenum unit);
 
 		const GraphicsProgramDesc& getProgramDesc() const override;
