@@ -34,6 +34,8 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
+#include <array>
+#include <chrono>
 
 #include "getopt.h"
 #include "linmath.h"
@@ -165,6 +167,14 @@ static void APIENTRY gl_debug_callback(GLenum source,
 
 	EL_TRACE("%s", output.str().c_str());
 }
+
+class ProfileBusyWait final
+{
+public:
+
+	ProfileBusyWait();
+	~ProfileBusyWait();
+};
 
 int main(int argc, char** argv)
 {
@@ -301,6 +311,8 @@ int main(int argc, char** argv)
 	gl_program->setTexture(texture_location, texture, slot0);
 	gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
 
+	// gl_program->setIndexBuffer()
+
     while (!glfwWindowShouldClose(windows[0]) &&
            !glfwWindowShouldClose(windows[1]))
     {
@@ -319,12 +331,18 @@ int main(int argc, char** argv)
             glfwGetFramebufferSize(windows[i], &width, &height);
             glfwMakeContextCurrent(windows[i]);
 
-            glViewport(0, 0, width, height);
+            GL_CHECK(glViewport(0, 0, width, height));
 
             mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
 			gl_program->setUniform(mvp_location, mvp);
 			gl_program->setUniform(color_location, colors[i]);
-            glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+
+#if 1
+            GL_CHECK(glDrawArrays(GL_TRIANGLE_FAN, 0, 4));
+#else
+			std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
+			GL_CHECK(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()));
+#endif
 
             glfwSwapBuffers(windows[i]);
         }
@@ -354,3 +372,15 @@ int main(int argc, char** argv)
 }
 
 #endif
+
+
+ProfileBusyWait::ProfileBusyWait()
+{
+	GLuint query[2];
+	GL_CHECK(glGenQueries(2, query));
+	GL_CHECK(glQueryCounter(query[0], GL_TIMESTAMP));
+}
+
+ProfileBusyWait::~ProfileBusyWait()
+{
+}
