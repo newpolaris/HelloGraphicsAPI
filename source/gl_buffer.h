@@ -20,7 +20,10 @@ public:
 
 private:
 
+	GraphicsBufferDesc _desc;
+
 	GLenum _target;
+	GLenum _usage;
 	GLuint _bufferID;
 };
 

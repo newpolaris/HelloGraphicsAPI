@@ -39,18 +39,18 @@ namespace el {
 		GraphicsDeviceTypeLast = GraphicsDeviceTypeMetal,
 	};
 
-	enum GraphicsTextureTarget {
-		GraphicsTextureTarget1D = 0,
-		GraphicsTextureTarget1DArray,
-		GraphicsTextureTarget2D,
-		GraphicsTextureTarget2DArray,
-		GraphicsTextureTarget3D,
-		GraphicsTextureTargetRect,
-		GraphicsTextureTargetRectArray,
-		GraphicsTextureTargetCube,
-		GraphicsTextureTargetCubeArray,
-		GraphicsTextureTargetFirst = GraphicsTextureTarget1D,
-		GraphicsTextureTargetLast = GraphicsTextureTargetCubeArray
+	enum GraphicsTextureDim {
+		GraphicsTextureDim1D = 0,
+		GraphicsTextureDim1DArray,
+		GraphicsTextureDim2D,
+		GraphicsTextureDim2DArray,
+		GraphicsTextureDim3D,
+		GraphicsTextureDimRect,
+		GraphicsTextureDimRectArray,
+		GraphicsTextureDimCube,
+		GraphicsTextureDimCubeArray,
+		GraphicsTextureDimFirst = GraphicsTextureDim1D,
+		GraphicsTextureDimLast = GraphicsTextureDimCubeArray
 	};
 
 	enum GraphicsDataType
@@ -66,6 +66,7 @@ namespace el {
 		GraphicsDataTypeStorageIndexBuffer = 8,
 	};
 
+	// https://www.khronos.org/opengl/wiki/Buffer_Object
 	enum GraphicsUsageFlagBits
 	{
 		GraphicsUsageFlagReadBit = 0x00000001,

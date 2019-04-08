@@ -33,7 +33,8 @@ namespace el {
 					const uint32_t kBufferSize = 512u;
 					char log[kBufferSize];
 					GL_CHECK(glGetProgramInfoLog(id, sizeof(log), nullptr, log));
-					EL_TRACE("%d: %s", status, log);
+					if (log[0] != '\0')
+						EL_TRACE("%d: %s", status, log);
 				}
 				if (status == GL_FALSE)
 				{

@@ -16,10 +16,18 @@ namespace el {
 		void setDataSize(size_t size);
 		size_t getDataSize() const;
 
+		void setDataType(GraphicsDataType dataType);
+		GraphicsDataType getDataType() const;
+
+		void setUsage(GraphicsUsageFlags usage);
+		GraphicsUsageFlags getUsage() const;
+
     private:
 
 		const char* _data;
 		size_t _dataSize;
+		GraphicsDataType _dataType;
+		GraphicsUsageFlags _usage;
     };
 
     class GraphicsBuffer

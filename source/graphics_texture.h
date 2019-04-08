@@ -18,15 +18,15 @@ namespace el {
 		void setDepth(uint32_t depth);
 		uint32_t getDepth() const;
 
-		void setTarget(GraphicsTextureTarget target);
-		GraphicsTextureTarget getTarget() const;
+		void setDim(GraphicsTextureDim target);
+		GraphicsTextureDim getDim() const;
 
 	private:
 
 		uint32_t _width;
 		uint32_t _height;
 		uint32_t _depth;
-		GraphicsTextureTarget _target;
+		GraphicsTextureDim _dim;
 	};
 
 	class GraphicsTexture

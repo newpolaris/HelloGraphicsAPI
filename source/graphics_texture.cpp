@@ -6,7 +6,7 @@ GraphicsTextureDesc::GraphicsTextureDesc() :
 	_width(0),
 	_height(0),
 	_depth(1),
-	_target(GraphicsTextureTarget2D)
+	_dim(GraphicsTextureDim2D)
 {
 }
 
@@ -40,14 +40,14 @@ uint32_t GraphicsTextureDesc::getDepth() const
 	return _depth;
 }
 
-void GraphicsTextureDesc::setTarget(GraphicsTextureTarget target)
+void GraphicsTextureDesc::setDim(GraphicsTextureDim dim)
 {
-	_target = target;
+	_dim = dim;
 }
 
-GraphicsTextureTarget GraphicsTextureDesc::getTarget() const
+GraphicsTextureDim GraphicsTextureDesc::getDim() const
 {
-	return _target;
+	return _dim;
 }
 
 GraphicsTexture::GraphicsTexture()

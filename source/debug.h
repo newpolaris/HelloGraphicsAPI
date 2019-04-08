@@ -19,7 +19,7 @@ namespace el {
 
 #define _EL_TRACE(_format, ...)	\
 	do { \
-		el::trace("EL: " _format "%s:%d\n", ##__VA_ARGS__, __FILE__, __LINE__); \
+		el::trace("%s:%d | EL_TRACE: " _format "\n", __FILE__, __LINE__, ##__VA_ARGS__); \
 	} while (0)
 
 #if EL_CONFIG_DEBUG

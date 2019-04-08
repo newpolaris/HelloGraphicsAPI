@@ -52,6 +52,7 @@
 #include "gl_program.h"
 #include "gl_shader.h"
 #include "gl_texture.h"
+#include "gl_profile.h"
 
 static const char* vertex_shader_text =
 "#version 110\n"
@@ -165,16 +166,9 @@ static void APIENTRY gl_debug_callback(GLenum source,
 	output << std::endl;
 	output << message << std::endl;
 
-	EL_TRACE("%s", output.str().c_str());
+	EL_TRACE("\n%s", output.str().c_str());
+	el::debug_break();
 }
-
-class ProfileBusyWait final
-{
-public:
-
-	ProfileBusyWait();
-	~ProfileBusyWait();
-};
 
 int main(int argc, char** argv)
 {
@@ -240,7 +234,7 @@ int main(int argc, char** argv)
     // All objects will be shared with the second context, created below
     {
 		GraphicsTextureDesc texture_desc;
-		texture_desc.setTarget(GraphicsTextureTarget2D);
+		texture_desc.setDim(GraphicsTextureDim2D);
 		texture_desc.setWidth(16);
 		texture_desc.setHeight(16);
 
@@ -270,6 +264,7 @@ int main(int argc, char** argv)
         vpos_location = glGetAttribLocation(program_id, "vPos");
 
 		GraphicsBufferDesc vertices_buffer_desc;
+		vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
 		vertices_buffer_desc.setData((const char*)vertices);
 		vertices_buffer_desc.setDataSize(sizeof(vertices));
 
@@ -282,6 +277,10 @@ int main(int argc, char** argv)
 	gl_program->use();
 	gl_program->setTexture(texture_location, texture, slot0);
 	gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
+
+	GLProfileBusyWait profile[2];
+	profile[0].setName("window 0");
+	profile[1].setName("window 1");
 
     windows[1] = glfwCreateWindow(400, 400, "Second", NULL, windows[0]);
     if (!windows[1])
@@ -297,7 +296,6 @@ int main(int argc, char** argv)
         glfwGetWindowSize(windows[0], &width, NULL);
         glfwGetWindowFrameSize(windows[0], &left, NULL, &right, NULL);
         glfwGetWindowPos(windows[0], &xpos, &ypos);
-
         glfwSetWindowPos(windows[1], xpos + width + left + right, ypos);
     }
 
@@ -313,15 +311,19 @@ int main(int argc, char** argv)
 
 	// gl_program->setIndexBuffer()
 
+	const vec3 colors[2] =
+	{
+		{ 0.8f, 0.4f, 1.f },
+		{ 0.3f, 0.4f, 1.f }
+	};
+	mat4x4 mvp;
+	mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
+	gl_program->setUniform(mvp_location, mvp);
+
     while (!glfwWindowShouldClose(windows[0]) &&
            !glfwWindowShouldClose(windows[1]))
     {
         int i;
-        const vec3 colors[2] =
-        {
-            { 0.8f, 0.4f, 1.f },
-            { 0.3f, 0.4f, 1.f }
-        };
 
         for (i = 0;  i < 2;  i++)
         {
@@ -331,20 +333,19 @@ int main(int argc, char** argv)
             glfwGetFramebufferSize(windows[i], &width, &height);
             glfwMakeContextCurrent(windows[i]);
 
+			profile[i].start();
+
             GL_CHECK(glViewport(0, 0, width, height));
-
-            mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
-			gl_program->setUniform(mvp_location, mvp);
+			// Shared bewteen context
 			gl_program->setUniform(color_location, colors[i]);
-
-#if 1
             GL_CHECK(glDrawArrays(GL_TRIANGLE_FAN, 0, 4));
-#else
-			std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
-			GL_CHECK(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()));
-#endif
 
+			profile[i].end();
             glfwSwapBuffers(windows[i]);
+			char profileBuf[256] = {'\0'};
+			sprintf(profileBuf, "%s CPU %.3f, GPU %.3f", profile[i].getName().c_str(), 
+						profile[i].getCpuTime(), profile[i].getGpuTime());
+			glfwSetWindowTitle(windows[i], profileBuf);
         }
 
         glfwPollEvents();
@@ -371,16 +372,39 @@ int main(int argc, char** argv)
 	}
 }
 
+void SubDrawTexture(float* vtxs)
+{
+	// Load the coordinate
+	glVertexAttribPointer(m_aPositionHandle, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), vtxs);
+	glVertexAttribPointer(m_aTexHandle, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), &vtxs[3]);
+
+	float vNormalVector[12] = { 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f };
+	glVertexAttribPointer(m_aNormalVector, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), vNormalVector);
+
+	// Drawing
+	if (bTriangleFan)
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	else {
+		std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
+		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()); 
+	}
+}
+
 #endif
-
-
-ProfileBusyWait::ProfileBusyWait()
+#if 0
 {
-	GLuint query[2];
-	GL_CHECK(glGenQueries(2, query));
-	GL_CHECK(glQueryCounter(query[0], GL_TIMESTAMP));
-}
+	std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
+	GL_CHECK(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()));
 
-ProfileBusyWait::~ProfileBusyWait()
-{
+	const GLbyte* offset = 0;
+	const GLuint fanCount = 4;
+	const GLuint count = (fanCount - 2) * 3;
+
+	GLuint ibo = 0;
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, params.numIndices * params.sizeofIndices, params.indices, GL_STATIC_DRAW);
+
+	glDrawElementsBaseVertex(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, nullptr, offset);
 }
+#endif
