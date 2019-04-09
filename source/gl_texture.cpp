@@ -33,6 +33,10 @@ bool GLTexture::create(const GraphicsTextureDesc& desc)
 			pixels[y * 16 + x] = rand() % 256;
 	}
 
+	// https://retokoradi.com/2014/03/30/opengl-transition-to-core-profile/
+	// TODO: OpenGL Core
+	//  GL_LUMINANCE -> GL_RED
+	//  GL_LUMINANCE_ALPHA -> GL_RG
 	GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 16, 16, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels));
 	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
@@ -49,8 +53,8 @@ void GLTexture::destroy()
 		_textureID = 0;
 	}
 
-	// m_Format = GL_INVALID_ENUM;
-	// m_Target = GL_INVALID_ENUM;
+	// _Format = GL_INVALID_ENUM;
+	// _Target = GL_INVALID_ENUM;
 }
 
 void GLTexture::bind(GLuint unit) const

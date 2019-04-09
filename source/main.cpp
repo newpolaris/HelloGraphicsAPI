@@ -180,13 +180,23 @@ int main(int argc, char** argv)
     if (!glfwInit())
         exit(EXIT_FAILURE);
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+#ifdef GLFW_INCLUDE_ES3
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+#elif 1 // COMPATIBILITY MODE
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#ifdef __APPLE__
+#	ifdef EL_PLAT_OSX
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
+#	endif
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+#else // LEGACY
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#endif
 
     windows[0] = glfwCreateWindow(400, 400, "First", NULL, NULL);
     if (!windows[0])
@@ -207,13 +217,23 @@ int main(int argc, char** argv)
     // pointers should be re-usable between them
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
-#if _DEBUG
-	glEnable(GL_DEBUG_OUTPUT);
-	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-	if (glDebugMessageCallback) {
-		glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-		glDebugMessageCallback(gl_debug_callback, nullptr);
+#if EL_CONFIG_DEBUG
+	if (glfwExtensionSupported("GL_ARB_debug_output"))
+	{
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+		if (glDebugMessageCallback) {
+			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+			glDebugMessageCallback(gl_debug_callback, nullptr);
+		}
 	}
+
+	std::printf("%s\n%s\n%s\n%s\n",
+		glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine
+		glGetString(GL_VERSION),   // e.g. 3.2 INTEL-8.0.61
+		glGetString(GL_VENDOR),	   // e.g. NVIDIA Corporation
+		glGetString(GL_SHADING_LANGUAGE_VERSION)  // e.g. 4.60 NVIDIA or 1.50 NVIDIA via Cg compiler
+	);
 #endif
 
 	using namespace el;
@@ -311,11 +331,6 @@ int main(int argc, char** argv)
 
 	// gl_program->setIndexBuffer()
 
-	const vec3 colors[2] =
-	{
-		{ 0.8f, 0.4f, 1.f },
-		{ 0.3f, 0.4f, 1.f }
-	};
 	mat4x4 mvp;
 	mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
 	gl_program->setUniform(mvp_location, mvp);
@@ -323,12 +338,16 @@ int main(int argc, char** argv)
     while (!glfwWindowShouldClose(windows[0]) &&
            !glfwWindowShouldClose(windows[1]))
     {
-        int i;
+		const vec3 colors[2] =
+		{
+			{ 0.8f, 0.4f, 1.f },
+			{ 0.3f, 0.4f, 1.f }
+		};
 
+        int i;
         for (i = 0;  i < 2;  i++)
         {
             int width, height;
-            mat4x4 mvp;
 
             glfwGetFramebufferSize(windows[i], &width, &height);
             glfwMakeContextCurrent(windows[i]);
