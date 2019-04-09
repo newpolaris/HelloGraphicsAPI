@@ -6,7 +6,7 @@
 
 using namespace el;
 
-bool GLDevice::create(const GraphicsDeviceDesc& desc)
+bool GLDevice::create(GraphicsDeviceDesc desc)
 {
 	// https://www.khronos.org/opengl/wiki/GLSL_:_common_mistakes#Enable_Or_Not_To_Enable
 	// For fixed pipeline
@@ -14,15 +14,15 @@ bool GLDevice::create(const GraphicsDeviceDesc& desc)
 	return true;
 }
 
-GraphicsProgramPtr GLDevice::createProgram(const GraphicsProgramDesc& desc)
+GraphicsProgramPtr GLDevice::createProgram(GraphicsProgramDesc desc)
 {
 	auto program = std::make_shared<GLProgram>();
-	if (program->create(desc))
+	if (program->create(std::move(desc)))
 		return program;
 	return nullptr;
 }
 
-GraphicsShaderPtr GLDevice::createShader(const GraphicsShaderDesc& desc) 
+GraphicsShaderPtr GLDevice::createShader(GraphicsShaderDesc desc) 
 {
 	auto shader = std::make_shared<GLShader>();
 	if (shader->create(desc.getStageFlag(), desc.getShaderCode()))
@@ -30,18 +30,18 @@ GraphicsShaderPtr GLDevice::createShader(const GraphicsShaderDesc& desc)
 	return nullptr;
 }
 
-GraphicsTexturePtr GLDevice::createTexture(const GraphicsTextureDesc& desc)
+GraphicsTexturePtr GLDevice::createTexture(GraphicsTextureDesc desc)
 {
 	auto texture = std::make_shared<GLTexture>();
-	if (texture->create(desc))
+	if (texture->create(std::move(desc)))
 		return texture;
 	return nullptr;
 }
 
-GraphicsBufferPtr GLDevice::createBuffer(const GraphicsBufferDesc& desc)
+GraphicsBufferPtr GLDevice::createBuffer(GraphicsBufferDesc desc)
 {
 	auto buffer = std::make_shared<GLBuffer>();
-	if (buffer->create(desc))
+	if (buffer->create(std::move(desc)))
 		return buffer;
 	return nullptr;
 }

@@ -1,19 +1,21 @@
 #pragma once
 
+#include "predefine.h"
+
+#if EL_PLAT_APPLE
+
 #include "graphics_buffer.h"
-#include "gl.h"
 
 namespace el {
 
-    class GLBuffer final : public GraphicsBuffer
+    class MTLBuffer final : public GraphicsBuffer
     {
     public:
 
-        GLBuffer();
-        ~GLBuffer();
+        MTLBuffer();
+        ~MTLBuffer();
 
         bool create(GraphicsBufferDesc desc) override;
-        bool create(GLenum target, int32_t size, const int8_t* data, GLenum flag);
         void destroy();
 
         void bind() const;
@@ -21,10 +23,8 @@ namespace el {
     private:
 
         GraphicsBufferDesc _desc;
-
-        GLenum _target;
-        GLenum _usage;
-        GLuint _bufferID;
     };
 
 } // namespace el {
+
+#endif // EL_PLAT_APPLE

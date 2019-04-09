@@ -4,6 +4,8 @@
 #import <MetalKit/MetalKit.h>
 #import "SharedStructures.h"
 
+#import "mtl_renderer.h"
+
 // The max number of command buffers in flight
 static const NSUInteger kMaxInflightBuffers = 3;
 

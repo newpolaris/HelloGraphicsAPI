@@ -37,7 +37,7 @@ namespace el {
         GraphicsBuffer();
         virtual ~GraphicsBuffer();
 
-        virtual bool create(const GraphicsBufferDesc& desc) = 0;
+        virtual bool create(GraphicsBufferDesc desc) = 0;
 
     private:
 

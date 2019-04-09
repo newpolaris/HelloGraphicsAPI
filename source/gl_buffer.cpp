@@ -14,10 +14,8 @@ GLBuffer::~GLBuffer()
 {
 }
 
-bool GLBuffer::create(const GraphicsBufferDesc& desc)
+bool GLBuffer::create(GraphicsBufferDesc desc)
 {
-    _desc = desc;
-
     auto type = desc.getDataType();
     if (type == GraphicsDataTypeStorageVertexBuffer)
         _target = GL_ARRAY_BUFFER;
@@ -45,6 +43,8 @@ bool GLBuffer::create(const GraphicsBufferDesc& desc)
 
     if (GLAD_GL_KHR_debug) // GLEW_KHR_debug
         GL_CHECK(glObjectLabel(GL_BUFFER, _bufferID, -1, "Vertex Array Buffer object"));
+
+    _desc = std::move(desc);
 
     return true;
 }

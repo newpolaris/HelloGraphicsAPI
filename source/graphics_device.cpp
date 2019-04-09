@@ -1,23 +1,23 @@
 #include "graphics_device.h"
 
 #include "gl_device.h"
-#include "gl_texture.h"
+#include "mtl_device.h"
 
 using namespace el;
 
 GraphicsDeviceDesc::GraphicsDeviceDesc() : 
-	_type(GraphicsDeviceTypeOpenGL)
+    _type(GraphicsDeviceTypeOpenGL)
 {
 }
 
 void GraphicsDeviceDesc::setType(GraphicsDeviceType type)
 {
-	_type = type;
+    _type = type;
 }
 
 GraphicsDeviceType GraphicsDeviceDesc::getType() const
 {
-	return _type;
+    return _type;
 }
 
 GraphicsDevice::GraphicsDevice()
@@ -28,29 +28,21 @@ GraphicsDevice::~GraphicsDevice()
 {
 }
 
-GraphicsTexturePtr GraphicsDevice::createTexture(const GraphicsTextureDesc& desc)
+GraphicsDevicePtr el::createDevice(GraphicsDeviceDesc desc)
 {
-	auto texture = std::make_shared<GLTexture>();
-	if (texture->create(desc))
-		return texture;
-	return nullptr;
-}
-
-GraphicsDevicePtr el::createDevice(const GraphicsDeviceDesc& desc)
-{
-	if (desc.getType() == GraphicsDeviceTypeOpenGL)
-	{
-		auto device = std::make_shared<GLDevice>();
-		if (device->create(desc))
-			return device;
-	} 
-	else if (desc.getType() == GraphicsDeviceTypeMetal)
-	{
-#if 0
-		auto device = std::make_shared<MTLDevice>();
-		if (device->create(desc))
-			return device;
+    if (desc.getType() == GraphicsDeviceTypeOpenGL)
+    {
+        auto device = std::make_shared<GLDevice>();
+        if (device->create(std::move(desc)))
+            return device;
+    } 
+#if EL_PLAT_APPLE
+    else if (desc.getType() == GraphicsDeviceTypeMetal)
+    {
+        auto device = std::make_shared<MTLDevice>();
+        if (device->create(std::move(desc)))
+            return device;
 #endif
-	}
-	return nullptr;
+    }
+    return nullptr;
 }

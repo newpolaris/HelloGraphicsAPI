@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 #include "graphics_types.h"
 #include "graphics_program.h"
 #include "gl_types.h"
@@ -16,7 +14,7 @@ namespace el {
 		GLProgram();
 		~GLProgram();
 
-		bool create(const GraphicsProgramDesc& desc);
+		bool create(GraphicsProgramDesc desc);
 		void destory();
 
 		GLuint getProgramID() const;

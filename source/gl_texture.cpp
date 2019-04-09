@@ -1,5 +1,7 @@
 #include "gl_texture.h"
 #include "debug.h"
+
+// TODO:
 #include <GLFW/glfw3.h>
 
 using namespace el;
@@ -14,9 +16,8 @@ GLTexture::~GLTexture()
 {
 }
 
-bool GLTexture::create(const GraphicsTextureDesc& desc)
+bool GLTexture::create(GraphicsTextureDesc desc)
 {
-	_textureDesc = desc;
 	_target = GL_TEXTURE_2D;
 
 	GL_CHECK(glGenTextures(1, &_textureID));
@@ -40,6 +41,8 @@ bool GLTexture::create(const GraphicsTextureDesc& desc)
 	GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 16, 16, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels));
 	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+
+	_textureDesc = std::move(desc);
 
 	return true;
 }

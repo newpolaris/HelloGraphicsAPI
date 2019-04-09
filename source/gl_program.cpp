@@ -69,8 +69,10 @@ GLProgram::~GLProgram()
 {
 }
 
-bool GLProgram::create(const GraphicsProgramDesc& desc)
+bool GLProgram::create(GraphicsProgramDesc desc)
 {
+    _programDesc = std::move(desc);
+
     std::vector<GLuint> shaderIDs;
     for (auto& s : desc.getShaders())
     {
@@ -82,7 +84,6 @@ bool GLProgram::create(const GraphicsProgramDesc& desc)
         return false;
 
     _programID = id;
-    _programDesc = desc;
 
     return true;
 }

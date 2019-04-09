@@ -1,18 +1,18 @@
-#include "msl_shader.h"
+#include "mtl_shader.h"
 
 #if EL_PLAT_APPLE
 
 using namespace el;
 
-MSLShader::MSLShader()
+MTLShader::MTLShader()
 {
 }
 
-MSLShader::~MSLShader()
+MTLShader::~MTLShader()
 {
 }
 
-bool MSLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
+bool MTLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
 {
     mtlpp::Device device = mtlpp::Device::CreateSystemDefaultDevice();
 
@@ -24,11 +24,11 @@ bool MSLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode
     return true;
 }
 
-void MSLShader::destroy()
+void MTLShader::destroy()
 {
 }
 
-const GraphicsShaderDesc& MSLShader::getDesc() const
+const GraphicsShaderDesc& MTLShader::getDesc() const
 {
     return _desc;
 }

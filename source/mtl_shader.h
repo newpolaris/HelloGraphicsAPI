@@ -1,20 +1,21 @@
 #pragma once
 
 #include "predefine.h"
+
+#if EL_PLAT_APPLE
+
 #include "graphics_types.h"
 #include "graphics_shader.h"
 #include "mtlpp.hpp"
 
-#if EL_PLAT_APPLE
-
 namespace el {
     
-    class MSLShader final : public GraphicsShader
+    class MTLShader final : public GraphicsShader
     {
     public:
 
-        MSLShader();
-        ~MSLShader();
+        MTLShader();
+        ~MTLShader();
 
         bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
         void destroy();

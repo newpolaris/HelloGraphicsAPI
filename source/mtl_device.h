@@ -4,7 +4,7 @@
 
 namespace el {
 
-	class GLDevice final : public GraphicsDevice
+	class MTLDevice final : public GraphicsDevice
 	{
 	public:
 
