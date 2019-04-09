@@ -1,6 +1,11 @@
 #pragma once
 
+#include "predefine.h"
+
+#if EL_PLAT_APPLE
+
 #include "graphics_device.h"
+#include "mtlpp.hpp"
 
 namespace el {
 
@@ -14,6 +19,12 @@ namespace el {
 		GraphicsShaderPtr createShader(GraphicsShaderDesc desc) override;
 		GraphicsTexturePtr createTexture(GraphicsTextureDesc desc) override;
 		GraphicsBufferPtr createBuffer(GraphicsBufferDesc desc) override;
+
+    private:
+
+        mtlpp::Device _device;
 	};
 
 } // namespace el {
+
+#endif // EL_PLAT_APPLE

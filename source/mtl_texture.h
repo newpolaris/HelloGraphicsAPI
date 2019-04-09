@@ -24,6 +24,8 @@ namespace el {
 
     private:
 
+        mtlpp::Texture _texture;
+
         GraphicsTextureDesc _textureDesc;
     };
 

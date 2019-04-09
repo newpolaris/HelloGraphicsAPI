@@ -2,6 +2,7 @@
 
 #if EL_PLAT_APPLE 
 
+#include "debug.h"
 #include "mtl_program.h"
 #include "mtl_shader.h"
 #include "mtl_texture.h"
@@ -11,7 +12,9 @@ using namespace el;
 
 bool MTLDevice::create(GraphicsDeviceDesc desc)
 {
-    // mtlpp::device();
+    _device = mtlpp::Device::CreateSystemDefaultDevice();
+    if (!_device)
+        return false;
 	return true;
 }
 

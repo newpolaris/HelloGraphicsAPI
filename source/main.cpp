@@ -27,6 +27,8 @@
 #include "debug.h"
 #include "gl.h"
 
+#ifdef EL_BUILD_OPENGL
+
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
@@ -172,8 +174,6 @@ static void APIENTRY gl_debug_callback(GLenum source,
     el::debug_break();
 }
 #endif // EL_CONFIG_DEBUG
-
-#ifdef EL_BUILD_OPENGL
 
 int main(int argc, char** argv)
 {

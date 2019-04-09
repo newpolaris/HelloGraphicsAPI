@@ -15,6 +15,5 @@ void mtl_renderer::create()
     deviceDesc.setType(el::GraphicsDeviceTypeMetal);
 
     device = el::createDevice(deviceDesc);
-    
     EL_ASSERT(device != nullptr);
 }
