@@ -3,51 +3,51 @@
 using namespace el;
 
 GraphicsBufferDesc::GraphicsBufferDesc() :
-	_data(nullptr),
-	_dataSize(0),
-	_dataType(GraphicsDataTypeNone),
-	_usage(0)
+    _data(nullptr),
+    _dataSize(0),
+    _dataType(GraphicsDataTypeNone),
+    _usage(0)
 {
 }
 
 void GraphicsBufferDesc::setData(const char* data)
 {
-	_data = data;
+    _data = data;
 }
 
 const char* GraphicsBufferDesc::getData() const
 {
-	return _data;
+    return _data;
 }
 
 void GraphicsBufferDesc::setDataSize(size_t size)
 {
-	_dataSize = size;
+    _dataSize = size;
 }
 
 size_t GraphicsBufferDesc::getDataSize() const
 {
-	return _dataSize;
+    return _dataSize;
 }
 
 void GraphicsBufferDesc::setDataType(GraphicsDataType dataType)
 {
-	_dataType = dataType;
+    _dataType = dataType;
 }
 
 GraphicsDataType GraphicsBufferDesc::getDataType() const
 {
-	return _dataType;
+    return _dataType;
 }
 
 void GraphicsBufferDesc::setUsage(GraphicsUsageFlags usage)
 {
-	_usage = usage;
+    _usage = usage;
 }
 
 GraphicsUsageFlags GraphicsBufferDesc::getUsage() const
 {
-	return _usage;
+    return _usage;
 }
 
 GraphicsBuffer::GraphicsBuffer()

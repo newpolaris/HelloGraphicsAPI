@@ -4,7 +4,7 @@
 
 #define EL_CONFIG_DEBUG 0
 
-#ifdef _DEBUG
+#if defined(_DEBUG) || !defined(NDEBUG)
 #	undef EL_CONFIG_DEBUG
-#	define EL_CONFIG_DEBUG 1
+#	define EL_CONFIG_DEBUG 0
 #endif

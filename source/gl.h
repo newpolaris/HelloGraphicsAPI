@@ -6,10 +6,8 @@
 #include <OpenGLES/ES2/gl.h>
 #elif EL_PLAT_ANDROID
 #include <GLES2/gl2.h>
-#elif EL_PLAT_WINDOWS
+#elif EL_PLAT_WINDOWS || EL_PLAT_OSX
 #include <glad/glad.h>
-#else // linux
-#include <GL/glew.h>
 #endif
 
 #ifndef GL_STACK_OVERFLOW   
@@ -37,7 +35,7 @@ namespace gl {
 #if EL_CONFIG_DEBUG
 #    define GL_CHECK(_call) _GL_CHECK(_call)
 #else
-#    define GL_CHECK(_call) _call
+#    define GL_CHECK(_call) ((void)(_call))
 #endif
 
 #define _EMPTY_OUT_ 0

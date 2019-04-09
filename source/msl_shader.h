@@ -2,24 +2,33 @@
 
 #include "predefine.h"
 #include "graphics_types.h"
+#include "graphics_shader.h"
 #include "mtlpp.hpp"
 
-#if EL_PLAT_IOS || EL_PLAT_OSX
+#if EL_PLAT_APPLE
 
-class MSLShader final : public GraphicsShader
-{
-public:
+namespace el {
+    
+    class MSLShader final : public GraphicsShader
+    {
+    public:
 
-	MSLShader();
-	~MSLShader();
+        MSLShader();
+        ~MSLShader();
 
-	void create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
-	void destroy();
+        bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
+        void destroy();
+        
+        const GraphicsShaderDesc& getDesc() const override;
 
-private:
+    private:
 
-	mtlpp::Library _library;
-	mtlpp::Function _function;
-};
+        GraphicsShaderDesc _desc;
+        
+        mtlpp::Library _library;
+        mtlpp::Function _function;
+    };
 
-#endif
+} // namespace el {
+
+#endif // EL_PLAT_APPLE

@@ -94,81 +94,84 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         glfwSetWindowShouldClose(window, GLFW_TRUE);
 }
 
+#if EL_CONFIG_DEBUG
+
 static void APIENTRY gl_debug_callback(GLenum source,
-	GLenum type,
-	GLuint id,
-	GLenum severity,
-	GLsizei length,
-	const GLchar* message,
-	const void* userParam)
+    GLenum type,
+    GLuint id,
+    GLenum severity,
+    GLsizei length,
+    const GLchar* message,
+    const void* userParam)
 {
-	// ignore these non-significant error codes
-	if (id == 131169 || id == 131185 || id == 131218 || id == 131204 || id == 131184) 
-		return;
+    // ignore these non-significant error codes
+    if (id == 131169 || id == 131185 || id == 131218 || id == 131204 || id == 131184) 
+        return;
 
-	std::stringstream output;
-	output << "---------- OPENGL CALLBACK -----------" << std::endl;
-	output << "SOURCE: ";
-	switch (source) {
-	case GL_DEBUG_SOURCE_API:
-		output << "WINDOW_SYSTEM";
-		break;
-	case GL_DEBUG_SOURCE_SHADER_COMPILER:
-		output << "SHADER_COMPILER";
-		break;
-	case GL_DEBUG_SOURCE_THIRD_PARTY:
-		output << "THIRD_PARTY";
-		break;
-	case GL_DEBUG_SOURCE_APPLICATION:
-		output << "APPLICATION";
-		break;
-	case GL_DEBUG_SOURCE_OTHER:
-		output << "OTHER";
-		break;
-	}
-	output << std::endl;
+    std::stringstream output;
+    output << "---------- OPENGL CALLBACK -----------" << std::endl;
+    output << "SOURCE: ";
+    switch (source) {
+    case GL_DEBUG_SOURCE_API:
+        output << "WINDOW_SYSTEM";
+        break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER:
+        output << "SHADER_COMPILER";
+        break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY:
+        output << "THIRD_PARTY";
+        break;
+    case GL_DEBUG_SOURCE_APPLICATION:
+        output << "APPLICATION";
+        break;
+    case GL_DEBUG_SOURCE_OTHER:
+        output << "OTHER";
+        break;
+    }
+    output << std::endl;
 
-	output << "TYPE: ";
-	switch (type) {
-	case GL_DEBUG_TYPE_ERROR:
-		output << "ERROR";
-		break;
-	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-		output << "DEPRECATED_BEHAVIOR";
-		break;
-	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-		output << "UNDEFINED_BEHAVIOR";
-		break;
-	case GL_DEBUG_TYPE_PORTABILITY:
-		output << "PORTABILITY";
-		break;
-	case GL_DEBUG_TYPE_PERFORMANCE:
-		output << "PERFORMANCE";
-		break;
-	case GL_DEBUG_TYPE_OTHER:
-		output << "OTHER";
-		break;
-	}
-	output << std::endl;
+    output << "TYPE: ";
+    switch (type) {
+    case GL_DEBUG_TYPE_ERROR:
+        output << "ERROR";
+        break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+        output << "DEPRECATED_BEHAVIOR";
+        break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+        output << "UNDEFINED_BEHAVIOR";
+        break;
+    case GL_DEBUG_TYPE_PORTABILITY:
+        output << "PORTABILITY";
+        break;
+    case GL_DEBUG_TYPE_PERFORMANCE:
+        output << "PERFORMANCE";
+        break;
+    case GL_DEBUG_TYPE_OTHER:
+        output << "OTHER";
+        break;
+    }
+    output << std::endl;
 
-	output << "SEVERITY : ";
-	switch (severity) {
-	case GL_DEBUG_SEVERITY_LOW:
-		output << "LOW";
-		break;
-	case GL_DEBUG_SEVERITY_MEDIUM:
-		output << "MEDIUM";
-		break;
-	case GL_DEBUG_SEVERITY_HIGH:
-		output << "HIGH";
-		break;
-	}
-	output << std::endl;
-	output << message << std::endl;
+    output << "SEVERITY : ";
+    switch (severity) {
+    case GL_DEBUG_SEVERITY_LOW:
+        output << "LOW";
+        break;
+    case GL_DEBUG_SEVERITY_MEDIUM:
+        output << "MEDIUM";
+        break;
+    case GL_DEBUG_SEVERITY_HIGH:
+        output << "HIGH";
+        break;
+    }
+    output << std::endl;
+    output << message << std::endl;
 
-	EL_TRACE("\n%s", output.str().c_str());
-	el::debug_break();
+    EL_TRACE("\n%s", output.str().c_str());
+    el::debug_break();
 }
+#endif // EL_CONFIG_DEBUG
 
 int main(int argc, char** argv)
 {
@@ -181,21 +184,23 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
 
 #ifdef GLFW_INCLUDE_ES3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-#elif 1 // COMPATIBILITY MODE
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+#elif 0 // COMPATIBILITY MODE
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#	ifdef EL_PLAT_OSX
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#	endif
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+#   ifdef EL_PLAT_APPLE
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#   else
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
+#   endif
 #else // LEGACY
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
 
     windows[0] = glfwCreateWindow(400, 400, "First", NULL, NULL);
@@ -216,91 +221,91 @@ int main(int argc, char** argv)
     // The contexts are created with the same APIs so the function
     // pointers should be re-usable between them
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-
+        
 #if EL_CONFIG_DEBUG
-	if (glfwExtensionSupported("GL_ARB_debug_output"))
-	{
-		glEnable(GL_DEBUG_OUTPUT);
-		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-		if (glDebugMessageCallback) {
-			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-			glDebugMessageCallback(gl_debug_callback, nullptr);
-		}
-	}
+    if (glfwExtensionSupported("GL_ARB_debug_output"))
+    {
+        glEnable(GL_DEBUG_OUTPUT);
+        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+        if (glDebugMessageCallback) {
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
+            glDebugMessageCallback(gl_debug_callback, nullptr);
+        }
+    }
 
-	std::printf("%s\n%s\n%s\n%s\n",
-		glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine
-		glGetString(GL_VERSION),   // e.g. 3.2 INTEL-8.0.61
-		glGetString(GL_VENDOR),	   // e.g. NVIDIA Corporation
-		glGetString(GL_SHADING_LANGUAGE_VERSION)  // e.g. 4.60 NVIDIA or 1.50 NVIDIA via Cg compiler
-	);
+    std::printf("%s\n%s\n%s\n%s\n",
+        glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine
+        glGetString(GL_VERSION),   // e.g. 3.2 INTEL-8.0.61
+        glGetString(GL_VENDOR),    // e.g. NVIDIA Corporation
+        glGetString(GL_SHADING_LANGUAGE_VERSION)  // e.g. 4.60 NVIDIA or 1.50 NVIDIA via Cg compiler
+    );
 #endif
 
-	using namespace el;
+    using namespace el;
 
-	GraphicsDeviceDesc deviceDesc;
-	deviceDesc.setType(GraphicsDeviceTypeOpenGL);
+    GraphicsDeviceDesc deviceDesc;
+    deviceDesc.setType(GraphicsDeviceTypeOpenGL);
 
-	GraphicsDevicePtr device = createDevice(deviceDesc);
+    GraphicsDevicePtr device = createDevice(deviceDesc);
 
-	GraphicsShaderPtr vertex_shader;
-	GraphicsShaderPtr fragment_shader;
-	GraphicsProgramPtr program;
-	GraphicsTexturePtr texture;
+    GraphicsShaderPtr vertex_shader;
+    GraphicsShaderPtr fragment_shader;
+    GraphicsProgramPtr program;
+    GraphicsTexturePtr texture;
 
-	GraphicsBufferPtr vertex_buffer;
+    GraphicsBufferPtr vertex_buffer;
 
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
-		GraphicsTextureDesc texture_desc;
-		texture_desc.setDim(GraphicsTextureDim2D);
-		texture_desc.setWidth(16);
-		texture_desc.setHeight(16);
+        GraphicsTextureDesc texture_desc;
+        texture_desc.setDim(GraphicsTextureDim2D);
+        texture_desc.setWidth(16);
+        texture_desc.setHeight(16);
 
-		texture = device->createTexture(texture_desc);
+        texture = device->createTexture(texture_desc);
 
-		GraphicsShaderDesc vertex_desc;
-		vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
-		vertex_desc.setShaderCode(vertex_shader_text);
+        GraphicsShaderDesc vertex_desc;
+        vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
+        vertex_desc.setShaderCode(vertex_shader_text);
 
-		GraphicsShaderDesc fragment_desc;
-		fragment_desc.setStageFlag(GraphicsShaderStageFragmentBit);
-		fragment_desc.setShaderCode(fragment_shader_text);
+        GraphicsShaderDesc fragment_desc;
+        fragment_desc.setStageFlag(GraphicsShaderStageFragmentBit);
+        fragment_desc.setShaderCode(fragment_shader_text);
 
-		vertex_shader = device->createShader(vertex_desc);
-		fragment_shader = device->createShader(fragment_desc);
+        vertex_shader = device->createShader(vertex_desc);
+        fragment_shader = device->createShader(fragment_desc);
 
-		GraphicsProgramDesc program_desc;
-		program_desc.addShader(vertex_shader);
-		program_desc.addShader(fragment_shader);
+        GraphicsProgramDesc program_desc;
+        program_desc.addShader(vertex_shader);
+        program_desc.addShader(fragment_shader);
 
-		program = device->createProgram(program_desc);
-		auto program_id = std::static_pointer_cast<GLProgram>(program)->getProgramID();
+        program = device->createProgram(program_desc);
+        auto program_id = std::static_pointer_cast<GLProgram>(program)->getProgramID();
 
         mvp_location = glGetUniformLocation(program_id, "MVP");
         color_location = glGetUniformLocation(program_id, "color");
         texture_location = glGetUniformLocation(program_id, "texture");
         vpos_location = glGetAttribLocation(program_id, "vPos");
 
-		GraphicsBufferDesc vertices_buffer_desc;
-		vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
-		vertices_buffer_desc.setData((const char*)vertices);
-		vertices_buffer_desc.setDataSize(sizeof(vertices));
+        GraphicsBufferDesc vertices_buffer_desc;
+        vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
+        vertices_buffer_desc.setData((const char*)vertices);
+        vertices_buffer_desc.setDataSize(sizeof(vertices));
 
-		vertex_buffer = device->createBuffer(vertices_buffer_desc);
+        vertex_buffer = device->createBuffer(vertices_buffer_desc);
     }
 
-	const GLint slot0 = 0;
+    const GLint slot0 = 0;
 
-	auto gl_program = std::static_pointer_cast<GLProgram>(program);
-	gl_program->use();
-	gl_program->setTexture(texture_location, texture, slot0);
-	gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
+    auto gl_program = std::static_pointer_cast<GLProgram>(program);
+    gl_program->use();
+    gl_program->setTexture(texture_location, texture, slot0);
+    gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
 
-	GLProfileBusyWait profile[2];
-	profile[0].setName("window 0");
-	profile[1].setName("window 1");
+    GLProfileBusyWait profile[2];
+    profile[0].setName("window 0");
+    profile[1].setName("window 1");
 
     windows[1] = glfwCreateWindow(400, 400, "Second", NULL, windows[0]);
     if (!windows[1])
@@ -325,24 +330,24 @@ int main(int argc, char** argv)
 
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
-	gl_program->use();
-	gl_program->setTexture(texture_location, texture, slot0);
-	gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
+    gl_program->use();
+    gl_program->setTexture(texture_location, texture, slot0);
+    gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
 
-	// gl_program->setIndexBuffer()
+    // gl_program->setIndexBuffer()
 
-	mat4x4 mvp;
-	mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
-	gl_program->setUniform(mvp_location, mvp);
+    mat4x4 mvp;
+    mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
+    gl_program->setUniform(mvp_location, mvp);
 
     while (!glfwWindowShouldClose(windows[0]) &&
            !glfwWindowShouldClose(windows[1]))
     {
-		const vec3 colors[2] =
-		{
-			{ 0.8f, 0.4f, 1.f },
-			{ 0.3f, 0.4f, 1.f }
-		};
+        const vec3 colors[2] =
+        {
+            { 0.8f, 0.4f, 1.f },
+            { 0.3f, 0.4f, 1.f }
+        };
 
         int i;
         for (i = 0;  i < 2;  i++)
@@ -352,78 +357,81 @@ int main(int argc, char** argv)
             glfwGetFramebufferSize(windows[i], &width, &height);
             glfwMakeContextCurrent(windows[i]);
 
-			profile[i].start();
+            
+            if (glfwExtensionSupported("GL_ARB_timer_query"))
+                profile[i].start();
 
             GL_CHECK(glViewport(0, 0, width, height));
-			// Shared bewteen context
-			gl_program->setUniform(color_location, colors[i]);
+            // Shared bewteen context
+            gl_program->setUniform(color_location, colors[i]);
             GL_CHECK(glDrawArrays(GL_TRIANGLE_FAN, 0, 4));
 
-			profile[i].end();
+            if (glfwExtensionSupported("GL_ARB_timer_query"))
+                profile[i].end();
+            
             glfwSwapBuffers(windows[i]);
-			char profileBuf[256] = {'\0'};
-			sprintf(profileBuf, "%s CPU %.3f, GPU %.3f", profile[i].getName().c_str(), 
-						profile[i].getCpuTime(), profile[i].getGpuTime());
-			glfwSetWindowTitle(windows[i], profileBuf);
+            char profileBuf[256] = {'\0'};
+            sprintf(profileBuf, "%s CPU %.3f, GPU %.3f", profile[i].getName().c_str(), 
+                        profile[i].getCpuTime(), profile[i].getGpuTime());
+            glfwSetWindowTitle(windows[i], profileBuf);
         }
 
         glfwPollEvents();
     }
 
-	std::static_pointer_cast<GLShader>(vertex_shader)->destroy(gl_program->getProgramID());
-	std::static_pointer_cast<GLShader>(fragment_shader)->destroy(gl_program->getProgramID());
+    std::static_pointer_cast<GLShader>(vertex_shader)->destroy(gl_program->getProgramID());
+    std::static_pointer_cast<GLShader>(fragment_shader)->destroy(gl_program->getProgramID());
 
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }
 
 #if 0
-{
-	// Load the coordinate
-	gl::VertexAttribPointer(m_aPositionHandle, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(FLOAT), vtxs);
-	gl::VertexAttribPointer(m_aTexHandle, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(FLOAT), &vtxs[3]);
 
-	if (bTriangleFan)
-		gl::DrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	else {
-		std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
-		gl::DrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()); 
-	}
+{
+    // Load the coordinate
+    gl::VertexAttribPointer(m_aPositionHandle, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(FLOAT), vtxs);
+    gl::VertexAttribPointer(m_aTexHandle, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(FLOAT), &vtxs[3]);
+
+    if (bTriangleFan)
+        gl::DrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    else {
+        std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
+        gl::DrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()); 
+    }
 }
 
 void SubDrawTexture(float* vtxs)
 {
-	// Load the coordinate
-	glVertexAttribPointer(m_aPositionHandle, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), vtxs);
-	glVertexAttribPointer(m_aTexHandle, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), &vtxs[3]);
+    // Load the coordinate
+    glVertexAttribPointer(m_aPositionHandle, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), vtxs);
+    glVertexAttribPointer(m_aTexHandle, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), &vtxs[3]);
 
-	float vNormalVector[12] = { 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f };
-	glVertexAttribPointer(m_aNormalVector, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), vNormalVector);
+    float vNormalVector[12] = { 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f };
+    glVertexAttribPointer(m_aNormalVector, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), vNormalVector);
 
-	// Drawing
-	if (bTriangleFan)
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	else {
-		std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()); 
-	}
+    // Drawing
+    if (bTriangleFan)
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    else {
+        std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()); 
+    }
 }
 
-#endif
-#if 0
 {
-	std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
-	GL_CHECK(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()));
+    std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
+    GL_CHECK(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()));
 
-	const GLbyte* offset = 0;
-	const GLuint fanCount = 4;
-	const GLuint count = (fanCount - 2) * 3;
+    const GLbyte* offset = 0;
+    const GLuint fanCount = 4;
+    const GLuint count = (fanCount - 2) * 3;
 
-	GLuint ibo = 0;
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, params.numIndices * params.sizeofIndices, params.indices, GL_STATIC_DRAW);
+    GLuint ibo = 0;
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, params.numIndices * params.sizeofIndices, params.indices, GL_STATIC_DRAW);
 
-	glDrawElementsBaseVertex(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, nullptr, offset);
+    glDrawElementsBaseVertex(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, nullptr, offset);
 }
 #endif

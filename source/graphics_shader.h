@@ -4,41 +4,41 @@
 
 namespace el {
 
-class GraphicsShaderDesc final
-{
-public:
+    class GraphicsShaderDesc final
+    {
+    public:
 
-	GraphicsShaderDesc();
+        GraphicsShaderDesc();
 
-	void setStageFlag(GraphicsShaderStageFlagBits stage);
-	GraphicsShaderStageFlagBits getStageFlag() const;
+        void setStageFlag(GraphicsShaderStageFlagBits stage);
+        GraphicsShaderStageFlagBits getStageFlag() const;
 
-	void setShaderCode(const char* code);
-	void setShaderCodeSize(size_t length);
+        void setShaderCode(const char* code);
+        void setShaderCodeSize(size_t length);
 
-	const char* getShaderCode() const;
-	size_t getShaderCodeSize() const;
+        const char* getShaderCode() const;
+        size_t getShaderCodeSize() const;
 
-private:
+    private:
 
-	GraphicsShaderStageFlagBits _stage;
-	const char* _shaderCode;
-	size_t _shaderCodeSize;
-};
+        GraphicsShaderStageFlagBits _stage;
+        const char* _shaderCode;
+        size_t _shaderCodeSize;
+    };
 
-class GraphicsShader
-{
-public:
+    class GraphicsShader
+    {
+    public:
 
-	GraphicsShader();
-	virtual ~GraphicsShader();
+        GraphicsShader();
+        virtual ~GraphicsShader();
 
-	virtual const GraphicsShaderDesc& getDesc() const = 0;
+        virtual const GraphicsShaderDesc& getDesc() const = 0;
 
-private:
+    private:
 
-	GraphicsShader(const GraphicsShader&) = delete;
-	GraphicsShader& operator=(const GraphicsShader&) = delete;
-};
+        GraphicsShader(const GraphicsShader&) = delete;
+        GraphicsShader& operator=(const GraphicsShader&) = delete;
+    };
 
 } // namespace el {

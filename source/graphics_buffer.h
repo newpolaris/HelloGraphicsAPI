@@ -10,24 +10,24 @@ namespace el {
 
         GraphicsBufferDesc();
 
-		void setData(const char* data);
-		const char* getData() const;
+        void setData(const char* data);
+        const char* getData() const;
 
-		void setDataSize(size_t size);
-		size_t getDataSize() const;
+        void setDataSize(size_t size);
+        size_t getDataSize() const;
 
-		void setDataType(GraphicsDataType dataType);
-		GraphicsDataType getDataType() const;
+        void setDataType(GraphicsDataType dataType);
+        GraphicsDataType getDataType() const;
 
-		void setUsage(GraphicsUsageFlags usage);
-		GraphicsUsageFlags getUsage() const;
+        void setUsage(GraphicsUsageFlags usage);
+        GraphicsUsageFlags getUsage() const;
 
     private:
 
-		const char* _data;
-		size_t _dataSize;
-		GraphicsDataType _dataType;
-		GraphicsUsageFlags _usage;
+        const char* _data;
+        size_t _dataSize;
+        GraphicsDataType _dataType;
+        GraphicsUsageFlags _usage;
     };
 
     class GraphicsBuffer
@@ -37,11 +37,11 @@ namespace el {
         GraphicsBuffer();
         virtual ~GraphicsBuffer();
 
-		virtual bool create(const GraphicsBufferDesc& desc) = 0;
+        virtual bool create(const GraphicsBufferDesc& desc) = 0;
 
     private:
 
-        const GraphicsBuffer(const GraphicsBuffer&) = delete;
+        GraphicsBuffer(const GraphicsBuffer&) = delete;
         GraphicsBuffer& operator=(const GraphicsBuffer&) = delete;
     };
 

@@ -11,6 +11,7 @@
 
 #define EL_PLAT_WINDOWS 0
 #define EL_PLAT_ANDROID 0
+#define EL_PLAT_APPLE 0
 #define EL_PLAT_IOS 0
 #define EL_PLAT_IOS_DEVICE 0
 #define EL_PLAT_IOS_SIMULATOR 0
@@ -48,31 +49,31 @@
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Compilers
 #if defined(__clang__)
-#	undef  EL_COMP_CLANG
-#	define EL_COMP_CLANG (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
+#   undef  EL_COMP_CLANG
+#   define EL_COMP_CLANG (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
 #elif defined(_MSC_VER)
-#	undef  EL_COMP_MSVC
-#	define EL_COMP_MSVC _MSC_VER
+#   undef  EL_COMP_MSVC
+#   define EL_COMP_MSVC _MSC_VER
 #elif defined(__GNUC__)
-#	undef  EL_COMP_GCC
-#	define EL_COMP_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#   undef  EL_COMP_GCC
+#   define EL_COMP_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #endif
 
 // https://www.boost.org/doc/libs/1_66_0/doc/html/predef
 #if defined(_WIN32) || defined(_WIN64) || defined(__WIN32__) || defined(__WINDOWS__)
-#	undef EL_PLAT_WINDOWS
-#	define EL_PLAT_WINDOWS 1
+#   undef EL_PLAT_WINDOWS
+#   define EL_PLAT_WINDOWS 1
 #elif defined(__ANDROID__)
-#	include <android/api-level.h>
-#	undef EL_PLAT_ANDROID
-#	define EL_PLAT_ANDROID __ANDROID_API__
+#   include <android/api-level.h>
+#   undef EL_PLAT_ANDROID
+#   define EL_PLAT_ANDROID __ANDROID_API__
 #elif  defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) \
-	|| defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
-#	undef  EL_PLAT_IOS
-#	define EL_PLAT_IOS 1
+    || defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
+#   undef  EL_PLAT_IOS
+#   define EL_PLAT_IOS 1
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
-#	undef  EL_PLAT_OSX
-#	define EL_PLAT_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
+#   undef  EL_PLAT_OSX
+#   define EL_PLAT_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
 #endif
 
 #if EL_PLAT_IOS
@@ -86,3 +87,7 @@
 #    endif
 #endif
 
+#if EL_PLAT_ISO || EL_PLAT_OSX
+#   undef EL_PLAT_APPLE
+#   define EL_PLAT_APPLE 1
+#endif

@@ -13,8 +13,7 @@ namespace el {
 #if EL_CONFIG_DEBUG
 #	define EL_TRACE		_EL_TRACE
 #else
-#	define EL_TRACE 
-#	define EL_TRACEOUT
+#	define EL_TRACE(_format, ...)	((void)(_format))
 #endif
 
 #define _EL_TRACE(_format, ...)	\
@@ -25,5 +24,5 @@ namespace el {
 #if EL_CONFIG_DEBUG
 #    define EL_ASSERT(_call) assert(_call)
 #else
-#    define EL_ASSERT(_call) _call
+#    define EL_ASSERT(_call) ((void)(_call))
 #endif
