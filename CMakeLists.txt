@@ -52,7 +52,42 @@ add_definitions(
 	-D_CRT_SECURE_NO_WARNINGS
 )
 
-add_executable(${APP_TARGET} ${SOURCE} ${GLAD})
+set(OSX_SOURCE
+    source/OSX/AppDelegate.mm
+    source/OSX/GameViewController.mm
+    source/OSX/main.mm
+    source/OSX/AppDelegate.h
+    source/OSX/GameViewController.h
+    source/OSX/SharedStructures.h)
+
+add_executable(
+    ${APP_TARGET} 
+    MACOSX_BUNDLE 
+    ${SOURCE} 
+    ${GLAD} 
+    ${OSX_SOURCE} 
+    source/OSX/MainMenu.xib 
+    source/OSX/Shaders.metal)
+
+set_source_files_properties(
+    source/OSX/MainMenu.xib
+    source/OSX/Shaders.metal
+    PROPERTIES
+    MACOSX_PACKAGE_LOCATION
+    Resources)
+
+set_target_properties(
+    ${APP_TARGET}
+    PROPERTIES
+    MACOSX_BUNDLE_INFO_PLIST
+    ${CMAKE_CURRENT_LIST_DIR}/source/OSX/plist.in)
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
+  -framework AppKit \
+  -framework Metal \
+  -framework MetalKit \
+  -framework ModelIO")
+
 target_include_directories(${APP_TARGET} PRIVATE "${GLAD_DIR}/include")
 target_link_libraries(${APP_TARGET} ${ALL_LIBS})
 

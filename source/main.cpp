@@ -173,6 +173,8 @@ static void APIENTRY gl_debug_callback(GLenum source,
 }
 #endif // EL_CONFIG_DEBUG
 
+#ifdef EL_BUILD_OPENGL
+
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
@@ -435,3 +437,5 @@ void SubDrawTexture(float* vtxs)
     glDrawElementsBaseVertex(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, nullptr, offset);
 }
 #endif
+
+#endif // EL_BUILD_OPENGL
