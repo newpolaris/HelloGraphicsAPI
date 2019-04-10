@@ -20,6 +20,11 @@
 #define GL_CONTEXT_LOST 0x0507
 #endif
 
+// Fix-up naming differences between OpenGL and OpenGL ES
+// TODO:
+#define glMapBufferOES glMapBuffer
+#define glUnmapBufferOES glUnmapBuffer
+
 namespace el {
 namespace gl {
 	bool error_handler(const char* file, int line);

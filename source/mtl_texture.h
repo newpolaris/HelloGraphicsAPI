@@ -6,10 +6,11 @@
 
 #include "graphics_types.h"
 #include "graphics_texture.h"
+#include "mtl_types.h"
 #include "mtlpp.hpp"
 
 namespace el {
-    
+
     class MTLTexture final : public GraphicsTexture
     {
     public:
@@ -19,14 +20,17 @@ namespace el {
 
         bool create(GraphicsTextureDesc desc);
         void destroy();
-        
+
+        void setDevice(GraphicsDevicePtr device);
+        GraphicsDevicePtr getDevice();
+
         const GraphicsTextureDesc& getTextureDesc() const override;
 
     private:
 
         mtlpp::Texture _texture;
-
         GraphicsTextureDesc _textureDesc;
+        MetalDeviceWeakPtr _device;
     };
 
 } // namespace el {

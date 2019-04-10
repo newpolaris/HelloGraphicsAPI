@@ -212,6 +212,12 @@ int main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
+    if (!glfwExtensionSupported("GL_ARB_framebuffer_object"))
+    {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    
     glfwSetKeyCallback(windows[0], key_callback);
 
     glfwMakeContextCurrent(windows[0]);

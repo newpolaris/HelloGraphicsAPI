@@ -139,7 +139,7 @@ namespace el {
     const GLubyte* gl::GetString(GLenum name)
     {
         const GLubyte* str = glGetString(name);
-        GL_CHECK(0);
+        GL_CHECK();
         return str;
     }
 

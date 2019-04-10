@@ -20,7 +20,8 @@ MTLTexture::~MTLTexture()
 
 bool MTLTexture::create(GraphicsTextureDesc desc)
 {
-	auto device = std::static_pointer_cast<MTLDevice>(this->getDevice());
+    auto device = _device.lock();
+    if (!device) return false;
 
     auto format = mtlpp::PixelFormat::RGBA8Unorm;
     auto textureDesc = mtlpp::TextureDescriptor::Texture2DDescriptor(
@@ -38,6 +39,16 @@ bool MTLTexture::create(GraphicsTextureDesc desc)
 
 void MTLTexture::destroy()
 {
+}
+
+void MTLTexture::setDevice(GraphicsDevicePtr device)
+{
+    _device = std::static_pointer_cast<MTLDevice>(std::move(device));
+}
+
+GraphicsDevicePtr MTLTexture::getDevice()
+{
+    return _device.lock();
 }
 
 const GraphicsTextureDesc& MTLTexture::getTextureDesc() const

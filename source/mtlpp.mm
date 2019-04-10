@@ -1,5 +1,6 @@
-#include "platform.h"
-#if EL_PLAT_IOS || EL_PLAT_OSX
+#include "predefine.h"
+
+#if EL_PLAT_APPLE
 
 /*
  * Copyright 2016-2017 Nikolay Aleksiev. All rights reserved.
@@ -4600,4 +4601,4 @@ namespace mtlpp
     }
 }
 
-#endif // #if EL_PLAT_IOS || EL_PLAT_OSX
+#endif // #if EL_PLAT_APPLE

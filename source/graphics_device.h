@@ -17,7 +17,7 @@ namespace el {
 		GraphicsDeviceType _type;
 	};
 
-	class GraphicsDevice
+    class GraphicsDevice : public std::enable_shared_from_this<GraphicsDevice>
 	{
 	public:
 
@@ -30,6 +30,7 @@ namespace el {
 		virtual GraphicsShaderPtr createShader(GraphicsShaderDesc desc) = 0;
 		virtual GraphicsTexturePtr createTexture(GraphicsTextureDesc desc) = 0;
 		virtual GraphicsBufferPtr createBuffer(GraphicsBufferDesc desc) = 0;
+        virtual GraphicsDeviceContextPtr createDeviceContext() = 0;
 	};
 
 	GraphicsDevicePtr createDevice(GraphicsDeviceDesc desc);

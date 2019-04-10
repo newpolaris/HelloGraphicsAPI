@@ -3,6 +3,7 @@
 #include "gl_shader.h"
 #include "gl_texture.h"
 #include "gl_buffer.h"
+#include "gl_device_context.h"
 
 using namespace el;
 
@@ -17,6 +18,8 @@ bool GLDevice::create(GraphicsDeviceDesc desc)
 GraphicsProgramPtr GLDevice::createProgram(GraphicsProgramDesc desc)
 {
 	auto program = std::make_shared<GLProgram>();
+    if (program == nullptr)
+        return nullptr;
 	if (program->create(std::move(desc)))
 		return program;
 	return nullptr;
@@ -25,6 +28,8 @@ GraphicsProgramPtr GLDevice::createProgram(GraphicsProgramDesc desc)
 GraphicsShaderPtr GLDevice::createShader(GraphicsShaderDesc desc) 
 {
 	auto shader = std::make_shared<GLShader>();
+    if (shader == nullptr)
+        return nullptr;
 	if (shader->create(desc.getStageFlag(), desc.getShaderCode()))
 		return shader;
 	return nullptr;
@@ -33,6 +38,8 @@ GraphicsShaderPtr GLDevice::createShader(GraphicsShaderDesc desc)
 GraphicsTexturePtr GLDevice::createTexture(GraphicsTextureDesc desc)
 {
 	auto texture = std::make_shared<GLTexture>();
+    if (texture == nullptr)
+        return nullptr;
 	if (texture->create(std::move(desc)))
 		return texture;
 	return nullptr;
@@ -41,7 +48,19 @@ GraphicsTexturePtr GLDevice::createTexture(GraphicsTextureDesc desc)
 GraphicsBufferPtr GLDevice::createBuffer(GraphicsBufferDesc desc)
 {
 	auto buffer = std::make_shared<GLBuffer>();
+    if (buffer == nullptr)
+        return nullptr;
 	if (buffer->create(std::move(desc)))
 		return buffer;
 	return nullptr;
+}
+
+GraphicsDeviceContextPtr GLDevice::createDeviceContext()
+{
+    auto context = std::make_shared<GLDeviceContext>();
+    if (context == nullptr)
+        return nullptr;
+    if (context->create())
+        return context;
+    return nullptr;
 }
