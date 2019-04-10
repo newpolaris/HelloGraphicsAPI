@@ -18,3 +18,4 @@ imgui.ini
 /external/gli/*.cmake
 _build/
 .DS_Store
+HelloGraphicsAPI.app.app/
