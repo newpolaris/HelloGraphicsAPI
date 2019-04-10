@@ -48,13 +48,12 @@
 #include "graphics_shader.h"
 #include "graphics_program.h"
 
-#include "gl_buffer.h"
-
 // TODO:
 #include "gl_program.h"
 #include "gl_shader.h"
 #include "gl_texture.h"
 #include "gl_profile.h"
+#include "gl_buffer.h"
 
 static const char* vertex_shader_text =
 "#version 110\n"

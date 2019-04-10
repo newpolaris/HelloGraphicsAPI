@@ -1,4 +1,4 @@
-#define METAL_MTLPP_EXAMPLE 1
+#define METAL_MTLPP_EXAMPLE 0
 
 #include <debug.h>
 #include <graphics_types.h>
@@ -47,9 +47,35 @@ namespace el {
         context = device->createDeviceContext();
         EL_ASSERT(context != nullptr);
 
-         uint32_t data[width * height];
+        uint32_t data[width * height];
         
-#if 0
+    #if 0
+        GraphicsFramebufferPtr colorRenderTarget;
+        GraphicsFramebufferDesc frameDesc;
+
+        colorRenderTarget = device->createFramebuffer(frameDesc);
+
+        context->setFramebuffer(colorRenderTarget);
+        
+        // ??
+        // glBindFramebuffer(GL_FRAME_BUFFER, some_magic_int);
+
+        // glBindFramebuffer(GL_FRAME_BUFFER, 0);
+        // on macbook framebuffer related width / height can't be deduced;
+
+        // id <CAMetalDrawable> drawable = _currentDrawable = [_metalLayer nextDrawable];
+        // _renderPassDescriptor = [MTLRenderPassDescriptor renderPassDescriptor];
+    
+        // create a color attachment every frame since we have to recreate the texture every frame
+        // MTLRenderPassColorAttachmentDescriptor *colorAttachment = _renderPassDescriptor.colorAttachments[0];
+        // colorAttachment.texture = texture;
+
+        // make sure to clear every frame for best performance
+        // colorAttachment.loadAction = MTLLoadActionClear;
+        // colorAttachment.clearColor = MTLClearColorMake(0.65f, 0.65f, 0.65f, 1.0f);
+    
+        // context->setFramebuffer(colorRenderTarget);
+
         context->begin();
         {
             context->beginRender(_renderPassDesc);
@@ -83,7 +109,7 @@ namespace el {
         context->finish(true);
 
         texture.GetBytes(data, width * 4, mtlpp::Region(0, 0, width, height), 0);
-#endif
+    #endif
         
         for (uint32_t i=0; i<width*height; i++)
         {
@@ -101,7 +127,8 @@ int main()
 
     return 0;
 }
-#else
+
+#elif 0
 
 #import <AppKit/NSApplication.h>
 
