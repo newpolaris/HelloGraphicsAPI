@@ -73,6 +73,9 @@
 #ifndef __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_10_0
 #   define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_10_0(x)
 #endif
+#ifndef __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_10_3
+#   define __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_10_3(x)
+#endif
 
 #define MTLPP_IS_AVAILABLE_MAC(mac)  (0 __DARWIN_ALIAS_STARTING_MAC___MAC_##mac( || 1 ))
 #define MTLPP_IS_AVAILABLE_IOS(ios)  (0 __DARWIN_ALIAS_STARTING_IPHONE___IPHONE_##ios( || 1 ))
@@ -146,7 +149,7 @@ namespace ns
         ArrayBase() { }
         ArrayBase(const Handle& handle) : Object(handle) { }
 
-        const uint32_t GetSize() const;
+        uint32_t GetSize() const;
 
     protected:
         void* GetItem(uint32_t index) const;
@@ -488,8 +491,8 @@ namespace mtlpp
 
         HazardTrackingModeUntracked MTLPP_AVAILABLE(NA, 10_0)   = 0x1 << ResourceHazardTrackingModeShift,
 
-        OptionCPUCacheModeDefault                               = CpuCacheModeDefaultCache,
-        OptionCPUCacheModeWriteCombined                         = CpuCacheModeWriteCombined,
+        OptionCpuCacheModeDefault                               = CpuCacheModeDefaultCache,
+        OptionCpuCacheModeWriteCombined                         = CpuCacheModeWriteCombined,
     }
     MTLPP_AVAILABLE(10_11, 8_0);
 
@@ -1134,11 +1137,11 @@ namespace mtlpp
     }
     MTLPP_AVAILABLE(10_11, 8_0);
 
-    enum PipelineOption : uint32_t
+    enum class PipelineOption
     {
-        NoPipelineOption = 0,
-        ArgumentInfo	 = 1 << 0,
-        BufferTypeInfo   = 1 << 1,
+        None           = 0,
+        ArgumentInfo   = 1 << 0,
+        BufferTypeInfo = 1 << 1,
     }
     MTLPP_AVAILABLE(10_11, 8_0);
 
@@ -1339,6 +1342,10 @@ namespace mtlpp
         ns::String          GetLabel() const;
         CommandBufferStatus GetStatus() const;
         ns::Error           GetError() const;
+        double              GetKernelStartTime() const MTLPP_AVAILABLE_IOS(10_3);
+        double              GetKernelEndTime() const MTLPP_AVAILABLE_IOS(10_3);
+        double              GetGpuStartTime() const MTLPP_AVAILABLE_IOS(10_3);
+        double              GetGpuEndTime() const MTLPP_AVAILABLE_IOS(10_3);
 
         void SetLabel(const ns::String& label);
 
@@ -1347,7 +1354,8 @@ namespace mtlpp
         void AddScheduledHandler(std::function<void(const CommandBuffer&)> handler);
         void AddCompletedHandler(std::function<void(const CommandBuffer&)> handler);
         void Present(const Drawable& drawable);
-        void Present(const Drawable& drawable, double presentationTime);
+        void PresentAtTime(const Drawable& drawable, double presentationTime);
+        void PresentAfterMinimumDuration(const Drawable& drawable, double duration) MTLPP_AVAILABLE_IOS(10_3);
         void WaitUntilScheduled();
         void WaitUntilCompleted();
         BlitCommandEncoder BlitCommandEncoder();
@@ -1557,8 +1565,13 @@ namespace mtlpp
         Drawable() { }
         Drawable(const ns::Handle& handle) : ns::Object(handle) { }
 
+        double   GetPresentedTime() const MTLPP_AVAILABLE_IOS(10_3);
+        uint64_t GetDrawableID() const MTLPP_AVAILABLE_IOS(10_3);
+
         void Present();
-        void Present(double presentationTime);
+        void PresentAtTime(double presentationTime);
+        void PresentAfterMinimumDuration(double duration) MTLPP_AVAILABLE_IOS(10_3);
+        void AddPresentedHandler(std::function<void(const Drawable&)> handler) MTLPP_AVAILABLE_IOS(10_3);
     }
     MTLPP_AVAILABLE(10_11, 8_0);
 }
