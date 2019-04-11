@@ -2420,7 +2420,7 @@ namespace ns
     }
 
     Error::Error() :
-        Object(Handle{ (__bridge void*)[[NSError alloc] init] })
+        Object(Handle{ (__bridge void*)[[NSError alloc] initWithDomain:@"" code:0 userInfo:nil] })
     {
 
     }
