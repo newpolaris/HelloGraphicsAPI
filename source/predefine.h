@@ -6,5 +6,5 @@
 
 #if defined(_DEBUG) || !defined(NDEBUG)
 #	undef EL_CONFIG_DEBUG
-#	define EL_CONFIG_DEBUG 0
+#	define EL_CONFIG_DEBUG 1
 #endif

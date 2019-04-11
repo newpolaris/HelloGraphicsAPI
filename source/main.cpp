@@ -173,6 +173,31 @@ static void APIENTRY gl_debug_callback(GLenum source,
 }
 #endif // EL_CONFIG_DEBUG
 
+#include <vector>
+#include <string>
+
+namespace el {
+
+	struct ImageData
+	{
+		int32_t width;
+		int32_t depth;
+		std::vector<int8_t> stream;
+		GraphicsPixelFormat format;
+	};
+
+	ImageData ImageLoaderPng(const std::string& filename)
+	{
+		ImageData container;
+		return container;
+	}
+}
+
+class GraphicsApplication
+{
+public:
+};
+
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
@@ -264,23 +289,29 @@ int main(int argc, char** argv)
         texture_desc.setHeight(16);
 
         texture = device->createTexture(texture_desc);
+		EL_ASSERT(texture);
 
         GraphicsShaderDesc vertex_desc;
         vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
         vertex_desc.setShaderCode(vertex_shader_text);
 
+        vertex_shader = device->createShader(vertex_desc);
+		EL_ASSERT(vertex_shader);
+
         GraphicsShaderDesc fragment_desc;
         fragment_desc.setStageFlag(GraphicsShaderStageFragmentBit);
         fragment_desc.setShaderCode(fragment_shader_text);
 
-        vertex_shader = device->createShader(vertex_desc);
         fragment_shader = device->createShader(fragment_desc);
+		EL_ASSERT(fragment_shader);
 
         GraphicsProgramDesc program_desc;
         program_desc.addShader(vertex_shader);
         program_desc.addShader(fragment_shader);
 
         program = device->createProgram(program_desc);
+		EL_ASSERT(program);
+
         auto program_id = std::static_pointer_cast<GLProgram>(program)->getProgramID();
 
         mvp_location = glGetUniformLocation(program_id, "MVP");
@@ -385,53 +416,3 @@ int main(int argc, char** argv)
     glfwTerminate();
     exit(EXIT_SUCCESS);
 }
-
-#if 0
-
-{
-    // Load the coordinate
-    gl::VertexAttribPointer(m_aPositionHandle, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(FLOAT), vtxs);
-    gl::VertexAttribPointer(m_aTexHandle, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(FLOAT), &vtxs[3]);
-
-    if (bTriangleFan)
-        gl::DrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    else {
-        std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
-        gl::DrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()); 
-    }
-}
-
-void SubDrawTexture(float* vtxs)
-{
-    // Load the coordinate
-    glVertexAttribPointer(m_aPositionHandle, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), vtxs);
-    glVertexAttribPointer(m_aTexHandle, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), &vtxs[3]);
-
-    float vNormalVector[12] = { 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f, 1.f };
-    glVertexAttribPointer(m_aNormalVector, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), vNormalVector);
-
-    // Drawing
-    if (bTriangleFan)
-        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-    else {
-        std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()); 
-    }
-}
-
-{
-    std::array<uint16_t, 6> indices = { 0, 1, 2, 0, 2, 3 };
-    GL_CHECK(glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, indices.data()));
-
-    const GLbyte* offset = 0;
-    const GLuint fanCount = 4;
-    const GLuint count = (fanCount - 2) * 3;
-
-    GLuint ibo = 0;
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, params.numIndices * params.sizeofIndices, params.indices, GL_STATIC_DRAW);
-
-    glDrawElementsBaseVertex(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, nullptr, offset);
-}
-#endif
