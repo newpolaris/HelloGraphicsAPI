@@ -7,7 +7,16 @@
 
 #if EL_PLAT_WINDOWS 
 extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _str);
-#endif
+#elif EL_PLAT_APPLE
+#    if defined(__OBJC__)
+#        import <Foundation/NSObjCRuntime.h>
+#    else
+#        include <CoreFoundation/CFString.h>
+extern "C" void NSLog(CFStringRef _format, ...);
+#    endif // defined(__OBJC__)
+#else
+#    include <stdio.h> // fputs, fflush
+#endif // EL_PLAT_WINDOWS
 
 void el::trace(const char* format, ...)
 {
@@ -32,7 +41,16 @@ void el::debug_output(const char* message)
 {
 #if EL_PLAT_WINDOWS 
 	OutputDebugStringA(message);
-#endif
+#elif EL_PLAT_APPLE
+#    if defined(__OBJC__)
+    NSLog(@"%s", message);
+#    else
+    NSLog(CFSTR("%s"), message);
+#    endif // defined(__OBJC__)
+#else
+    fputs(message, stdout);
+    fflush(stdout);
+#endif // EL_PLAT_WINDOWS
 }
 
 void el::debug_break()

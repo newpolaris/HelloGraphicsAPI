@@ -1,9 +1,9 @@
 #include "../mtlpp.hpp"
 #include "window.hpp"
 #include <string>
+#include "debug.h"
 
 #if 1
-#import <Foundation/Foundation.h>
 
 mtlpp::Device              g_device;
 mtlpp::CommandQueue        g_commandQueue;
@@ -67,10 +67,10 @@ int main()
             constexpr sampler textureSampler (mag_filter::nearest,
                                               min_filter::nearest);
             // Sample the texture to obtain a color
-            const float colorSample = colorTexture.sample(textureSampler, in.textureCoordinate).r;
+            const half4 colorSample = colorTexture.sample(textureSampler, in.textureCoordinate);
             
             // We return the color of the texture
-            return half4(colorSample, colorSample, colorSample, 1.0);
+            return colorSample;
         }
     )""";
     
@@ -87,7 +87,7 @@ int main()
     ns::Error error;
     mtlpp::Library library = g_device.NewLibrary(shadersSrc, mtlpp::CompileOptions(), &error);
     if (!library)
-        NSLog(@"Failed to created pipeline state, error %s", error.GetLocalizedDescription().GetCStr());
+        EL_TRACE("Failed to created pipeline state, error %s", error.GetLocalizedDescription().GetCStr());
 
     mtlpp::Function vertFunc = library.NewFunction("vertFunc");
     mtlpp::Function fragFunc = library.NewFunction("fragFunc");
