@@ -45,6 +45,7 @@
 #include "graphics_types.h"
 #include "graphics_shader.h"
 #include "graphics_program.h"
+#include "graphics_texture.h"
 
 #include "gl_buffer.h"
 
@@ -105,7 +106,7 @@ static void APIENTRY gl_debug_callback(GLenum source,
     const void* userParam)
 {
     // ignore these non-significant error codes
-    if (id == 131169 || id == 131185 || id == 131218 || id == 131204 || id == 131184) 
+    if (id == 131169 || id == 131185 || id == 131218 || id == 131204 || id == 131184)
         return;
 
     std::stringstream output;
@@ -178,19 +179,19 @@ static void APIENTRY gl_debug_callback(GLenum source,
 
 namespace el {
 
-	struct ImageData
-	{
-		int32_t width;
-		int32_t depth;
-		std::vector<int8_t> stream;
-		GraphicsPixelFormat format;
-	};
+    struct ImageData
+    {
+        int32_t width;
+        int32_t depth;
+        std::vector<int8_t> stream;
+        GraphicsPixelFormat format;
+    };
 
-	ImageData ImageLoaderPng(const std::string& filename)
-	{
-		ImageData container;
-		return container;
-	}
+    ImageData ImageLoaderPng(const std::string& filename)
+    {
+        ImageData container;
+        return container;
+    }
 }
 
 class GraphicsApplication
@@ -246,7 +247,7 @@ int main(int argc, char** argv)
     // The contexts are created with the same APIs so the function
     // pointers should be re-usable between them
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-        
+
 #if EL_CONFIG_DEBUG
     if (glfwExtensionSupported("GL_ARB_debug_output"))
     {
@@ -283,34 +284,48 @@ int main(int argc, char** argv)
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
+        int x, y;
+        char pixels[16 * 16];
+
+        srand((unsigned int)glfwGetTimerValue());
+
+        for (y = 0; y < 16; y++)
+        {
+            for (x = 0; x < 16; x++)
+                pixels[y * 16 + x] = rand() % 256;
+        }
+
         GraphicsTextureDesc texture_desc;
         texture_desc.setDim(GraphicsTextureDim2D);
+        texture_desc.setPixelFormat(GraphicsPixelFormat::GraphicsPixelFormatR8Unorm);
         texture_desc.setWidth(16);
         texture_desc.setHeight(16);
+        texture_desc.setStream(static_cast<stream_t*>(pixels));
+        texture_desc.setStreamSize(16 * 16);
 
         texture = device->createTexture(texture_desc);
-		EL_ASSERT(texture);
+        EL_ASSERT(texture);
 
         GraphicsShaderDesc vertex_desc;
         vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
         vertex_desc.setShaderCode(vertex_shader_text);
 
         vertex_shader = device->createShader(vertex_desc);
-		EL_ASSERT(vertex_shader);
+        EL_ASSERT(vertex_shader);
 
         GraphicsShaderDesc fragment_desc;
         fragment_desc.setStageFlag(GraphicsShaderStageFragmentBit);
         fragment_desc.setShaderCode(fragment_shader_text);
 
         fragment_shader = device->createShader(fragment_desc);
-		EL_ASSERT(fragment_shader);
+        EL_ASSERT(fragment_shader);
 
         GraphicsProgramDesc program_desc;
         program_desc.addShader(vertex_shader);
         program_desc.addShader(fragment_shader);
 
         program = device->createProgram(program_desc);
-		EL_ASSERT(program);
+        EL_ASSERT(program);
 
         auto program_id = std::static_pointer_cast<GLProgram>(program)->getProgramID();
 
@@ -372,7 +387,7 @@ int main(int argc, char** argv)
     gl_program->setUniform(mvp_location, mvp);
 
     while (!glfwWindowShouldClose(windows[0]) &&
-           !glfwWindowShouldClose(windows[1]))
+        !glfwWindowShouldClose(windows[1]))
     {
         const vec3 colors[2] =
         {
@@ -381,14 +396,14 @@ int main(int argc, char** argv)
         };
 
         int i;
-        for (i = 0;  i < 2;  i++)
+        for (i = 0; i < 2; i++)
         {
             int width, height;
 
             glfwGetFramebufferSize(windows[i], &width, &height);
             glfwMakeContextCurrent(windows[i]);
 
-            
+
             if (glfwExtensionSupported("GL_ARB_timer_query"))
                 profile[i].start();
 
@@ -399,11 +414,11 @@ int main(int argc, char** argv)
 
             if (glfwExtensionSupported("GL_ARB_timer_query"))
                 profile[i].end();
-            
+
             glfwSwapBuffers(windows[i]);
-            char profileBuf[256] = {'\0'};
-            sprintf(profileBuf, "%s CPU %.3f, GPU %.3f", profile[i].getName().c_str(), 
-                        profile[i].getCpuTime(), profile[i].getGpuTime());
+            char profileBuf[256] = { '\0' };
+            sprintf(profileBuf, "%s CPU %.3f, GPU %.3f", profile[i].getName().c_str(),
+                profile[i].getCpuTime(), profile[i].getGpuTime());
             glfwSetWindowTitle(windows[i], profileBuf);
         }
 

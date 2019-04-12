@@ -1,5 +1,6 @@
 #include "gl_texture.h"
 #include "debug.h"
+#include "gl_types.h"
 #include <GLFW/glfw3.h>
 
 using namespace el;
@@ -17,67 +18,68 @@ GLTexture::~GLTexture()
 bool GLTexture::create(const GraphicsTextureDesc& desc)
 {
 	_textureDesc = desc;
-	_target = GL_TEXTURE_2D;
+	_target = asTextureTarget(desc.getDim());
+	
+	const GLint border = 0;
+
+	GLint level = 0;
+	GLint internalformat = asTextureInternalFormat(desc.getPixelFormat());
+	GLenum format = asTextureFormat(desc.getPixelFormat());
+	GLenum type = asTextureType(desc.getPixelFormat());
 
 	GL_CHECK(glGenTextures(1, &_textureID));
-	GL_CHECK(glBindTexture(GL_TEXTURE_2D, _textureID));
+    if (_textureID == 0)
+        return false;
+    GL_CHECK(glBindTexture(_target, _textureID));
 
-	int x, y;
-	char pixels[16 * 16];
+    uint32_t width = desc.getWidth();
+    uint32_t height = desc.getHeight();
+    uint32_t depth = desc.getDepth();
 
-	srand((unsigned int)glfwGetTimerValue());
+    const stream_t* stream = desc.getStream();
 
-	for (y = 0;  y < 16;  y++)
-	{
-		for (x = 0;  x < 16;  x++)
-			pixels[y * 16 + x] = rand() % 256;
-	}
+    // https://retokoradi.com/2014/03/30/opengl-transition-to-core-profile/
+    // TODO: OpenGL Core
+    //  GL_LUMINANCE -> GL_RED
+    //  GL_LUMINANCE_ALPHA -> GL_RG
+    GL_CHECK(glTexImage2D(_target, level, internalformat, width, height, border, format, type, stream));
+    GL_CHECK(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+    GL_CHECK(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
-	// https://retokoradi.com/2014/03/30/opengl-transition-to-core-profile/
-	// TODO: OpenGL Core
-	//  GL_LUMINANCE -> GL_RED
-	//  GL_LUMINANCE_ALPHA -> GL_RG
-	GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 16, 16, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels));
-	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-
-	return true;
+    return true;
 }
 
 void GLTexture::destroy()
 {
-	// No need to unboud before deleting and silently ignores 0
-	if (!_textureID)
-	{
-		GL_CHECK(glDeleteTextures(1, &_textureID));
-		_textureID = 0;
-	}
-
-	// _Format = GL_INVALID_ENUM;
-	// _Target = GL_INVALID_ENUM;
+    // No need to unboud before deleting and silently ignores 0
+    if (!_textureID)
+    {
+        GL_CHECK(glDeleteTextures(1, &_textureID));
+        _textureID = 0;
+    }
 }
 
 void GLTexture::bind(GLuint unit) const
 {
-	EL_ASSERT(_textureID != 0u);
-	GL_CHECK(glActiveTexture(GL_TEXTURE0 + unit));
-	GL_CHECK(glBindTexture(_target, _textureID));
+    EL_ASSERT(_textureID != 0u);
+    GL_CHECK(glActiveTexture(GL_TEXTURE0 + unit));
+    GL_CHECK(glBindTexture(_target, _textureID));
 }
 
 void GLTexture::unbind(GLuint unit) const
 {
-	EL_ASSERT(_textureID != 0u);
-	GL_CHECK(glActiveTexture(GL_TEXTURE0 + unit));
-	GL_CHECK(glBindTexture(_target, 0));
+    EL_ASSERT(_textureID != 0u);
+    GL_CHECK(glActiveTexture(GL_TEXTURE0 + unit));
+    GL_CHECK(glBindTexture(_target, 0));
 }
 
 GLuint GLTexture::getTextureID() const
 {
-	return _textureID;
+    return _textureID;
 }
 
 const GraphicsTextureDesc& GLTexture::getTextureDesc() const
 {
-	return _textureDesc;
+    return _textureDesc;
 }
 

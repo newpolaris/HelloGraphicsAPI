@@ -7,6 +7,9 @@
 
 namespace el {
 
+	typedef char stream_t;
+	typedef uint32_t streamsize_t;
+
 	class GraphicsDeviceDesc;
 	class GraphicsProgramDesc;
 	class GraphicsShaderDesc;
@@ -230,6 +233,6 @@ namespace el {
         GraphicsPixelFormatDepth32Float_Stencil8 = 260,
         GraphicsPixelFormatX32_Stencil8 = 261,
         GraphicsPixelFormatX24_Stencil8 = 262,
-	};
+    };
 
 } // namespace el

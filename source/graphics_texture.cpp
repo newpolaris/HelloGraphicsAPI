@@ -1,4 +1,5 @@
 #include "graphics_texture.h"
+#include <istream>
 
 using namespace el;
 
@@ -6,7 +7,10 @@ GraphicsTextureDesc::GraphicsTextureDesc() :
 	_width(0),
 	_height(0),
 	_depth(1),
-	_dim(GraphicsTextureDim2D)
+	_stream(nullptr),
+	_streamSize(0),
+	_dim(GraphicsTextureDim2D),
+    _pixelFormat(GraphicsPixelFormat::GraphicsPixelFormatInvalid)
 {
 }
 
@@ -48,6 +52,36 @@ void GraphicsTextureDesc::setDim(GraphicsTextureDim dim)
 GraphicsTextureDim GraphicsTextureDesc::getDim() const
 {
 	return _dim;
+}
+
+void GraphicsTextureDesc::setStream(stream_t * stream)
+{
+	_stream = stream;
+}
+
+const char* GraphicsTextureDesc::getStream() const
+{
+	return _stream;
+}
+
+void GraphicsTextureDesc::setStreamSize(streamsize_t streamSize)
+{
+	_streamSize = streamSize;
+}
+
+streamsize_t GraphicsTextureDesc::getStreamSize() const
+{
+	return _streamSize;
+}
+
+void GraphicsTextureDesc::setPixelFormat(GraphicsPixelFormat format)
+{
+    _pixelFormat = format;
+}
+
+GraphicsPixelFormat GraphicsTextureDesc::getPixelFormat() const
+{
+    return _pixelFormat;
 }
 
 GraphicsTexture::GraphicsTexture()

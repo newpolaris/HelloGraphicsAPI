@@ -3,6 +3,7 @@
 #include "graphics_types.h"
 
 namespace el {
+
 	class GraphicsTextureDesc final
 	{
 	public:
@@ -21,12 +22,24 @@ namespace el {
 		void setDim(GraphicsTextureDim target);
 		GraphicsTextureDim getDim() const;
 
+		void setStream(stream_t* stream);
+		const stream_t* getStream() const;
+
+		void setStreamSize(streamsize_t stream);
+		streamsize_t getStreamSize() const;
+
+        void setPixelFormat(GraphicsPixelFormat format);
+        GraphicsPixelFormat getPixelFormat() const;
+
 	private:
 
 		uint32_t _width;
 		uint32_t _height;
 		uint32_t _depth;
+		stream_t* _stream;
+		streamsize_t _streamSize;
 		GraphicsTextureDim _dim;
+        GraphicsPixelFormat _pixelFormat;
 	};
 
 	class GraphicsTexture
