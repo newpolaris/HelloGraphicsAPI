@@ -27,8 +27,6 @@
 #include "debug.h"
 #include "gl.h"
 
-#ifdef EL_BUILD_OPENGL
-
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
@@ -442,5 +440,3 @@ void SubDrawTexture(float* vtxs)
     glDrawElementsBaseVertex(GL_TRIANGLES, count, GL_UNSIGNED_SHORT, nullptr, offset);
 }
 #endif
-
-#endif // EL_BUILD_OPENGL

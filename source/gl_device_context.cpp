@@ -1,6 +1,6 @@
 #include "gl_device_context.h"
 
-#if EL_BUILD_DEVICE_OPENGL
+#if EL_BUILD_OPENGL
 
 #include "gl.h"
 
@@ -23,4 +23,4 @@ void GLDeviceContext::destory()
 {
 }
 
-#endif // #if EL_BUILD_DEVICE_OPENGL
+#endif // #if EL_BUILD_OPENGL

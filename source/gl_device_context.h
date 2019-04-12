@@ -2,7 +2,7 @@
 
 #include "predefine.h"
 
-#if EL_BUILD_DEVICE_OPENGL
+#if EL_BUILD_OPENGL
 
 #include "graphics_device_context.h"
 
@@ -24,4 +24,4 @@ namespace el {
 
 } // namespace el {
 
-#endif // #if EL_BUILD_DEVICE_OPENGL
+#endif // #if EL_BUILD_OPENGL

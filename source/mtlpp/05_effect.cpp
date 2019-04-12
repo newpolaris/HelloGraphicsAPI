@@ -9,7 +9,7 @@
 #include <graphics_buffer.h>
 #include <graphics_program.h>
 
-#if 1
+#if 0
 
 namespace el
 {
