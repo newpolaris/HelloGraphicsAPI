@@ -2,7 +2,7 @@
 #include "debug.h"
 
 // TODO:
-#include <GLFW/glfw3.h>
+#include "gl_types.h"
 
 using namespace el;
 
@@ -18,33 +18,33 @@ GLTexture::~GLTexture()
 
 bool GLTexture::create(GraphicsTextureDesc desc)
 {
-	_target = GL_TEXTURE_2D;
+	_target = asTextureTarget(desc.getDim());
+
+	const GLint border = 0;
+
+	GLint level = 0;
+	GLint internalformat = asTextureInternalFormat(desc.getPixelFormat());
+	GLenum format = asTextureFormat(desc.getPixelFormat());
+	GLenum type = asTextureType(desc.getPixelFormat());
 
 	GL_CHECK(glGenTextures(1, &_textureID));
-	GL_CHECK(glBindTexture(GL_TEXTURE_2D, _textureID));
+	if (_textureID == 0)
+		return false;
+	GL_CHECK(glBindTexture(_target, _textureID));
 
-	int x, y;
-	char pixels[16 * 16];
+	uint32_t width = desc.getWidth();
+	uint32_t height = desc.getHeight();
 
-	srand((unsigned int)glfwGetTimerValue());
+	const stream_t* stream = desc.getStream();
 
-	for (y = 0;  y < 16;  y++)
-	{
-		for (x = 0;  x < 16;  x++)
-			pixels[y * 16 + x] = rand() % 256;
-	}
-
-	// https://retokoradi.com/2014/03/30/opengl-transition-to-core-profile/
-	// TODO: OpenGL Core
-	//  GL_LUMINANCE -> GL_RED
-	//  GL_LUMINANCE_ALPHA -> GL_RG
-	GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, 16, 16, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels));
-	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-	GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+	GL_CHECK(glTexImage2D(_target, level, internalformat, width, height, border, format, type, stream));
+	GL_CHECK(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+	GL_CHECK(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
 	_textureDesc = std::move(desc);
 
 	return true;
+
 }
 
 void GLTexture::destroy()
@@ -55,9 +55,6 @@ void GLTexture::destroy()
 		GL_CHECK(glDeleteTextures(1, &_textureID));
 		_textureID = 0;
 	}
-
-	// _Format = GL_INVALID_ENUM;
-	// _Target = GL_INVALID_ENUM;
 }
 
 void GLTexture::bind(GLuint unit) const

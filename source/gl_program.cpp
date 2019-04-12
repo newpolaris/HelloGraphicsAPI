@@ -19,6 +19,9 @@ namespace el {
 
             Handle create(const std::vector<GLuint>& shaderIDs)
             {
+                // In opengl it is valid, but check logic error
+                EL_ASSERT(shaderIDs.size() > 0);
+                
                 GLuint id = gl::CreateProgram();
 
                 GLint status = 0;
@@ -71,8 +74,6 @@ GLProgram::~GLProgram()
 
 bool GLProgram::create(GraphicsProgramDesc desc)
 {
-    _programDesc = std::move(desc);
-
     std::vector<GLuint> shaderIDs;
     for (auto& s : desc.getShaders())
     {
@@ -84,6 +85,7 @@ bool GLProgram::create(GraphicsProgramDesc desc)
         return false;
 
     _programID = id;
+    _programDesc = std::move(desc);
 
     return true;
 }

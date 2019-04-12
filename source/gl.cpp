@@ -23,7 +23,7 @@ namespace el {
             }
 
             EL_TRACE("GL_ERROR: %d %s %s(%d)\n", error, message.c_str(), file, line);
-            // debug_break();
+            debug_break();
 
         } while (GL_NO_ERROR != (error = glGetError()));
         return false;
