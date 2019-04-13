@@ -4,9 +4,29 @@
 #include "graphics_program.h"
 #include "gl_types.h"
 #include "linmath.h"
+#include <string>
+#include <map>
 
 namespace el {
+    
+    struct GLUniform
+    {
+        std::string name;
+        GLenum type;
+        GLint size;
+        GLint index;
+    };
+    
+    struct GLAttribute
+    {
+        std::string name;
+        GLenum type;
+        GLint size;
+        GLint index;
+    };
 
+    std::size_t asTypeSize(GLenum type);
+    
 	class GLProgram final : public GraphicsProgram
 	{
 	public:
@@ -24,6 +44,21 @@ namespace el {
 		void setUniform(GLint location, const GLint& v0);
 		void setUniform(GLint location, const vec3& v0);
 		void setUniform(GLint location, const mat4x4& m0);
+        
+        template <typename T>
+        void updateUniform(const std::string& name, T&& value)
+        {
+            if (_activeUniform.find(name) == _activeUniform.end())
+            {
+                EL_ASSERT(false);
+                return;
+            }
+            auto& uniform = _activeUniform[name];
+            std::size_t len = asTypeSize(uniform.type);
+            EL_ASSERT(len == sizeof(T));
+            GLuint location = uniform.index;
+            setUniform(location, value);
+        }
 
 		void setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void *pointer);
 		void setVertexBuffer(GLint location, const GraphicsBufferPtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset);
@@ -32,9 +67,15 @@ namespace el {
 		const GraphicsProgramDesc& getProgramDesc() const override;
 
 	private:
+        
+        void setupActiveUniform();
+        void setupActiveAttribute();
 
 		GLuint _programID;
 		GraphicsProgramDesc _programDesc;
+        
+        std::map<std::string, GLUniform> _activeUniform;
+        std::map<std::string, GLAttribute> _activeAttribute;
 	};
 
 } // namespace el {

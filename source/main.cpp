@@ -240,8 +240,9 @@ int main(int argc, char** argv)
     glfwMakeContextCurrent(windows[0]);
     
     // Lack of ARB_framebuffer_objects in extension list over OSX 3.2
-    if (!glfwExtensionSupported("GL_ARB_framebuffer_object"))
+    if (GLVersion.major < 3 && !glfwExtensionSupported("GL_ARB_framebuffer_object"))
     {
+        EL_TRACE("Require GL_ARB_framebuffer_object");
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
@@ -409,6 +410,7 @@ int main(int argc, char** argv)
             glfwGetFramebufferSize(windows[i], &width, &height);
             glfwMakeContextCurrent(windows[i]);
 
+            // TODO: change to support flags
             if (glfwExtensionSupported("GL_ARB_timer_query"))
                 profile[i].start();
 
