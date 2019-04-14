@@ -4,6 +4,10 @@
  */
 #include "mtlpp.hpp"
 
+#include <platform.h>
+
+#if EL_PLAT_APPLE
+
 //////////////////////////////////////
 // FILE: argument.mm
 //////////////////////////////////////
@@ -4765,3 +4769,4 @@ namespace mtlpp
     }
 }
 
+#endif // #if EL_PLAT_APPLE

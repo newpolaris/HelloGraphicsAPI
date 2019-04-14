@@ -200,7 +200,7 @@ void GLProgram::setupActiveUniform()
     GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_UNIFORMS, &count));
     
     const GLsizei bufSize = 16;
-    for (GLuint i = 0; i < count; i++)
+    for (GLint i = 0; i < count; i++)
     {
         GLchar nameBuf[bufSize] = { 0 };
         GLsizei length;
@@ -221,7 +221,7 @@ void GLProgram::setupActiveAttribute()
     GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_ATTRIBUTES, &count));
     
     const GLsizei bufSize = 16;
-    for (GLuint i = 0; i < count; i++)
+    for (GLint i = 0; i < count; i++)
     {
         GLchar nameBuf[bufSize] = { 0 };
         GLsizei length;

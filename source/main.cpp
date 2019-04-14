@@ -25,7 +25,7 @@
 
 #include "predefine.h"
 #include "debug.h"
-#include "gl.h"
+#include <OpenGL/gl.h>
 
 #include <GLFW/glfw3.h>
 
@@ -48,11 +48,11 @@
 #include "graphics_texture.h"
 
 // TODO:
-#include "gl_program.h"
-#include "gl_shader.h"
-#include "gl_texture.h"
-#include "gl_profile.h"
-#include "gl_buffer.h"
+#include <OpenGL/gl_program.h>
+#include <OpenGL/gl_shader.h>
+#include <OpenGL/gl_texture.h>
+#include <OpenGL/gl_profile.h>
+#include <OpenGL/gl_buffer.h>
 
 static const char* vertex_shader_text =
 "#version 110\n"

@@ -42,7 +42,7 @@ GraphicsDevicePtr el::createDevice(GraphicsDeviceDesc desc)
         auto device = std::make_shared<MTLDevice>();
         if (device->create(std::move(desc)))
             return device;
-#endif
     }
+#endif
     return nullptr;
 }
