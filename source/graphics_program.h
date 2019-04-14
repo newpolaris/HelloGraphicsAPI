@@ -30,8 +30,6 @@ namespace el {
 		GraphicsProgram& operator=(const GraphicsProgram&) = delete;
 
 		virtual const GraphicsProgramDesc& getProgramDesc() const = 0;
-
-	private:
 	};
 
 } // namespace el {

@@ -120,7 +120,7 @@ struct SymbolicConstant
     size_t size;
 };
 
-size_t asTypeSize(GLenum type)
+size_t el::asTypeSize(GLenum type)
 {
     switch(type)
     {

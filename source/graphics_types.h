@@ -19,7 +19,6 @@ namespace el {
 
 	typedef std::shared_ptr<class GraphicsDevice> GraphicsDevicePtr;
 	typedef std::shared_ptr<class GraphicsDeviceContext> GraphicsDeviceContextPtr;
-	typedef std::shared_ptr<class GraphicsContext> GraphicsContextPtr;
 	typedef std::shared_ptr<class GraphicsShader> GraphicsShaderPtr;
 	typedef std::shared_ptr<class GraphicsProgram> GraphicsProgramPtr;
 	typedef std::shared_ptr<class GraphicsTexture> GraphicsTexturePtr;

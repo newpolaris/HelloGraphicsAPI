@@ -41,6 +41,7 @@
 #include "linmath.h"
 
 #include "graphics_device.h"
+#include "graphics_device_context.h"
 #include "graphics_texture.h"
 #include "graphics_types.h"
 #include "graphics_shader.h"
@@ -391,6 +392,10 @@ int main(int argc, char** argv)
 
     mat4x4 mvp;
     mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
+
+	GraphicsDeviceContextPtr context = device->createDeviceContext();
+
+	program->updateUniform("MVP", mvp);
     gl_program->setUniform(mvp_location, mvp);
 
     while (!glfwWindowShouldClose(windows[0]) &&

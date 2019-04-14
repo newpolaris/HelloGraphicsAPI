@@ -1,7 +1,7 @@
 #include "graphics_device.h"
 
-#include "gl_device.h"
-#include "mtl_device.h"
+#include <opengl/gl_device.h>
+#include <Metal/mtl_device.h>
 
 using namespace el;
 
