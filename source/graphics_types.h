@@ -24,6 +24,8 @@ namespace el {
 	typedef std::shared_ptr<class GraphicsTexture> GraphicsTexturePtr;
 	typedef std::shared_ptr<class GraphicsBuffer> GraphicsBufferPtr;
 
+	typedef std::weak_ptr<class GraphicsDevice> GraphicsDeviceWeakPtr;
+
 	typedef std::vector<GraphicsShaderPtr> GraphicsShaders;
 
 	enum GraphicsDeviceType

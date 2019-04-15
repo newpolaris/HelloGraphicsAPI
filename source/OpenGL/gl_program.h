@@ -15,6 +15,7 @@ namespace el {
         GLenum type;
         GLint size;
         GLint index;
+        GLuint unit;
     };
     
     struct GLAttribute
@@ -39,11 +40,12 @@ namespace el {
 
 		GLuint getProgramID() const;
 
-		void use() const;
+		void apply() const;
 
 		void setUniform(GLint location, const GLint& v0);
 		void setUniform(GLint location, const vec3& v0);
 		void setUniform(GLint location, const mat4x4& m0);
+        void setUniform(const std::string& name, const GraphicsTexturePtr& texture);
         
         template <typename T>
         void updateUniform(const std::string& name, T&& value)

@@ -239,9 +239,10 @@ int main(int argc, char** argv)
     glfwSetKeyCallback(windows[0], key_callback);
 
     glfwMakeContextCurrent(windows[0]);
-    
-    // Lack of ARB_framebuffer_objects in extension list over OSX 3.2
-    if (GLVersion.major < 3 && !glfwExtensionSupported("GL_ARB_framebuffer_object"))
+
+    // TODO:
+    // glad_glGenFramebuffersEXT   
+    if (glGenFramebuffers != 0)
     {
         EL_TRACE("Require GL_ARB_framebuffer_object");
         glfwTerminate();
@@ -257,14 +258,11 @@ int main(int argc, char** argv)
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
 #if EL_CONFIG_DEBUG
-    if (glfwExtensionSupported("GL_ARB_debug_output"))
-    {
-        glEnable(GL_DEBUG_OUTPUT);
-        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-        if (glDebugMessageCallback) {
-            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-            glDebugMessageCallback(gl_debug_callback, nullptr);
-        }
+    if (glDebugMessageCallback) {
+        GL_CHECK(glEnable(GL_DEBUG_OUTPUT));
+        GL_CHECK(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
+        GL_CHECK(glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE));
+        GL_CHECK(glDebugMessageCallback(gl_debug_callback, nullptr));
     }
 
     std::printf("%s\n%s\n%s\n%s\n",
@@ -350,16 +348,21 @@ int main(int argc, char** argv)
         vertex_buffer = device->createBuffer(vertices_buffer_desc);
     }
 
-    const GLint slot0 = 0;
+	GraphicsDeviceContextPtr context = device->createDeviceContext();
+    context->setProgram(program);
+    context->setTexture("texture", texture);
+    // context->setVertexBuffer("vPos", vertex_buffer, vertices, sizeof(vertices[0]), 0);
 
     auto gl_program = std::static_pointer_cast<GLProgram>(program);
-    gl_program->use();
-    gl_program->setTexture(texture_location, texture, slot0);
     gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
 
     GLProfileBusyWait profile[2];
     profile[0].setName("window 0");
+    profile[0].setDevice(device);
+    profile[0].create();
     profile[1].setName("window 1");
+    profile[1].setDevice(device);
+    profile[1].create();
 
     windows[1] = glfwCreateWindow(400, 400, "Second", NULL, windows[0]);
     if (!windows[1])
@@ -384,18 +387,16 @@ int main(int argc, char** argv)
 
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
-    gl_program->use();
-    gl_program->setTexture(texture_location, texture, slot0);
-    gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
+    context->setProgram(program);
 
-    // gl_program->setIndexBuffer()
+    gl_program->apply();
+    gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
 
     mat4x4 mvp;
     mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
 
-	GraphicsDeviceContextPtr context = device->createDeviceContext();
-
-	program->updateUniform("MVP", mvp);
+    // TODO:
+	// program->updateUniform("MVP", mvp);
     gl_program->setUniform(mvp_location, mvp);
 
     while (!glfwWindowShouldClose(windows[0]) &&
@@ -415,17 +416,16 @@ int main(int argc, char** argv)
             glfwGetFramebufferSize(windows[i], &width, &height);
             glfwMakeContextCurrent(windows[i]);
 
-            // TODO: change to support flags
-            if (glfwExtensionSupported("GL_ARB_timer_query"))
-                profile[i].start();
+            profile[i].start();
 
-            GL_CHECK(glViewport(0, 0, width, height));
+            context->setProgram(program);
+            context->setViewport(0, 0, width, height);
+
             // Shared bewteen context
             gl_program->setUniform(color_location, colors[i]);
             GL_CHECK(glDrawArrays(GL_TRIANGLE_FAN, 0, 4));
 
-            if (glfwExtensionSupported("GL_ARB_timer_query"))
-                profile[i].end();
+            profile[i].end();
 
             glfwSwapBuffers(windows[i]);
             char profileBuf[256] = { '\0' };

@@ -5,6 +5,7 @@
 #include "gl_shader.h"
 #include "gl_texture.h"
 #include "gl_buffer.h"
+
 #include <string>
 
 namespace el {
@@ -104,7 +105,7 @@ GLuint GLProgram::getProgramID() const
     return _programID;
 }
 
-void GLProgram::use() const
+void GLProgram::apply() const
 {
     GL_CHECK(glUseProgram(_programID));
 }
@@ -199,16 +200,34 @@ void GLProgram::setupActiveUniform()
     GLint count;
     GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_UNIFORMS, &count));
     
+    uint32_t textureUnit = 0;
+
     const GLsizei bufSize = 16;
     for (GLint i = 0; i < count; i++)
     {
         GLchar nameBuf[bufSize] = { 0 };
         GLsizei length;
-        GLUniform uniform;
-        GL_CHECK(glGetActiveUniform(_programID, i, bufSize, &length, &uniform.size, &uniform.type, nameBuf));
+        GLenum type;
+        GLint size;
+        GL_CHECK(glGetActiveUniform(_programID, i, bufSize, &length, &size, &type, nameBuf));
         std::string name(nameBuf, length);
+
+        EL_ASSERT(i == glGetUniformLocation(_programID, name.c_str()));
+
+        GLUniform uniform;
         uniform.name = name;
         uniform.index = i;
+        uniform.unit = 0;
+        uniform.type = type;
+        uniform.size = size;
+
+        if (type == GL_SAMPLER_1D || 
+            type == GL_SAMPLER_2D ||
+            type == GL_SAMPLER_3D || 
+            type == GL_SAMPLER_CUBE)
+        {
+            uniform.unit = textureUnit++;
+        }
         _activeUniform[name] = std::move(uniform);
     }
 }
@@ -228,6 +247,9 @@ void GLProgram::setupActiveAttribute()
         GLAttribute attribute;
         GL_CHECK(glGetActiveAttrib(_programID, i, bufSize, &length, &attribute.size, &attribute.type, nameBuf));
         std::string name(nameBuf, length);
+
+        EL_ASSERT(i == glGetAttribLocation(_programID, name.c_str()));
+
         attribute.name = name;
         attribute.index = i;
         _activeAttribute[name] = std::move(attribute);
@@ -247,6 +269,24 @@ void GLProgram::setUniform(GLint location, const vec3& v0)
 void GLProgram::setUniform(GLint location, const mat4x4& m0)
 {
     GL_CHECK(glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat*)m0));
+}
+
+void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& texture)
+{
+    auto it = _activeUniform.find(name);
+    if (it == _activeUniform.end())
+    {
+        EL_ASSERT(false);
+        return;
+    }
+    auto& uniform = it->second;
+
+    std::size_t len = asTypeSize(uniform.type);
+    GLuint location = uniform.index;
+
+    const auto& glTexture = std::static_pointer_cast<GLTexture>(texture);
+    if (glTexture != nullptr)
+        glTexture->bind(uniform.unit);
 }
 
 void GLProgram::setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void * pointer)
