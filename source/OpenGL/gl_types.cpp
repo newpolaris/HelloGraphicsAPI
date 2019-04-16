@@ -1,6 +1,190 @@
 #include "gl_types.h"
 #include "debug.h"
 
+bool el::isSamplerType(GLenum type)
+{
+    switch (type)
+    {
+    case GL_SAMPLER_2D:
+    case GL_SAMPLER_3D:
+    case GL_SAMPLER_CUBE:
+    case GL_SAMPLER_2D_ARRAY:
+        return true;
+    }
+    return false;
+}
+
+GLuint el::asVariableComponentCount(GLenum type)
+{
+    return asVariableColumnCount(type) * asVariableRowCount(type);
+}
+
+GLuint el::asVariableRowCount(GLenum type)
+{
+    switch (type)
+    {
+    case GL_BOOL:
+    case GL_FLOAT:
+    case GL_INT:
+    case GL_SAMPLER_2D:
+    case GL_SAMPLER_CUBE:
+    case GL_SAMPLER_2D_ARRAY:
+    case GL_BOOL_VEC2:
+    case GL_FLOAT_VEC2:
+    case GL_INT_VEC2:
+    case GL_INT_VEC3:
+    case GL_FLOAT_VEC3:
+    case GL_BOOL_VEC3:
+    case GL_BOOL_VEC4:
+    case GL_FLOAT_VEC4:
+    case GL_INT_VEC4:
+        return 1;
+    case GL_FLOAT_MAT2:
+    case GL_FLOAT_MAT3x2:
+    case GL_FLOAT_MAT4x2:
+        return 2;
+    case GL_FLOAT_MAT3:
+    case GL_FLOAT_MAT2x3:
+    case GL_FLOAT_MAT4x3:
+        return 3;
+    case GL_FLOAT_MAT4:
+    case GL_FLOAT_MAT2x4:
+    case GL_FLOAT_MAT3x4:
+        return 4;
+    default:
+        EL_ASSERT(FALSE);
+        return 0;
+    }
+}
+
+GLuint el::asVariableColumnCount(GLenum type)
+{
+    switch (type)
+    {
+    case GL_BOOL:
+    case GL_FLOAT:
+    case GL_INT:
+    case GL_SAMPLER_2D:
+    case GL_SAMPLER_CUBE:
+    case GL_SAMPLER_2D_ARRAY:
+        return 1;
+    case GL_BOOL_VEC2:
+    case GL_FLOAT_VEC2:
+    case GL_INT_VEC2:
+    case GL_FLOAT_MAT2:
+    case GL_FLOAT_MAT2x3:
+    case GL_FLOAT_MAT2x4:
+        return 2;
+    case GL_BOOL_VEC3:
+    case GL_FLOAT_VEC3:
+    case GL_INT_VEC3:
+    case GL_FLOAT_MAT3:
+    case GL_FLOAT_MAT3x2:
+    case GL_FLOAT_MAT3x4:
+        return 3;
+    case GL_BOOL_VEC4:
+    case GL_FLOAT_VEC4:
+    case GL_INT_VEC4:
+    case GL_FLOAT_MAT4:
+    case GL_FLOAT_MAT4x2:
+    case GL_FLOAT_MAT4x3:
+        return 4;
+    default:
+        EL_ASSERT(FALSE);
+        return 0;
+    }
+}
+
+GLuint el::asVariableComponentSize(GLenum type)
+{
+    switch (type)
+    {
+    case GL_BOOL: return sizeof(GLint);
+    case GL_FLOAT: return sizeof(GLfloat);
+    case GL_INT: return sizeof(GLint);
+    case GL_UNSIGNED_INT: return sizeof(GLuint);
+    default: return 0;
+    }
+}
+
+GLuint el::asVariableInternalSize(GLenum type)
+{
+    // Expanded to 4-element vectors
+    return asVariableComponentSize(asVariableComponentType(type)) * asVariableRowCount(type) * 4;
+}
+
+GLuint el::asVariableExternalSize(GLenum type)
+{
+    return asVariableComponentSize(asVariableComponentType(type)) * asVariableComponentCount(type);
+}
+
+GLenum el::asVariableComponentType(GLenum type)
+{
+    switch (type)
+    {
+    case GL_BOOL:
+    case GL_BOOL_VEC2:
+    case GL_BOOL_VEC3:
+    case GL_BOOL_VEC4:
+        return GL_BOOL;
+    case GL_FLOAT:
+    case GL_FLOAT_VEC2:
+    case GL_FLOAT_VEC3:
+    case GL_FLOAT_VEC4:
+    case GL_FLOAT_MAT2:
+    case GL_FLOAT_MAT3:
+    case GL_FLOAT_MAT4:
+        return GL_FLOAT;
+    case GL_INT:
+    case GL_SAMPLER_2D:
+    case GL_SAMPLER_2D_ARRAY:
+    case GL_SAMPLER_CUBE:
+    case GL_INT_VEC2:
+    case GL_INT_VEC3:
+    case GL_INT_VEC4:
+        return GL_INT;
+    default:
+        EL_ASSERT(FALSE);
+        return GL_NONE;
+    }
+}
+
+std::string el::asVariableComponentTypename(GLenum type)
+{
+    switch(type)
+    {
+    case GL_FLOAT: return "float";
+    case GL_FLOAT_VEC2: return "vec2";
+    case GL_FLOAT_VEC3: return "vec3";
+    case GL_FLOAT_VEC4: return "vec4";
+    case GL_INT: return "int";
+    case GL_INT_VEC2: return "ivec2";
+    case GL_INT_VEC3: return "ivec3";
+    case GL_INT_VEC4: return "ivec4";
+    case GL_UNSIGNED_INT: return "unsigned int";
+    case GL_UNSIGNED_INT_VEC2: return "uvec2";
+    case GL_UNSIGNED_INT_VEC3: return "uvec3";
+    case GL_UNSIGNED_INT_VEC4: return "uvec4";
+    case GL_BOOL: return "bool";
+    case GL_BOOL_VEC2: return "bvec2";
+    case GL_BOOL_VEC3: return "bvec3";
+    case GL_BOOL_VEC4: return "bvec4";
+    case GL_FLOAT_MAT2: return "mat2";
+    case GL_FLOAT_MAT3: return "mat3";
+    case GL_FLOAT_MAT4: return "mat4";
+    case GL_FLOAT_MAT2x3: return "mat2x3";
+    case GL_FLOAT_MAT2x4: return "mat2x4";
+    case GL_FLOAT_MAT3x2: return "mat3x2";
+    case GL_FLOAT_MAT3x4: return "mat3x4";
+    case GL_FLOAT_MAT4x2: return "mat4x2";
+    case GL_FLOAT_MAT4x3: return "mat4x3";
+    case GL_SAMPLER_2D: return "sampler2D";
+    case GL_SAMPLER_3D: return "sampler3D";
+    case GL_SAMPLER_CUBE: return "samplerCube";
+    default: EL_ASSERT(false); return "";
+    }
+}
+
 GLenum el::getShaderStage(GraphicsShaderStageFlagBits stage)
 {
     switch (stage) {

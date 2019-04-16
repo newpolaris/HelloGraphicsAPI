@@ -23,7 +23,7 @@ namespace el {
             {
                 // In opengl it is valid, but check logic error
                 EL_ASSERT(shaderIDs.size() > 0);
-                
+
                 GLuint id = gl::CreateProgram();
 
                 GLint status = 0;
@@ -65,7 +65,7 @@ namespace el {
 
 using namespace el;
 
-GLProgram::GLProgram() : 
+GLProgram::GLProgram() :
     _programID(0)
 {
 }
@@ -91,7 +91,7 @@ bool GLProgram::create(GraphicsProgramDesc desc)
 
     setupActiveUniform();
     setupActiveAttribute();
-    
+
     return true;
 }
 
@@ -121,85 +121,13 @@ struct SymbolicConstant
     size_t size;
 };
 
-size_t el::asTypeSize(GLenum type)
-{
-    switch(type)
-    {
-    case GL_FLOAT: return 4*1;
-    case GL_FLOAT_VEC2: return 4*2;
-    case GL_FLOAT_VEC3: return 4*3;
-    case GL_FLOAT_VEC4: return 4*4;
-    case GL_INT: return 4*1;
-    case GL_INT_VEC2: return 4*2;
-    case GL_INT_VEC3: return 4*3;
-    case GL_INT_VEC4: return 4*4;
-    case GL_UNSIGNED_INT: return 4*1;
-    case GL_UNSIGNED_INT_VEC2: return 4*2;
-    case GL_UNSIGNED_INT_VEC3: return 4*3;
-    case GL_UNSIGNED_INT_VEC4: return 4*4;
-    case GL_BOOL: return 4*1;
-    case GL_BOOL_VEC2: return 4*2;
-    case GL_BOOL_VEC3: return 4*3;
-    case GL_BOOL_VEC4: return 4*4;
-    case GL_FLOAT_MAT2: return 4*2;
-    case GL_FLOAT_MAT3: return 4*3;
-    case GL_FLOAT_MAT4: return 4*4;
-    case GL_FLOAT_MAT2x3: return 4*2*3;
-    case GL_FLOAT_MAT2x4: return 4*2*4;
-    case GL_FLOAT_MAT3x2: return 4*3*2;
-    case GL_FLOAT_MAT3x4: return 4*3*4;
-    case GL_FLOAT_MAT4x2: return 4*4*2;
-    case GL_FLOAT_MAT4x3: return 4*4*3;
-    case GL_SAMPLER_2D: return 4*1;
-    case GL_SAMPLER_3D: return 4*1;
-    case GL_SAMPLER_CUBE: return 4*1;
-    default: EL_ASSERT(false); return 0;
-    }
-}
-
-std::string asType(GLenum type)
-{
-    switch(type)
-    {
-    case GL_FLOAT: return "float";
-    case GL_FLOAT_VEC2: return "vec2";
-    case GL_FLOAT_VEC3: return "vec3";
-    case GL_FLOAT_VEC4: return "vec4";
-    case GL_INT: return "int";
-    case GL_INT_VEC2: return "ivec2";
-    case GL_INT_VEC3: return "ivec3";
-    case GL_INT_VEC4: return "ivec4";
-    case GL_UNSIGNED_INT: return "unsigned int";
-    case GL_UNSIGNED_INT_VEC2: return "uvec2";
-    case GL_UNSIGNED_INT_VEC3: return "uvec3";
-    case GL_UNSIGNED_INT_VEC4: return "uvec4";
-    case GL_BOOL: return "bool";
-    case GL_BOOL_VEC2: return "bvec2";
-    case GL_BOOL_VEC3: return "bvec3";
-    case GL_BOOL_VEC4: return "bvec4";
-    case GL_FLOAT_MAT2: return "mat2";
-    case GL_FLOAT_MAT3: return "mat3";
-    case GL_FLOAT_MAT4: return "mat4";
-    case GL_FLOAT_MAT2x3: return "mat2x3";
-    case GL_FLOAT_MAT2x4: return "mat2x4";
-    case GL_FLOAT_MAT3x2: return "mat3x2";
-    case GL_FLOAT_MAT3x4: return "mat3x4";
-    case GL_FLOAT_MAT4x2: return "mat4x2";
-    case GL_FLOAT_MAT4x3: return "mat4x3";
-    case GL_SAMPLER_2D: return "sampler2D";
-    case GL_SAMPLER_3D: return "sampler3D";
-    case GL_SAMPLER_CUBE: return "samplerCube";
-    default: EL_ASSERT(false); return "";
-    }
-}
-
 void GLProgram::setupActiveUniform()
 {
     EL_ASSERT(_programID != 0);
-    
+
     GLint count;
     GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_UNIFORMS, &count));
-    
+
     uint32_t textureUnit = 0;
 
     const GLsizei bufSize = 16;
@@ -221,9 +149,9 @@ void GLProgram::setupActiveUniform()
         uniform.type = type;
         uniform.size = size;
 
-        if (type == GL_SAMPLER_1D || 
+        if (type == GL_SAMPLER_1D ||
             type == GL_SAMPLER_2D ||
-            type == GL_SAMPLER_3D || 
+            type == GL_SAMPLER_3D ||
             type == GL_SAMPLER_CUBE)
         {
             uniform.unit = textureUnit++;
@@ -235,23 +163,27 @@ void GLProgram::setupActiveUniform()
 void GLProgram::setupActiveAttribute()
 {
     EL_ASSERT(_programID != 0);
-    
+
     GLint count;
     GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_ATTRIBUTES, &count));
-    
+
     const GLsizei bufSize = 16;
     for (GLint i = 0; i < count; i++)
     {
         GLchar nameBuf[bufSize] = { 0 };
         GLsizei length;
+        GLint size;
+        GLenum type;
         GLAttribute attribute;
-        GL_CHECK(glGetActiveAttrib(_programID, i, bufSize, &length, &attribute.size, &attribute.type, nameBuf));
+        GL_CHECK(glGetActiveAttrib(_programID, i, bufSize, &length, &size, &type, nameBuf));
         std::string name(nameBuf, length);
 
         EL_ASSERT(i == glGetAttribLocation(_programID, name.c_str()));
 
         attribute.name = name;
         attribute.index = i;
+        attribute.size = asVariableComponentCount(type);
+        attribute.type = asVariableComponentType(type);
         _activeAttribute[name] = std::move(attribute);
     }
 }
@@ -304,8 +236,6 @@ void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& te
         return;
     }
     auto& uniform = it->second;
-
-    std::size_t len = asTypeSize(uniform.type);
 
     const auto& glTexture = std::static_pointer_cast<GLTexture>(texture);
     if (glTexture != nullptr)

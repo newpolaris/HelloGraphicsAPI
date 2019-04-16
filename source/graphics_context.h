@@ -13,7 +13,7 @@ namespace el {
 		GraphicsContext();
 		virtual ~GraphicsContext();
 
-        virtual void setViewport(int32_t x, int32_t y, uint32_t width, uint32_t height) = 0;
+        virtual void setViewport(const Viewport& viewport) = 0;
         virtual void setProgram(const GraphicsProgramPtr& program) = 0;
         virtual void setTexture(const std::string& name, const GraphicsTexturePtr& texture) = 0;
         virtual void setVertexBuffer(const std::string& name, const GraphicsBufferPtr& vertex_buffer, uint32_t stride, uint32_t offset) = 0;

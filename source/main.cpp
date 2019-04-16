@@ -202,7 +202,6 @@ class GraphicsApplication
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
-    GLint mvp_location, vpos_location, color_location, texture_location;
 
     glfwSetErrorCallback(error_callback);
 
@@ -217,7 +216,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-#   ifdef EL_PLAT_APPLE
+#   if EL_PLAT_APPLE
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #   else
@@ -241,7 +240,7 @@ int main(int argc, char** argv)
     glfwMakeContextCurrent(windows[0]);
 
     // TODO:
-    // glad_glGenFramebuffersEXT   
+    // how to handle glad_glGenFramebuffersEXT?
     if (glGenFramebuffers != 0)
     {
         EL_TRACE("Require GL_ARB_framebuffer_object");
@@ -333,13 +332,6 @@ int main(int argc, char** argv)
         program = device->createProgram(program_desc);
         EL_ASSERT(program);
 
-        auto program_id = std::static_pointer_cast<GLProgram>(program)->getProgramID();
-
-        mvp_location = glGetUniformLocation(program_id, "MVP");
-        color_location = glGetUniformLocation(program_id, "color");
-        texture_location = glGetUniformLocation(program_id, "texture");
-        vpos_location = glGetAttribLocation(program_id, "vPos");
-
         GraphicsBufferDesc vertices_buffer_desc;
         vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
         vertices_buffer_desc.setData((const char*)vertices);
@@ -414,7 +406,7 @@ int main(int argc, char** argv)
             profile[i].start();
 
             context[i]->setProgram(program);
-            context[i]->setViewport(0, 0, width, height);
+            context[i]->setViewport(Viewport(0, 0, width, height));
 
             // Shared bewteen context
             context[i]->setUniform("color", colors[i]);
@@ -432,9 +424,12 @@ int main(int argc, char** argv)
         glfwPollEvents();
     }
 
-    // vertex_shader->destory();
-    std::static_pointer_cast<GLShader>(vertex_shader)->destroy();
-    std::static_pointer_cast<GLShader>(fragment_shader)->destroy();
+    vertex_shader.reset();
+    fragment_shader.reset();
+    program.reset();
+    context[0].reset();
+    context[1].reset();
+    device.reset();
 
     glfwTerminate();
     exit(EXIT_SUCCESS);

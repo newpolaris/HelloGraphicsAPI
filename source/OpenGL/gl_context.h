@@ -19,7 +19,7 @@ namespace el {
         bool create();
         void destory();
 
-        void setViewport(int32_t x, int32_t y, uint32_t width, uint32_t height) override;
+        void setViewport(const Viewport& viewport) override;
         void setProgram(const GraphicsProgramPtr& ptr) override;
         void setTexture(const std::string& name, const GraphicsTexturePtr& texture) override;
         void setVertexBuffer(const std::string& name, const GraphicsBufferPtr& vertex_buffer, uint32_t stride, uint32_t offset) override;
@@ -28,6 +28,7 @@ namespace el {
         
 	private:
 
+        Viewport _viewport;
         GLProgramPtr _program;
 	};
 

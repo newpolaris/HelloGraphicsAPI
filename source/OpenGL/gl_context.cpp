@@ -35,13 +35,16 @@ bool GLContext::create()
 
 void GLContext::destory()
 {
+    _program.reset();
 }
 
-void GLContext::setViewport(int32_t x, int32_t y, uint32_t width, uint32_t height)
+void GLContext::setViewport(const Viewport& viewport)
 {
-    // TODO: viewport comparing;
-
-    GL_CHECK(glViewport(x, y, width, height));
+    if (_viewport != viewport)
+    {
+        _viewport = viewport;
+        GL_CHECK(glViewport(_viewport.x, _viewport.y, _viewport.width, _viewport.height));
+    }
 }
 
 void GLContext::setProgram(const GraphicsProgramPtr& ptr)

@@ -43,6 +43,7 @@ namespace shader {
 
 	void destroy(Handle& handle)
 	{
+        // TODO: id 0 is silently ignored
 		if (isInitialized(handle))
 		{
 			gl::DeleteShader(handle);
@@ -60,6 +61,7 @@ GLShader::GLShader() : _id(0)
 
 GLShader::~GLShader()
 {
+    destroy();
 }
 
 bool GLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)

@@ -1,5 +1,4 @@
 #include "gl_profile.h"
-#include <glfw/glfw3.h>
 
 using namespace el;
 

@@ -1,7 +1,5 @@
 #include "gl_texture.h"
 #include "debug.h"
-
-// TODO:
 #include "gl_types.h"
 
 using namespace el;
@@ -14,6 +12,7 @@ GLTexture::GLTexture() :
 
 GLTexture::~GLTexture()
 {
+    destroy();
 }
 
 bool GLTexture::create(GraphicsTextureDesc desc)
@@ -44,17 +43,12 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 	_textureDesc = std::move(desc);
 
 	return true;
-
 }
 
 void GLTexture::destroy()
 {
-	// No need to unboud before deleting and silently ignores 0
-	if (!_textureID)
-	{
-		GL_CHECK(glDeleteTextures(1, &_textureID));
-		_textureID = 0;
-	}
+    GL_CHECK(glDeleteTextures(1, &_textureID));
+    _textureID = 0;
 }
 
 void GLTexture::bind(GLuint unit) const
