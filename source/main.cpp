@@ -40,20 +40,19 @@
 #include "getopt.h"
 #include "linmath.h"
 
-#include "graphics_device.h"
-#include "graphics_context.h"
-#include "graphics_texture.h"
-#include "graphics_types.h"
-#include "graphics_shader.h"
-#include "graphics_program.h"
-#include "graphics_texture.h"
+#include <graphics_device.h>
+#include <graphics_context.h>
+#include <graphics_texture.h>
+#include <graphics_types.h>
+#include <graphics_shader.h>
+#include <graphics_program.h>
+#include <graphics_texture.h>
+#include <graphics_buffer.h>
 
 // TODO:
-#include <OpenGL/gl_program.h>
-#include <OpenGL/gl_shader.h>
-#include <OpenGL/gl_texture.h>
 #include <OpenGL/gl_profile.h>
-#include <OpenGL/gl_buffer.h>
+
+#include <stdi/imagea.h>
 
 static const char* vertex_shader_text =
 "#version 110\n"
@@ -241,6 +240,7 @@ int main(int argc, char** argv)
 
     // TODO:
     // how to handle glad_glGenFramebuffersEXT?
+    // GL_IMPORT_EXT__(true, PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
     if (glGenFramebuffers != 0)
     {
         EL_TRACE("Require GL_ARB_framebuffer_object");
@@ -310,6 +310,8 @@ int main(int argc, char** argv)
 
         texture = device->createTexture(texture_desc);
         EL_ASSERT(texture);
+
+        howto - file_name, handle
 
         GraphicsShaderDesc vertex_desc;
         vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);

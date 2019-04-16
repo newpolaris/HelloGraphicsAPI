@@ -13,7 +13,6 @@ namespace el {
         ~GLBuffer();
 
         bool create(GraphicsBufferDesc desc) override;
-        bool create(GLenum target, int32_t size, const int8_t* data, GLenum flag);
         void destroy();
 
         void bind() const;

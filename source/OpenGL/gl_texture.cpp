@@ -37,6 +37,9 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 	const stream_t* stream = desc.getStream();
 
 	GL_CHECK(glTexImage2D(_target, level, internalformat, width, height, border, format, type, stream));
+
+    sometings to do;
+
 	GL_CHECK(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	GL_CHECK(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
