@@ -60,12 +60,13 @@ add_executable(
     #MACOSX_BUNDLE 
     ${RENDERER_LIST} 
     ${GLAD} 
+    ${STB}
     #${OSX_SOURCE} 
     #OSX/MainMenu.xib 
     #OSX/Shaders.metal
     )
 
-target_include_directories(${APP_TARGET} PRIVATE "${GLAD_DIR}/include")
+target_include_directories(${APP_TARGET} PRIVATE "${GLAD_DIR}/include" "{STB_DIR}")
 target_link_libraries(${APP_TARGET} ${ALL_LIBS})
 
 # Xcode and Visual working directories

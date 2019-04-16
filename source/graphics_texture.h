@@ -22,6 +22,24 @@ namespace el {
         void setDim(GraphicsTextureDim target);
         GraphicsTextureDim getDim() const;
 
+        uint32_t getWrapS() const;
+        void setWrapS(uint32_t wrap);
+
+        uint32_t getWrapT() const;
+        void setWrapT(uint32_t wrap);
+
+        uint32_t getWrapR() const;
+        void setWrapR(uint32_t wrap);
+
+        uint32_t getMinFilter() const;
+        void setMinFilter(uint32_t filter);
+
+        uint32_t getMagFilter() const;
+        void setMagFilter(uint32_t filter);
+
+        float getAnisotropyLevel() const;
+        void setAnisotropyLevel(float anisoLevel);
+
 		void setStream(stream_t* stream);
 		const stream_t* getStream() const;
 
@@ -36,6 +54,14 @@ namespace el {
 		uint32_t _width;
 		uint32_t _height;
 		uint32_t _depth;
+        uint32_t _level;
+        uint32_t _wrapS;
+        uint32_t _wrapT;
+        uint32_t _wrapR;
+        uint32_t _minFilter;
+        uint32_t _magFilter;
+        float _anisotropyLevel;
+
 		stream_t* _stream;
 		streamsize_t _streamSize;
 		GraphicsTextureDim _dim;

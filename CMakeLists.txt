@@ -19,12 +19,17 @@ include(UsebackportedModules)
 include(CreateLaunchers)
 include(MSVCMultipleProcessCompile) # /MP
 
-# GLAD
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
+
+# GLAD
 set(GLAD_DIR "${EXTERNAL_DIR}/glad")
 add_library("glad" "${GLAD_DIR}/src/glad.c")
 target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
 
+# STB
+set(STB_DIR "${EXTERNAL_DIR}/stb")
+add_library("stb" "${STB_DIR}/stb_image.cpp")
+target_include_directories("stb" PRIVATE "${STB_DIR}")
 
 link_libraries(glfw)
 
@@ -39,6 +44,7 @@ include_directories(
 
 set(ALL_LIBS
 	"glad"
+    "stb"
 	${OPENGL_LIBRARY}
 )
 

@@ -52,7 +52,7 @@
 // TODO:
 #include <OpenGL/gl_profile.h>
 
-#include <stdi/imagea.h>
+#include <stb_image.h>
 
 static const char* vertex_shader_text =
 "#version 110\n"
@@ -178,17 +178,103 @@ static void APIENTRY gl_debug_callback(GLenum source,
 
 namespace el {
 
-    struct ImageData
+    GLenum getComponent(int Components)
     {
+        switch (Components)
+        {
+        case 1u:
+            return GL_RED;
+        case 2u:
+            return GL_RG;
+        case 3u:
+            return GL_RGB;
+        case 4u:
+            return GL_RGBA;
+        default:
+            EL_ASSERT(false);
+            return 0;
+        };
+    }
+
+    GLenum getInternalComponent(int Components, bool isFloat)
+    {
+        GLenum base = getComponent(Components);
+
+        // TODO: pure 2.1 has float type?
+        if (isFloat)
+        {
+            switch (base)
+            {
+                // TODO: pure 2.1 has red and rg (?)
+
+            case GL_RED: 
+                return GL_R16F;
+            case GL_RG:
+                return GL_RG16F;
+            case GL_RGB:
+                return GL_RGB16F;
+            case GL_RGBA:
+                return GL_RGBA16F;
+            }
+        }
+        else
+        {
+            // TODO: pure 2.1 has red and rg (?)
+            switch (base)
+            {
+            case GL_RED:
+                return GL_R8;
+            case GL_RG:
+			    return GL_RG8;
+            case GL_RGB:
+                return GL_RGB8;
+            case GL_RGBA:
+                return GL_RGBA8;
+            }
+        }
+        return 0;
+    }
+
+    class ImageData
+    {
+    public:
+        
         int32_t width;
         int32_t depth;
         std::vector<int8_t> stream;
         GraphicsPixelFormat format;
     };
 
-    ImageData ImageLoaderPng(const std::string& filename)
+    typedef std::shared_ptr<class ImageData> ImageDataPtr;
+
+    ImageDataPtr ImageLoader(const std::string& filename)
     {
-        ImageData container;
+        stbi_set_flip_vertically_on_load(true);
+
+        int width = 0, height = 0, components = 0;
+        stbi_uc* imagedata = stbi_load(filename.c_str(), &width, &height, &components, 0);
+        if (!imagedata) return nullptr;
+        streamsize_t length = widht * height * components;
+
+        GLenum target = GL_TEXTURE_2D;
+        GLenum type = GL_UNSIGNED_BYTE;
+
+        GraphicsPixelFormat format = GraphicsPixelFormat::GraphicsPixelFormatInvalid;
+        switch (components)
+        {
+        case 1: format = GraphicsPixelFormat::GraphicsPixelFormatR8Unorm; break;
+        case 2: format = GraphicsPixelFormat::GraphicsPixelFormatRG8Unorm; break;
+        case 4: format = GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm; break;
+        }
+
+        auto container = std::make_shared<ImageData>();
+        container->format = format;
+        container->stream = std::vector<stream_t>(imagedata, length);
+        container->width = width;
+        container->height = height;
+
+        stbi_image_free(imagedata);
+
         return container;
     }
 }
@@ -286,8 +372,22 @@ int main(int argc, char** argv)
 
     GraphicsBufferPtr vertex_buffer;
 
-    // Create the OpenGL objects inside the first context, created above
-    // All objects will be shared with the second context, created below
+    if (true)
+    {
+        ImageDataPtr image = ImageLoader("cute_girl.png");
+
+        GraphicsTextureDesc texture_desc;
+        texture_desc.setDim(GraphicsTextureDim2D);
+        texture_desc.setPixelFormat(GraphicsPixelFormat::GraphicsPixelFormatR8Unorm);
+        texture_desc.setWidth(image.width);
+        texture_desc.setHeight(image.height);
+        texture_desc.setStream(static_cast<stream_t*>(image.stream.data()));
+        texture_desc.setStreamSize(image.stream.size());
+
+        texture = device->createTexture(texture_desc);
+        EL_ASSERT(texture);
+    }
+    else
     {
         int x, y;
         char pixels[16 * 16];
@@ -310,9 +410,10 @@ int main(int argc, char** argv)
 
         texture = device->createTexture(texture_desc);
         EL_ASSERT(texture);
-
-        howto - file_name, handle
-
+    }
+    // Create the OpenGL objects inside the first context, created above
+    // All objects will be shared with the second context, created below
+    {
         GraphicsShaderDesc vertex_desc;
         vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
         vertex_desc.setShaderCode(vertex_shader_text);

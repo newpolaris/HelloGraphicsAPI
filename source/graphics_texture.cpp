@@ -84,6 +84,66 @@ GraphicsPixelFormat GraphicsTextureDesc::getPixelFormat() const
 	return _pixelFormat;
 }
 
+uint32_t GraphicsTextureDesc::getWrapS() const
+{
+    return _wrapS;
+}
+
+void GraphicsTextureDesc::setWrapS(uint32_t wrap)
+{
+    _wrapS = wrap;
+}
+
+uint32_t GraphicsTextureDesc::getWrapT() const
+{
+    return _wrapT;
+}
+
+void GraphicsTextureDesc::setWrapT(uint32_t wrap)
+{
+    _wrapT = wrap;
+}
+
+uint32_t GraphicsTextureDesc::getWrapR() const
+{
+    return _wrapT;
+}
+
+void GraphicsTextureDesc::setWrapR(uint32_t wrap)
+{
+    _wrapR = wrap;
+}
+
+uint32_t GraphicsTextureDesc::getMinFilter() const
+{
+    return _minFilter;
+}
+
+void GraphicsTextureDesc::setMinFilter(uint32_t filter)
+{
+    _minFilter = filter;
+}
+
+uint32_t GraphicsTextureDesc::getMagFilter() const
+{
+    return _magFilter;
+}
+
+void GraphicsTextureDesc::setMagFilter(uint32_t filter)
+{
+    _magFilter = filter;
+}
+
+float GraphicsTextureDesc::getAnisotropyLevel() const
+{
+    return _anisotropyLevel;
+}
+
+void GraphicsTextureDesc::setAnisotropyLevel(float anisoLevel)
+{
+    _anisotropyLevel = anisoLevel;
+}
+
 GraphicsTexture::GraphicsTexture()
 {
 }
