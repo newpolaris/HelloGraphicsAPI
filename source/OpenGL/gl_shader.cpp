@@ -41,11 +41,10 @@ namespace shader {
 		return Handle(id);
 	}
 
-	void destroy(const el::gl::program::Handle& phandle, Handle& handle)
+	void destroy(Handle& handle)
 	{
 		if (isInitialized(handle))
 		{
-			gl::DetachShader(phandle, handle);
 			gl::DeleteShader(handle);
 			handle = 0;
 		}
@@ -72,9 +71,9 @@ bool GLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
 	return true;
 }
 
-void GLShader::destroy(gl::program::Handle program)
+void GLShader::destroy()
 {
-	shader::destroy(program, _id);
+	shader::destroy(_id);
 }
 
 GLuint GLShader::getID() const

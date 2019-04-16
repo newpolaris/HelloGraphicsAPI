@@ -6,12 +6,6 @@
 #include "graphics_shader.h"
 
 namespace el {
-	namespace gl {
-		namespace program
-		{
-			typedef GLuint Handle;
-		}
-	}
 
 	class GLShader final : public GraphicsShader
 	{
@@ -21,7 +15,7 @@ namespace el {
 		~GLShader();
 
 		bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
-		void destroy(gl::program::Handle program);
+		void destroy();
 
 		GLuint getID() const;
 

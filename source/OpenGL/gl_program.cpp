@@ -271,6 +271,30 @@ void GLProgram::setUniform(GLint location, const mat4x4& m0)
     GL_CHECK(glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat*)m0));
 }
 
+void GLProgram::setUniform(const std::string& name, const vec3& v0)
+{
+    auto it = _activeUniform.find(name);
+    if (it == _activeUniform.end())
+    {
+        EL_ASSERT(false);
+        return;
+    }
+    auto& uniform = it->second;
+    setUniform(uniform.index, v0);
+}
+
+void GLProgram::setUniform(const std::string& name, const mat4x4& m0)
+{
+    auto it = _activeUniform.find(name);
+    if (it == _activeUniform.end())
+    {
+        EL_ASSERT(false);
+        return;
+    }
+    auto& uniform = it->second;
+    setUniform(uniform.index, m0);
+}
+
 void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& texture)
 {
     auto it = _activeUniform.find(name);
@@ -282,11 +306,27 @@ void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& te
     auto& uniform = it->second;
 
     std::size_t len = asTypeSize(uniform.type);
-    GLuint location = uniform.index;
 
     const auto& glTexture = std::static_pointer_cast<GLTexture>(texture);
     if (glTexture != nullptr)
         glTexture->bind(uniform.unit);
+}
+
+void GLProgram::setVertexBuffer(const std::string& name, const GraphicsBufferPtr& buffer, uint32_t stride, uint32_t offset)
+{
+    auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
+    if (glBuffer != nullptr)
+        glBuffer->bind();
+    EL_ASSERT(glBuffer != nullptr);
+
+    auto it = _activeAttribute.find(name);
+    if (it == _activeAttribute.end())
+    {
+        EL_ASSERT(false);
+        return;
+    }
+    auto& attrib = it->second;
+    setVertexBuffer(attrib.index, buffer, 2, GL_FLOAT, stride, offset);
 }
 
 void GLProgram::setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void * pointer)

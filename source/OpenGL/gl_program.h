@@ -3,7 +3,7 @@
 #include "graphics_types.h"
 #include "graphics_program.h"
 #include "gl_types.h"
-#include "linmath.h"
+#include <linmath.h>
 #include <string>
 #include <map>
 
@@ -45,7 +45,11 @@ namespace el {
 		void setUniform(GLint location, const GLint& v0);
 		void setUniform(GLint location, const vec3& v0);
 		void setUniform(GLint location, const mat4x4& m0);
+
+        void setUniform(const std::string& name, const vec3& v0);
+        void setUniform(const std::string& name, const mat4x4& m0);
         void setUniform(const std::string& name, const GraphicsTexturePtr& texture);
+        void setVertexBuffer(const std::string& name, const GraphicsBufferPtr& buffer, uint32_t stride, uint32_t offset);
         
         template <typename T>
         void updateUniform(const std::string& name, T&& value)

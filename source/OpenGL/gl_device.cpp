@@ -3,7 +3,7 @@
 #include "gl_shader.h"
 #include "gl_texture.h"
 #include "gl_buffer.h"
-#include "gl_device_context.h"
+#include "gl_context.h"
 
 using namespace el;
 
@@ -55,9 +55,9 @@ GraphicsBufferPtr GLDevice::createBuffer(GraphicsBufferDesc desc)
 	return nullptr;
 }
 
-GraphicsDeviceContextPtr GLDevice::createDeviceContext()
+GraphicsContextPtr GLDevice::createDeviceContext()
 {
-    auto context = std::make_shared<GLDeviceContext>();
+    auto context = std::make_shared<GLContext>();
     if (context == nullptr)
         return nullptr;
     if (context->create())

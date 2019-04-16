@@ -11,14 +11,14 @@ namespace el {
 	typedef uint32_t streamsize_t;
 
 	class GraphicsDeviceDesc;
-	class GraphicsDeviceContextDesc;
+	class GraphicsContextDesc;
 	class GraphicsProgramDesc;
 	class GraphicsShaderDesc;
 	class GraphicsTextureDesc;
 	class GraphicsBufferDesc;
 
 	typedef std::shared_ptr<class GraphicsDevice> GraphicsDevicePtr;
-	typedef std::shared_ptr<class GraphicsDeviceContext> GraphicsDeviceContextPtr;
+	typedef std::shared_ptr<class GraphicsContext> GraphicsContextPtr;
 	typedef std::shared_ptr<class GraphicsShader> GraphicsShaderPtr;
 	typedef std::shared_ptr<class GraphicsProgram> GraphicsProgramPtr;
 	typedef std::shared_ptr<class GraphicsTexture> GraphicsTexturePtr;

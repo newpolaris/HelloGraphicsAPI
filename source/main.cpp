@@ -41,7 +41,7 @@
 #include "linmath.h"
 
 #include "graphics_device.h"
-#include "graphics_device_context.h"
+#include "graphics_context.h"
 #include "graphics_texture.h"
 #include "graphics_types.h"
 #include "graphics_shader.h"
@@ -348,13 +348,10 @@ int main(int argc, char** argv)
         vertex_buffer = device->createBuffer(vertices_buffer_desc);
     }
 
-	GraphicsDeviceContextPtr context = device->createDeviceContext();
-    context->setProgram(program);
-    context->setTexture("texture", texture);
-    // context->setVertexBuffer("vPos", vertex_buffer, vertices, sizeof(vertices[0]), 0);
-
-    auto gl_program = std::static_pointer_cast<GLProgram>(program);
-    gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
+    GraphicsContextPtr context[2];
+    context[0] = device->createDeviceContext();
+    context[0]->setProgram(program); context[0]->setTexture("texture", texture);
+    context[0]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
 
     GLProfileBusyWait profile[2];
     profile[0].setName("window 0");
@@ -387,17 +384,15 @@ int main(int argc, char** argv)
 
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
-    context->setProgram(program);
-
-    gl_program->apply();
-    gl_program->setVertexBuffer(vpos_location, vertex_buffer, 2, GL_FLOAT, sizeof(vertices[0]), 0);
+    context[1] = device->createDeviceContext();
+    context[1]->setProgram(program);
+    context[1]->setTexture("texture", texture);
+    context[1]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
 
     mat4x4 mvp;
     mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
 
-    // TODO:
-	// program->updateUniform("MVP", mvp);
-    gl_program->setUniform(mvp_location, mvp);
+	context[1]->setUniform("MVP", mvp);
 
     while (!glfwWindowShouldClose(windows[0]) &&
             !glfwWindowShouldClose(windows[1]))
@@ -418,11 +413,11 @@ int main(int argc, char** argv)
 
             profile[i].start();
 
-            context->setProgram(program);
-            context->setViewport(0, 0, width, height);
+            context[i]->setProgram(program);
+            context[i]->setViewport(0, 0, width, height);
 
             // Shared bewteen context
-            gl_program->setUniform(color_location, colors[i]);
+            context[i]->setUniform("color", colors[i]);
             GL_CHECK(glDrawArrays(GL_TRIANGLE_FAN, 0, 4));
 
             profile[i].end();
@@ -437,8 +432,9 @@ int main(int argc, char** argv)
         glfwPollEvents();
     }
 
-    std::static_pointer_cast<GLShader>(vertex_shader)->destroy(gl_program->getProgramID());
-    std::static_pointer_cast<GLShader>(fragment_shader)->destroy(gl_program->getProgramID());
+    // vertex_shader->destory();
+    std::static_pointer_cast<GLShader>(vertex_shader)->destroy();
+    std::static_pointer_cast<GLShader>(fragment_shader)->destroy();
 
     glfwTerminate();
     exit(EXIT_SUCCESS);
