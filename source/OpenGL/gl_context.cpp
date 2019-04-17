@@ -38,6 +38,14 @@ void GLContext::destory()
     _program.reset();
 }
 
+void GLContext::beginRendering()
+{
+}
+
+void GLContext::endRendering()
+{
+}
+
 void GLContext::setViewport(const Viewport& viewport)
 {
     if (_viewport != viewport)
@@ -79,6 +87,13 @@ void GLContext::setUniform(const std::string& name, const mat4x4& m0)
 {
     EL_ASSERT(_program);
     _program->setUniform(name, m0);
+}
+
+void GLContext::draw(GraphicsPrimitiveType primitive, int32_t first, uint32_t count)
+{
+    EL_ASSERT(_program);
+    GLenum mode = asPrimitiveType(primitive);
+    GL_CHECK(glDrawArrays(mode, first, count));
 }
 
 #endif // #if EL_BUILD_OPENGL

@@ -49,38 +49,43 @@
 #include <graphics_texture.h>
 #include <graphics_buffer.h>
 
+#include <cstdio>
+
 // TODO:
 #include <OpenGL/gl_profile.h>
 
 #include <stb/stb_image.h>
+#include <utility.h>
 
-static const char* vertex_shader_text =
-"#version 110\n"
-"uniform mat4 MVP;\n"
-"attribute vec2 vPos;\n"
-"varying vec2 texcoord;\n"
-"void main()\n"
-"{\n"
-"    gl_Position = MVP * vec4(vPos, 0.0, 1.0);\n"
-"    texcoord = vPos;\n"
-"}\n";
+static const char* vertex_shader_text = R"""(
+#version 110
+uniform mat4 MVP;
+attribute vec2 vPos;
+varying vec2 texcoord;
+void main()
+{
+	gl_Position = MVP * vec4(vPos, 0.0, 1.0);
+	texcoord = vPos;
+};
+)""";
 
-static const char* fragment_shader_text =
-"#version 110\n"
-"uniform sampler2D texture;\n"
-"uniform vec3 color;\n"
-"varying vec2 texcoord;\n"
-"void main()\n"
-"{\n"
-"    gl_FragColor = vec4(color * texture2D(texture, texcoord).g, 1.0);\n"
-"}\n";
+static const char* fragment_shader_text = R"""(
+#version 110
+uniform sampler2D texture;
+uniform vec3 color;
+varying vec2 texcoord;
+void main()
+{
+	gl_FragColor = vec4(color * texture2D(texture, texcoord).g, 1.0);
+}
+)""";
 
 static const vec2 vertices[4] =
 {
-    { 0.f, 0.f },
-    { 1.f, 0.f },
-    { 1.f, 1.f },
-    { 0.f, 1.f }
+    {0.f, 0.f},
+    {1.f, 0.f},
+    {1.f, 1.f},
+    {0.f, 1.f}
 };
 
 static void error_callback(int error, const char* description)
@@ -97,12 +102,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 #if EL_CONFIG_DEBUG
 
 static void APIENTRY gl_debug_callback(GLenum source,
-        GLenum type,
-        GLuint id,
-        GLenum severity,
-        GLsizei length,
-        const GLchar* message,
-        const void* userParam)
+    GLenum type,
+    GLuint id,
+    GLenum severity,
+    GLsizei length,
+    const GLchar* message,
+    const void* userParam)
 {
     // ignore these non-significant error codes
     if (id == 131169 || id == 131185 || id == 131218 || id == 131204 || id == 131184)
@@ -112,58 +117,58 @@ static void APIENTRY gl_debug_callback(GLenum source,
     output << "---------- OPENGL CALLBACK -----------" << std::endl;
     output << "SOURCE: ";
     switch (source) {
-        case GL_DEBUG_SOURCE_API:
-            output << "WINDOW_SYSTEM";
-            break;
-        case GL_DEBUG_SOURCE_SHADER_COMPILER:
-            output << "SHADER_COMPILER";
-            break;
-        case GL_DEBUG_SOURCE_THIRD_PARTY:
-            output << "THIRD_PARTY";
-            break;
-        case GL_DEBUG_SOURCE_APPLICATION:
-            output << "APPLICATION";
-            break;
-        case GL_DEBUG_SOURCE_OTHER:
-            output << "OTHER";
-            break;
+    case GL_DEBUG_SOURCE_API:
+        output << "WINDOW_SYSTEM";
+        break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER:
+        output << "SHADER_COMPILER";
+        break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY:
+        output << "THIRD_PARTY";
+        break;
+    case GL_DEBUG_SOURCE_APPLICATION:
+        output << "APPLICATION";
+        break;
+    case GL_DEBUG_SOURCE_OTHER:
+        output << "OTHER";
+        break;
     }
     output << std::endl;
 
     output << "TYPE: ";
     switch (type) {
-        case GL_DEBUG_TYPE_ERROR:
-            output << "ERROR";
-            break;
-        case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-            output << "DEPRECATED_BEHAVIOR";
-            break;
-        case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-            output << "UNDEFINED_BEHAVIOR";
-            break;
-        case GL_DEBUG_TYPE_PORTABILITY:
-            output << "PORTABILITY";
-            break;
-        case GL_DEBUG_TYPE_PERFORMANCE:
-            output << "PERFORMANCE";
-            break;
-        case GL_DEBUG_TYPE_OTHER:
-            output << "OTHER";
-            break;
+    case GL_DEBUG_TYPE_ERROR:
+        output << "ERROR";
+        break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+        output << "DEPRECATED_BEHAVIOR";
+        break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+        output << "UNDEFINED_BEHAVIOR";
+        break;
+    case GL_DEBUG_TYPE_PORTABILITY:
+        output << "PORTABILITY";
+        break;
+    case GL_DEBUG_TYPE_PERFORMANCE:
+        output << "PERFORMANCE";
+        break;
+    case GL_DEBUG_TYPE_OTHER:
+        output << "OTHER";
+        break;
     }
     output << std::endl;
 
     output << "SEVERITY : ";
     switch (severity) {
-        case GL_DEBUG_SEVERITY_LOW:
-            output << "LOW";
-            break;
-        case GL_DEBUG_SEVERITY_MEDIUM:
-            output << "MEDIUM";
-            break;
-        case GL_DEBUG_SEVERITY_HIGH:
-            output << "HIGH";
-            break;
+    case GL_DEBUG_SEVERITY_LOW:
+        output << "LOW";
+        break;
+    case GL_DEBUG_SEVERITY_MEDIUM:
+        output << "MEDIUM";
+        break;
+    case GL_DEBUG_SEVERITY_HIGH:
+        output << "HIGH";
+        break;
     }
     output << std::endl;
     output << message << std::endl;
@@ -172,9 +177,6 @@ static void APIENTRY gl_debug_callback(GLenum source,
     el::debug_break();
 }
 #endif // EL_CONFIG_DEBUG
-
-#include <vector>
-#include <string>
 
 namespace el {
 
@@ -207,7 +209,7 @@ namespace el {
             {
                 // TODO: pure 2.1 has red and rg (?)
 
-            case GL_RED: 
+            case GL_RED:
                 return GL_R16F;
             case GL_RG:
                 return GL_RG16F;
@@ -225,7 +227,7 @@ namespace el {
             case GL_RED:
                 return GL_R8;
             case GL_RG:
-			    return GL_RG8;
+                return GL_RG8;
             case GL_RGB:
                 return GL_RGB8;
             case GL_RGBA:
@@ -238,7 +240,7 @@ namespace el {
     class ImageData
     {
     public:
-        
+
         uint32_t width;
         uint32_t height;
         uint32_t depth;
@@ -253,7 +255,7 @@ namespace el {
         stbi_set_flip_vertically_on_load(true);
 
         int width = 0, height = 0, components = 0;
-        stream_t* imagedata = (stream_t*)stbi_load(filename.c_str(), &width, &height, &components, STBI_rgb_alpha);
+        auto imagedata = (stream_t*)stbi_load(filename.c_str(), &width, &height, &components, STBI_rgb_alpha);
         if (!imagedata) return nullptr;
 
         streamsize_t length = width * height * 4;
@@ -284,7 +286,7 @@ namespace el {
 
 class GraphicsApplication
 {
-    public:
+public:
 };
 
 int main(int argc, char** argv)
@@ -354,11 +356,11 @@ int main(int argc, char** argv)
     }
 
     std::printf("%s\n%s\n%s\n%s\n",
-            glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine
-            glGetString(GL_VERSION),   // e.g. 3.2 INTEL-8.0.61
-            glGetString(GL_VENDOR),    // e.g. NVIDIA Corporation
-            glGetString(GL_SHADING_LANGUAGE_VERSION)  // e.g. 4.60 NVIDIA or 1.50 NVIDIA via Cg compiler
-            );
+        glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine
+        glGetString(GL_VERSION),   // e.g. 3.2 INTEL-8.0.61
+        glGetString(GL_VENDOR),    // e.g. NVIDIA Corporation
+        glGetString(GL_SHADING_LANGUAGE_VERSION)  // e.g. 4.60 NVIDIA or 1.50 NVIDIA via Cg compiler
+    );
 #endif
 
     using namespace el;
@@ -377,7 +379,7 @@ int main(int argc, char** argv)
 
     if (true)
     {
-        const ImageDataPtr image = ImageLoader("smallmiku.png");
+        const ImageDataPtr image = ImageLoader("miku.png");
         EL_ASSERT(image);
 
         GraphicsTextureDesc texture_desc;
@@ -418,9 +420,11 @@ int main(int argc, char** argv)
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
+        const auto vertex_shader_text = fileread("main.vert");
+
         GraphicsShaderDesc vertex_desc;
         vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
-        vertex_desc.setShaderCode(vertex_shader_text);
+        vertex_desc.setShaderCode(vertex_shader_text.get());
 
         vertex_shader = device->createShader(vertex_desc);
         EL_ASSERT(vertex_shader);
@@ -491,15 +495,15 @@ int main(int argc, char** argv)
     mat4x4 mvp;
     mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
 
-	context[1]->setUniform("MVP", mvp);
+    context[1]->setUniform("MVP", mvp);
 
     while (!glfwWindowShouldClose(windows[0]) &&
-            !glfwWindowShouldClose(windows[1]))
+        !glfwWindowShouldClose(windows[1]))
     {
         const vec3 colors[2] =
         {
-            { 0.8f, 0.4f, 1.f },
-            { 0.3f, 0.4f, 1.f }
+            {0.8f, 0.4f, 1.f},
+            {0.3f, 0.4f, 1.f}
         };
 
         int i;
@@ -512,22 +516,20 @@ int main(int argc, char** argv)
 
             profile[i].start();
 
+            context[i]->beginRendering();
             context[i]->setProgram(program);
             context[i]->setViewport(Viewport(0, 0, width, height));
 
             // Shared bewteen context
             context[i]->setUniform("color", colors[i]);
-
-            // TODO: make wrap it;
-
-            GL_CHECK(glDrawArrays(GL_TRIANGLE_FAN, 0, 4));
+            context[i]->draw(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, 0, 4);
 
             profile[i].end();
 
             glfwSwapBuffers(windows[i]);
-            char profileBuf[256] = { '\0' };
+            char profileBuf[256] = {'\0'};
             sprintf(profileBuf, "%s CPU %.3f, GPU %.3f", profile[i].getName().c_str(),
-                    profile[i].getCpuTime(), profile[i].getGpuTime());
+                profile[i].getCpuTime(), profile[i].getGpuTime());
             glfwSetWindowTitle(windows[i], profileBuf);
         }
 

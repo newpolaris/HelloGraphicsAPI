@@ -185,6 +185,19 @@ std::string el::asVariableComponentTypename(GLenum type)
     }
 }
 
+GLenum el::asPrimitiveType(GraphicsPrimitiveType primitiveType)
+{
+	switch (primitiveType)
+	{
+	case GraphicsPrimitiveType::GraphicsPrimitiveTypeFan:
+		return GL_TRIANGLE_FAN;
+	default:
+		EL_ASSERT(false);
+		return 0;
+	}
+	return 0;
+}
+
 GLenum el::getShaderStage(GraphicsShaderStageFlagBits stage)
 {
     switch (stage) {

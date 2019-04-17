@@ -305,7 +305,7 @@ namespace el {
 		GraphicsPixelFormatX32_Stencil8 = 261,
 		GraphicsPixelFormatX24_Stencil8 = 262,
 
-        GraphicsPixelFormatRGB8Unorm = 66, // TODO:
+        GraphicsPixelFormatRGB8Unorm = 66 // TODO:
 	};
 
     enum class GraphicsPixelAlignment : uint8_t
@@ -315,5 +315,10 @@ namespace el {
         GraphicsPixelAlignment4 = 4,
         GraphicsPixelAlignment8 = 8,
     };
+
+	enum class GraphicsPrimitiveType : uint8_t
+	{
+		GraphicsPrimitiveTypeFan = 5,
+	};
 
 } // namespace el

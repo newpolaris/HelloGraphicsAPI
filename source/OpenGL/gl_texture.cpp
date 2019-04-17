@@ -46,7 +46,7 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 
 	const stream_t* stream = desc.getStream();
 
-    GLint pixelAlignment = (GLint)desc.getPixelAlignment();
+    auto pixelAlignment = static_cast<GLint>(desc.getPixelAlignment());
 
     GLint oldPixelAlignment = defaultPixelAlignement;
     GL_CHECK(glGetIntegerv(GL_UNPACK_ALIGNMENT, &oldPixelAlignment));
@@ -55,6 +55,9 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 
     // TODO:
 	GL_CHECK(glTexImage2D(_target, level, GL_RGB, width, height, border, GL_RGBA, type, stream));
+
+    if (oldPixelAlignment != pixelAlignment)
+        GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, oldPixelAlignment));
 
     // TODO: GL-2.1
     // glTexSubImage2D
@@ -73,9 +76,6 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 
     *data = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, mapSize, GL_MAP_READ_BIT);
 #endif
-
-    if (oldPixelAlignment != pixelAlignment)
-        GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, oldPixelAlignment));
 
     auto wrapS = asSamplerAddressMode(desc.getAddressModeU());
     auto wrapT = asSamplerAddressMode(desc.getAddresModeV());
@@ -109,9 +109,9 @@ bool GLTexture::create(GraphicsTextureDesc desc)
         GL_CHECK(glTexParameterf(_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisoLevel));
 #endif
 
-	_textureDesc = std::move(desc);
-
 	GL_CHECK(glBindTexture(_target, 0));
+
+	_textureDesc = std::move(desc);
     
 	return true;
 }

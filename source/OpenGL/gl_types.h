@@ -17,6 +17,7 @@ namespace el {
 
     bool isSamplerType(GLenum type);
 
+	GLenum asPrimitiveType(GraphicsPrimitiveType primitiveType);
     GLenum getShaderStage(GraphicsShaderStageFlagBits stage);
 
     GLuint asVariableComponentCount(GLenum type);
