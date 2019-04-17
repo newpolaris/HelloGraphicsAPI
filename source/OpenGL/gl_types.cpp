@@ -251,7 +251,7 @@ GLenum el::asTextureType(GraphicsPixelFormat format)
     case GraphicsPixelFormat::GraphicsPixelFormatRG16Uint:			textureType = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRG16Sint:			textureType = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRG16Float:			textureType = 0; break;
-    case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm:			textureType = 0; break;
+    case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm:			textureType = GL_UNSIGNED_BYTE; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm_sRGB:			textureType = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Snorm:			textureType = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Uint:			textureType = 0; break;
@@ -385,7 +385,7 @@ GLenum el::asTextureFormat(GraphicsPixelFormat textureFormat)
     case GraphicsPixelFormat::GraphicsPixelFormatRG16Uint:			format = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRG16Sint:			format = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRG16Float:			format = 0; break;
-    case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm:			format = 0; break;
+    case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm:			format = GL_RGBA; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm_sRGB:			format = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Snorm:			format = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Uint:			format = 0; break;
@@ -519,7 +519,7 @@ GLint el::asTextureInternalFormat(GraphicsPixelFormat format)
     case GraphicsPixelFormat::GraphicsPixelFormatRG16Uint:			internalFormat = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRG16Sint:			internalFormat = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRG16Float:			internalFormat = 0; break;
-    case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm:			internalFormat = 0; break;
+    case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm:			internalFormat = GL_RGBA; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm_sRGB:			internalFormat = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Snorm:			internalFormat = 0; break;
     case GraphicsPixelFormat::GraphicsPixelFormatRGBA8Uint:			internalFormat = 0; break;
@@ -618,4 +618,68 @@ GLint el::asTextureInternalFormat(GraphicsPixelFormat format)
     }
     EL_ASSERT(internalFormat != 0);
     return internalFormat;
+}
+
+GLenum el::asSamplerAddressMode(GraphicsSamplerAddressMode mode)
+{
+    switch (mode)
+    {
+    case GraphicsSamplerAddressModeRepeat:
+        return GL_REPEAT;
+    case GraphicsSamplerAddressModeMirroredReapt:
+        return GL_MIRRORED_REPEAT;
+    case GraphicsSamplerAddressModeClampToEdge:
+        return GL_CLAMP_TO_EDGE;
+    case GraphicsSamplerAddressModeClampToBorder:
+        return GL_CLAMP_TO_BORDER;
+    case GraphicsSamplerAddressModeMirrorClampToEdge:
+    default:
+        EL_ASSERT(false);
+        return 0;
+    }
+}
+
+//
+// see details
+// section "Mapping of OpenGL to Vulkan filter modes"
+// in https://vulkan.lunarg.com/doc/view/1.0.26.0/linux/vkspec.chunked/ch12.html#VkSamplerAddressMode 
+//
+GLenum el::asSamplerMinFilter(GraphicsFilter filter, GraphicsSamplerMipmapMode mode)
+{
+    // GL_minFilter_MIPMAP_mipmapMode
+    if (mode == GraphicsSamplerMipmapModeNone)
+    {
+        if (filter == GraphicsFilterNearest)
+            return GL_NEAREST;
+        else
+            return GL_LINEAR;
+    } 
+    else if (mode == GraphicsSamplerMipmapModeNearest)
+    {
+        if (filter == GraphicsFilterNearest)
+            return GL_NEAREST_MIPMAP_NEAREST;
+        else
+            return GL_LINEAR_MIPMAP_NEAREST;
+    }
+    else
+    {
+        if (filter == GraphicsFilterNearest)
+            return GL_NEAREST_MIPMAP_LINEAR;
+        else
+            return GL_LINEAR_MIPMAP_LINEAR;
+    }
+}
+
+GLenum el::asSamplerMagFilter(GraphicsFilter filter)
+{
+    switch (filter) 
+    {
+    case GraphicsFilterNearest: 
+        return GL_NEAREST;
+    case GraphicsFilterLinear:
+        return GL_LINEAR;
+    default:
+        EL_ASSERT(false);
+        return 0;
+    }
 }

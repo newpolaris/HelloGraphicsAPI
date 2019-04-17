@@ -1,9 +1,19 @@
+#pragma once
+
 #include "gl.h"
 #include "graphics_types.h"
 #include "debug.h"
 
 namespace el {
     typedef std::shared_ptr<class GLProgram> GLProgramPtr;
+}
+
+namespace el {
+    const GLenum defaultWrap = GL_REPEAT;
+    const GLenum defaultMinFilter = GL_LINEAR_MIPMAP_LINEAR;
+    const GLenum defaultMagFilter = GL_LINEAR;
+    const GLfloat defaultAnisoLevel = 0;
+    const GLint defaultPixelAlignement = 4;
 
     bool isSamplerType(GLenum type);
 
@@ -22,4 +32,7 @@ namespace el {
     GLenum asTextureType(GraphicsPixelFormat format);
     GLenum asTextureFormat(GraphicsPixelFormat textureFormat);
     GLint  asTextureInternalFormat(GraphicsPixelFormat format);
+    GLenum asSamplerAddressMode(GraphicsSamplerAddressMode mode);
+    GLenum asSamplerMinFilter(GraphicsFilter filter, GraphicsSamplerMipmapMode mode);
+    GLenum asSamplerMagFilter(GraphicsFilter filter);
 }

@@ -145,6 +145,38 @@ namespace el {
 		GraphicsShaderStageFlagBitsMaxEnum = 0x7FFFFFFF
 	};
 
+    // From vulkan sepc.
+    enum GraphicsSamplerAddressMode
+    {
+        GraphicsSamplerAddressModeRepeat = 0,
+        GraphicsSamplerAddressModeMirroredReapt = 1,
+        GraphicsSamplerAddressModeClampToEdge = 2,
+        GraphicsSamplerAddressModeClampToBorder = 3,
+        GraphicsSamplerAddressModeMirrorClampToEdge = 4
+    };
+
+    enum GraphicsFilter
+    {
+        GraphicsFilterNearest = 0,
+        GraphicsFilterLinear = 1,
+    };
+
+    enum GraphicsSamplerMipmapMode {
+        GraphicsSamplerMipmapModeNone = 0,
+        GraphicsSamplerMipmapModeNearest = 1,
+        GraphicsSamplerMipmapModeLinear = 2,
+    };
+
+    // From vulkan sepc.
+    enum class GraphicsBorderColor {
+        GraphicsBorderColorFloatTransparentBlack = 0,
+        GraphicsBorderColorIntTransparentBlack = 1,
+        GraphicsBorderColorFloatOpaqueBlack = 2,
+        GraphicsBorderColorIntOpaqueBlack = 3,
+        GraphicsBorderColorFloatOpaqueWhite = 4,
+        GraphicsBorderColorIntOpaqueWhite = 5,
+    };
+
 	// From MTLPixelFormat
 	enum class GraphicsPixelFormat
 	{
@@ -272,6 +304,16 @@ namespace el {
 		GraphicsPixelFormatDepth32Float_Stencil8 = 260,
 		GraphicsPixelFormatX32_Stencil8 = 261,
 		GraphicsPixelFormatX24_Stencil8 = 262,
+
+        GraphicsPixelFormatRGB8Unorm = 66, // TODO:
 	};
+
+    enum class GraphicsPixelAlignment : uint8_t
+    {
+        GraphicsPixelAlignment1 = 1,
+        GraphicsPixelAlignment2 = 2,
+        GraphicsPixelAlignment4 = 4,
+        GraphicsPixelAlignment8 = 8,
+    };
 
 } // namespace el

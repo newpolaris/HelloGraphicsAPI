@@ -1,6 +1,7 @@
 #include "graphics_types.h"
 #include "graphics_texture.h"
 #include "gl.h"
+#include "gl_types.h"
 
 namespace el
 {

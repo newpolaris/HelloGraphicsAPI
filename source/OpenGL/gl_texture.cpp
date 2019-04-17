@@ -6,14 +6,7 @@ using namespace el;
 
 GLTexture::GLTexture() : 
 	_textureID(0u), 
-	_target(0u),
-    _levels(1),
-    _wrapS(GL_REPEAT),
-    _wrapT(GL_REPEAT),
-    _wrapR(GL_REPEAT),
-    _minFilter(GL_NEAREST_MIPMAP_LINEAR),
-    _magFilter(GL_LINEAR),
-    _anisotropyLevel(0)
+	_target(0u)
 {
 }
 
@@ -26,57 +19,100 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 {
 	_target = asTextureTarget(desc.getDim());
 
-	const GLint border = 0;
-
-	GLint level = 0;
-	GLint internalformat = asTextureInternalFormat(desc.getPixelFormat());
-	GLenum format = asTextureFormat(desc.getPixelFormat());
-	GLenum type = asTextureType(desc.getPixelFormat());
-
 	GL_CHECK(glGenTextures(1, &_textureID));
 	if (_textureID == 0)
 		return false;
+
+	EL_ASSERT(_target != 0);
+	EL_ASSERT(_textureID != 0);
+
 	GL_CHECK(glBindTexture(_target, _textureID));
+
+	const GLint border = 0;
+
+    const GLint levels = desc.getLevels();
+
+    // unsupport multi-level images
+    EL_ASSERT(levels == 1);
+	const GLint level = 0;
+
+    // https://stackoverflow.com/questions/34497195/difference-between-format-and-internalformat
+	GLint internalformat = asTextureInternalFormat(desc.getPixelFormat());
+	GLenum format = asTextureFormat(desc.getPixelFormat());
+	GLenum type = asTextureType(desc.getPixelFormat());
 
 	uint32_t width = desc.getWidth();
 	uint32_t height = desc.getHeight();
 
 	const stream_t* stream = desc.getStream();
 
-	GL_CHECK(glTexImage2D(_target, level, internalformat, width, height, border, format, type, stream));
+    GLint pixelAlignment = (GLint)desc.getPixelAlignment();
 
-	EL_ASSERT(_target != 0);
-	EL_ASSERT(_textureID != 0);
+    GLint oldPixelAlignment = defaultPixelAlignement;
+    GL_CHECK(glGetIntegerv(GL_UNPACK_ALIGNMENT, &oldPixelAlignment));
+    if (oldPixelAlignment != pixelAlignment)
+        GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, pixelAlignment));
 
-    GLenum defaultWrap = GL_REPEAT;
-    auto wrapS = desc.getWrapS();
-    auto wrapT = desc.getWrapT();
-    auto wrapR = desc.getWrapR();
+    // TODO:
+	GL_CHECK(glTexImage2D(_target, level, GL_RGB, width, height, border, GL_RGBA, type, stream));
+
+    // TODO: GL-2.1
+    // glTexSubImage2D
+
+#if 0
+    glTexSubImage2D
+        GLsizei mapSize = w * h * num;
+    if (_pboSize < mapSize)
+    {
+        glBufferData(GL_PIXEL_PACK_BUFFER, mapSize, nullptr, GL_STREAM_READ);
+        _pboSize = mapSize;
+    }
+
+    glBindTexture(_target, _texture);
+    glGetTexImage(_target, mipLevel, format, type, 0);
+
+    *data = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, mapSize, GL_MAP_READ_BIT);
+#endif
+
+    if (oldPixelAlignment != pixelAlignment)
+        GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, oldPixelAlignment));
+
+    auto wrapS = asSamplerAddressMode(desc.getAddressModeU());
+    auto wrapT = asSamplerAddressMode(desc.getAddresModeV());
+    auto wrapR = asSamplerAddressMode(desc.getAddresModeW());
 
     if (wrapS != defaultWrap)
-        GL_CHECK(glTexParameteri(GL_TEXTURE_WRAP_S, wrapS));
+        GL_CHECK(glTexParameteri(_target, GL_TEXTURE_WRAP_S, wrapS));
     if (wrapT != defaultWrap)
-        GL_CHECK(glTexParameteri(GL_TEXTURE_WRAP_T, wrapS));
+        GL_CHECK(glTexParameteri(_target, GL_TEXTURE_WRAP_T, wrapS));
     if (wrapR != defaultWrap)
-        GL_CHECK(glTexParameteri(GL_TEXTURE_WRAP_R, wrapS));
+        GL_CHECK(glTexParameteri(_target, GL_TEXTURE_WRAP_R, wrapS));
 
     auto minFilter = desc.getMinFilter();
     auto magFilter = desc.getMagFilter();
-    auto defaultMinFilter = GL_LINEAR_MIPMAP_LINEAR;
-    auto defaultMagFilter = GL_LINEAR;
-    EL_ASSERT(magFilter == GL_NEAREST || magFilter == GL_LINEAR);
-    if (minFilter != defaultMinFilter)
-        GL_CHECK(glTexParameteri(GL_TEXTURE_MIN_FILTER, minFilter));
-    if (magFilter != defaultMagFilter)
-        GL_CHECK(glTexParameteri(GL_TEXTURE_MAG_FILTER, magFilter));
+    auto mipFilter = desc.getSamplerMipmapMode();
 
-    GLfloat defaultAnisoLevel = 0;
+    GLenum glMinFilter = asSamplerMinFilter(minFilter, mipFilter);
+    GLenum glMagFilter = asSamplerMagFilter(magFilter);
+
+    EL_ASSERT(glMagFilter == GL_NEAREST || glMagFilter == GL_LINEAR);
+
+    if (glMinFilter != defaultMinFilter)
+        GL_CHECK(glTexParameteri(_target, GL_TEXTURE_MIN_FILTER, glMinFilter));
+    if (glMagFilter != defaultMagFilter)
+        GL_CHECK(glTexParameteri(_target, GL_TEXTURE_MAG_FILTER, glMagFilter));
+
+#if 0 // TODO:
+    // bSupportAnisotropy
     auto anisoLevel = desc.getAnisotropyLevel();
     if (anisoLevel > defaultAnisoLevel)
-        GL_CHECK(glTextureParameterf(GL_TEXTURE_MAX_ANISOTROPY_EXT, anisoLevel));
+        GL_CHECK(glTexParameterf(_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisoLevel));
+#endif
 
 	_textureDesc = std::move(desc);
 
+	GL_CHECK(glBindTexture(_target, 0));
+    
 	return true;
 }
 

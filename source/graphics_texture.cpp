@@ -1,5 +1,4 @@
 #include "graphics_texture.h"
-#include <istream>
 
 using namespace el;
 
@@ -7,10 +6,19 @@ GraphicsTextureDesc::GraphicsTextureDesc() :
 	_width(0),
 	_height(0),
 	_depth(1),
+    _levels(1),
+    _addressModeU(GraphicsSamplerAddressMode::GraphicsSamplerAddressModeRepeat),
+    _addressModeV(GraphicsSamplerAddressMode::GraphicsSamplerAddressModeRepeat),
+    _addressModeW(GraphicsSamplerAddressMode::GraphicsSamplerAddressModeRepeat),
+    _minFilter(GraphicsFilterLinear),
+    _magFilter(GraphicsFilterLinear),
+    _samplerMipmapMode(GraphicsSamplerMipmapModeNone),
+    _anisotropyLevel(0),
 	_stream(nullptr),
 	_streamSize(0),
 	_dim(GraphicsTextureDim2D),
-	_pixelFormat(GraphicsPixelFormat::GraphicsPixelFormatInvalid)
+	_pixelFormat(GraphicsPixelFormat::GraphicsPixelFormatInvalid),
+    _pixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment4)
 {
 }
 
@@ -44,17 +52,88 @@ uint32_t GraphicsTextureDesc::getDepth() const
 	return _depth;
 }
 
-void GraphicsTextureDesc::setDim(GraphicsTextureDim dim)
+void GraphicsTextureDesc::setLevels(uint32_t levels)
 {
-	_dim = dim;
+    _levels = levels;
 }
 
-GraphicsTextureDim GraphicsTextureDesc::getDim() const
+uint32_t GraphicsTextureDesc::getLevels() const
 {
-	return _dim;
+    return _levels;
 }
 
-void GraphicsTextureDesc::setStream(stream_t * stream)
+GraphicsSamplerAddressMode GraphicsTextureDesc::getAddressModeU() const
+{
+    return _addressModeU;
+}
+
+void GraphicsTextureDesc::setAddressModeU(GraphicsSamplerAddressMode mode)
+{
+    _addressModeU = mode;
+}
+
+GraphicsSamplerAddressMode GraphicsTextureDesc::getAddresModeV() const
+{
+    return _addressModeV;
+}
+
+void GraphicsTextureDesc::setAddressModeV(GraphicsSamplerAddressMode mode)
+{
+    _addressModeV = mode;
+}
+
+GraphicsSamplerAddressMode GraphicsTextureDesc::getAddresModeW() const
+{
+    return _addressModeW;
+}
+
+void GraphicsTextureDesc::setAddressModeW(GraphicsSamplerAddressMode mode)
+{
+    _addressModeW = mode;
+}
+
+GraphicsFilter GraphicsTextureDesc::getMinFilter() const
+{
+    return _minFilter;
+}
+
+void GraphicsTextureDesc::setMinFilter(GraphicsFilter filter)
+{
+    _minFilter = filter;
+}
+
+GraphicsFilter GraphicsTextureDesc::getMagFilter() const
+{
+    return _magFilter;
+}
+
+void GraphicsTextureDesc::setMagFilter(GraphicsFilter filter)
+{
+    _magFilter = filter;
+}
+
+GraphicsSamplerMipmapMode GraphicsTextureDesc::getSamplerMipmapMode() const
+{
+    return _samplerMipmapMode;
+}
+
+void GraphicsTextureDesc::setSamplerMipmapMode(GraphicsSamplerMipmapMode mode)
+{
+    _samplerMipmapMode = mode;
+}
+
+float GraphicsTextureDesc::getAnisotropyLevel() const
+{
+    return _anisotropyLevel;
+}
+
+void GraphicsTextureDesc::setAnisotropyLevel(float anisoLevel)
+{
+    _anisotropyLevel = anisoLevel;
+}
+
+
+void GraphicsTextureDesc::setStream(stream_t* stream)
 {
 	_stream = stream;
 }
@@ -74,6 +153,16 @@ streamsize_t GraphicsTextureDesc::getStreamSize() const
 	return _streamSize;
 }
 
+void GraphicsTextureDesc::setDim(GraphicsTextureDim dim)
+{
+	_dim = dim;
+}
+
+GraphicsTextureDim GraphicsTextureDesc::getDim() const
+{
+	return _dim;
+}
+
 void GraphicsTextureDesc::setPixelFormat(GraphicsPixelFormat format)
 {
 	_pixelFormat = format;
@@ -84,64 +173,14 @@ GraphicsPixelFormat GraphicsTextureDesc::getPixelFormat() const
 	return _pixelFormat;
 }
 
-uint32_t GraphicsTextureDesc::getWrapS() const
+void GraphicsTextureDesc::setPixelAlignment(GraphicsPixelAlignment align)
 {
-    return _wrapS;
+    _pixelAlignment = align;
 }
 
-void GraphicsTextureDesc::setWrapS(uint32_t wrap)
+GraphicsPixelAlignment GraphicsTextureDesc::getPixelAlignment() const
 {
-    _wrapS = wrap;
-}
-
-uint32_t GraphicsTextureDesc::getWrapT() const
-{
-    return _wrapT;
-}
-
-void GraphicsTextureDesc::setWrapT(uint32_t wrap)
-{
-    _wrapT = wrap;
-}
-
-uint32_t GraphicsTextureDesc::getWrapR() const
-{
-    return _wrapT;
-}
-
-void GraphicsTextureDesc::setWrapR(uint32_t wrap)
-{
-    _wrapR = wrap;
-}
-
-uint32_t GraphicsTextureDesc::getMinFilter() const
-{
-    return _minFilter;
-}
-
-void GraphicsTextureDesc::setMinFilter(uint32_t filter)
-{
-    _minFilter = filter;
-}
-
-uint32_t GraphicsTextureDesc::getMagFilter() const
-{
-    return _magFilter;
-}
-
-void GraphicsTextureDesc::setMagFilter(uint32_t filter)
-{
-    _magFilter = filter;
-}
-
-float GraphicsTextureDesc::getAnisotropyLevel() const
-{
-    return _anisotropyLevel;
-}
-
-void GraphicsTextureDesc::setAnisotropyLevel(float anisoLevel)
-{
-    _anisotropyLevel = anisoLevel;
+    return _pixelAlignment;
 }
 
 GraphicsTexture::GraphicsTexture()

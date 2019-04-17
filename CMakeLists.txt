@@ -19,6 +19,7 @@ include(UsebackportedModules)
 include(CreateLaunchers)
 include(MSVCMultipleProcessCompile) # /MP
 
+# EXTENNAL
 set(EXTERNAL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/external")
 
 # GLAD

@@ -12,6 +12,10 @@ bool GLDevice::create(GraphicsDeviceDesc desc)
 	// https://www.khronos.org/opengl/wiki/GLSL_:_common_mistakes#Enable_Or_Not_To_Enable
 	// For fixed pipeline
 	// glEnable(GL_TEXTURE_2D);
+
+    // Max Aniso Level query
+    // bSupportAnisotropy
+    
 	return true;
 }
 

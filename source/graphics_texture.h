@@ -4,6 +4,10 @@
 
 namespace el {
 
+}
+
+namespace el {
+
     class GraphicsTextureDesc final
     {
     public:
@@ -19,23 +23,26 @@ namespace el {
         void setDepth(uint32_t depth);
         uint32_t getDepth() const;
 
-        void setDim(GraphicsTextureDim target);
-        GraphicsTextureDim getDim() const;
+        void setLevels(uint32_t levels);
+        uint32_t getLevels() const;
 
-        uint32_t getWrapS() const;
-        void setWrapS(uint32_t wrap);
+        GraphicsSamplerAddressMode getAddressModeU() const;
+        void setAddressModeU(GraphicsSamplerAddressMode wrap);
 
-        uint32_t getWrapT() const;
-        void setWrapT(uint32_t wrap);
+        GraphicsSamplerAddressMode getAddresModeV() const;
+        void setAddressModeV(GraphicsSamplerAddressMode wrap);
 
-        uint32_t getWrapR() const;
-        void setWrapR(uint32_t wrap);
+        GraphicsSamplerAddressMode getAddresModeW() const;
+        void setAddressModeW(GraphicsSamplerAddressMode wrap);
 
-        uint32_t getMinFilter() const;
-        void setMinFilter(uint32_t filter);
+        GraphicsFilter getMinFilter() const;
+        void setMinFilter(GraphicsFilter filter);
 
-        uint32_t getMagFilter() const;
-        void setMagFilter(uint32_t filter);
+        GraphicsFilter getMagFilter() const;
+        void setMagFilter(GraphicsFilter filter);
+
+        GraphicsSamplerMipmapMode getSamplerMipmapMode() const;
+        void setSamplerMipmapMode(GraphicsSamplerMipmapMode mode);
 
         float getAnisotropyLevel() const;
         void setAnisotropyLevel(float anisoLevel);
@@ -46,26 +53,34 @@ namespace el {
 		void setStreamSize(streamsize_t stream);
 		streamsize_t getStreamSize() const;
 
+        void setDim(GraphicsTextureDim target);
+        GraphicsTextureDim getDim() const;
+
         void setPixelFormat(GraphicsPixelFormat format);
         GraphicsPixelFormat getPixelFormat() const;
+
+        void setPixelAlignment(GraphicsPixelAlignment align);
+        GraphicsPixelAlignment getPixelAlignment() const;
 
 	private:
 
 		uint32_t _width;
 		uint32_t _height;
 		uint32_t _depth;
-        uint32_t _level;
-        uint32_t _wrapS;
-        uint32_t _wrapT;
-        uint32_t _wrapR;
-        uint32_t _minFilter;
-        uint32_t _magFilter;
+        uint32_t _levels;
+        GraphicsSamplerAddressMode _addressModeU;
+        GraphicsSamplerAddressMode _addressModeV;
+        GraphicsSamplerAddressMode _addressModeW;
+        GraphicsFilter _minFilter;
+        GraphicsFilter _magFilter;
+        GraphicsSamplerMipmapMode _samplerMipmapMode;
         float _anisotropyLevel;
 
 		stream_t* _stream;
 		streamsize_t _streamSize;
 		GraphicsTextureDim _dim;
         GraphicsPixelFormat _pixelFormat;
+        GraphicsPixelAlignment _pixelAlignment;
 	};
 
     class GraphicsTexture

@@ -52,7 +52,7 @@
 // TODO:
 #include <OpenGL/gl_profile.h>
 
-#include <stb_image.h>
+#include <stb/stb_image.h>
 
 static const char* vertex_shader_text =
 "#version 110\n"
@@ -239,9 +239,10 @@ namespace el {
     {
     public:
         
-        int32_t width;
-        int32_t depth;
-        std::vector<int8_t> stream;
+        uint32_t width;
+        uint32_t height;
+        uint32_t depth;
+        std::vector<stream_t> stream;
         GraphicsPixelFormat format;
     };
 
@@ -252,9 +253,10 @@ namespace el {
         stbi_set_flip_vertically_on_load(true);
 
         int width = 0, height = 0, components = 0;
-        stbi_uc* imagedata = stbi_load(filename.c_str(), &width, &height, &components, 0);
+        stream_t* imagedata = (stream_t*)stbi_load(filename.c_str(), &width, &height, &components, STBI_rgb_alpha);
         if (!imagedata) return nullptr;
-        streamsize_t length = widht * height * components;
+
+        streamsize_t length = width * height * 4;
 
         GLenum target = GL_TEXTURE_2D;
         GLenum type = GL_UNSIGNED_BYTE;
@@ -264,14 +266,15 @@ namespace el {
         {
         case 1: format = GraphicsPixelFormat::GraphicsPixelFormatR8Unorm; break;
         case 2: format = GraphicsPixelFormat::GraphicsPixelFormatRG8Unorm; break;
+        case 3: format = GraphicsPixelFormat::GraphicsPixelFormatRGB8Unorm; break;
         case 4: format = GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm; break;
         }
 
         auto container = std::make_shared<ImageData>();
         container->format = format;
-        container->stream = std::vector<stream_t>(imagedata, length);
-        container->width = width;
-        container->height = height;
+        container->stream = std::vector<stream_t>(imagedata, imagedata + length);
+        container->width = (int32_t)width;
+        container->height = (int32_t)height;
 
         stbi_image_free(imagedata);
 
@@ -374,15 +377,16 @@ int main(int argc, char** argv)
 
     if (true)
     {
-        ImageDataPtr image = ImageLoader("cute_girl.png");
+        const ImageDataPtr image = ImageLoader("smallmiku.png");
+        EL_ASSERT(image);
 
         GraphicsTextureDesc texture_desc;
         texture_desc.setDim(GraphicsTextureDim2D);
-        texture_desc.setPixelFormat(GraphicsPixelFormat::GraphicsPixelFormatR8Unorm);
-        texture_desc.setWidth(image.width);
-        texture_desc.setHeight(image.height);
-        texture_desc.setStream(static_cast<stream_t*>(image.stream.data()));
-        texture_desc.setStreamSize(image.stream.size());
+        texture_desc.setPixelFormat(GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm);
+        texture_desc.setWidth(image->width);
+        texture_desc.setHeight(image->height);
+        texture_desc.setStream(static_cast<stream_t*>(image->stream.data()));
+        texture_desc.setStreamSize(image->stream.size());
 
         texture = device->createTexture(texture_desc);
         EL_ASSERT(texture);
@@ -513,6 +517,9 @@ int main(int argc, char** argv)
 
             // Shared bewteen context
             context[i]->setUniform("color", colors[i]);
+
+            // TODO: make wrap it;
+
             GL_CHECK(glDrawArrays(GL_TRIANGLE_FAN, 0, 4));
 
             profile[i].end();
