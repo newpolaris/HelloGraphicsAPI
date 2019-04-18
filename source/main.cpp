@@ -57,29 +57,6 @@
 #include <stb/stb_image.h>
 #include <utility.h>
 
-static const char* vertex_shader_text = R"""(
-#version 110
-uniform mat4 MVP;
-attribute vec2 vPos;
-varying vec2 texcoord;
-void main()
-{
-	gl_Position = MVP * vec4(vPos, 0.0, 1.0);
-	texcoord = vPos;
-};
-)""";
-
-static const char* fragment_shader_text = R"""(
-#version 110
-uniform sampler2D texture;
-uniform vec3 color;
-varying vec2 texcoord;
-void main()
-{
-	gl_FragColor = vec4(color * texture2D(texture, texcoord).g, 1.0);
-}
-)""";
-
 static const vec2 vertices[4] =
 {
     {0.f, 0.f},
@@ -255,7 +232,7 @@ namespace el {
         stbi_set_flip_vertically_on_load(true);
 
         int width = 0, height = 0, components = 0;
-        auto imagedata = (stream_t*)stbi_load(filename.c_str(), &width, &height, &components, STBI_rgb_alpha);
+        auto imagedata = (stream_t*)stbi_load(filename.c_str(), &width, &height, &components, 0);
         if (!imagedata) return nullptr;
 
         streamsize_t length = width * height * 4;
@@ -384,11 +361,12 @@ int main(int argc, char** argv)
 
         GraphicsTextureDesc texture_desc;
         texture_desc.setDim(GraphicsTextureDim2D);
-        texture_desc.setPixelFormat(GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm);
+        texture_desc.setPixelFormat(image->format);
         texture_desc.setWidth(image->width);
         texture_desc.setHeight(image->height);
         texture_desc.setStream(static_cast<stream_t*>(image->stream.data()));
         texture_desc.setStreamSize(image->stream.size());
+        texture_desc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment1);
 
         texture = device->createTexture(texture_desc);
         EL_ASSERT(texture);
@@ -421,6 +399,7 @@ int main(int argc, char** argv)
     // All objects will be shared with the second context, created below
     {
         const auto vertex_shader_text = fileread("main.vert");
+        EL_ASSERT(vertex_shader_text);
 
         GraphicsShaderDesc vertex_desc;
         vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
@@ -429,9 +408,12 @@ int main(int argc, char** argv)
         vertex_shader = device->createShader(vertex_desc);
         EL_ASSERT(vertex_shader);
 
+        const auto frag_shader_text = fileread("main.frag");
+        EL_ASSERT(frag_shader_text);
+
         GraphicsShaderDesc fragment_desc;
         fragment_desc.setStageFlag(GraphicsShaderStageFragmentBit);
-        fragment_desc.setShaderCode(fragment_shader_text);
+        fragment_desc.setShaderCode(frag_shader_text.get());
 
         fragment_shader = device->createShader(fragment_desc);
         EL_ASSERT(fragment_shader);

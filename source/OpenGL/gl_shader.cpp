@@ -35,6 +35,7 @@ namespace shader {
 				gl::GetShaderInfoLog(id, length, nullptr, buffer.data());
 				el::trace("%s:%d %s\n", __FILE__, __LINE__, buffer.data());
 				gl::DeleteShader(id);
+                debug_break();
 				return 0;
 			}
 		}

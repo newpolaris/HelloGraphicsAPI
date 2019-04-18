@@ -5,9 +5,10 @@
 #define EL_CONFIG_DEBUG 0
 
 #if defined(_DEBUG) || !defined(NDEBUG)
-#	undef EL_CONFIG_DEBUG
-#	define EL_CONFIG_DEBUG 1
+#   undef EL_CONFIG_DEBUG
+#   define EL_CONFIG_DEBUG 1
 #endif
+#define EL_CONFIG_DEBUG_BREAK 1
 
 // target: osx legacy support (framebuffer and vao supported)
 #define EL_BUILD_OPENGL 1

@@ -39,6 +39,7 @@ bool GLTexture::create(GraphicsTextureDesc desc)
     // https://stackoverflow.com/questions/34497195/difference-between-format-and-internalformat
 	GLint internalformat = asTextureInternalFormat(desc.getPixelFormat());
 	GLenum format = asTextureFormat(desc.getPixelFormat());
+
 	GLenum type = asTextureType(desc.getPixelFormat());
 
 	uint32_t width = desc.getWidth();
@@ -53,8 +54,7 @@ bool GLTexture::create(GraphicsTextureDesc desc)
     if (oldPixelAlignment != pixelAlignment)
         GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, pixelAlignment));
 
-    // TODO:
-	GL_CHECK(glTexImage2D(_target, level, GL_RGB, width, height, border, GL_RGBA, type, stream));
+	GL_CHECK(glTexImage2D(_target, level, internalformat, width, height, border, format, type, stream));
 
     if (oldPixelAlignment != pixelAlignment)
         GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, oldPixelAlignment));

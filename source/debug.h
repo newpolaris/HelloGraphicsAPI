@@ -22,7 +22,14 @@ namespace el {
 	} while (0)
 
 #if EL_CONFIG_DEBUG
-#    define EL_ASSERT(_call) assert(_call)
+#   if !EL_CONFIG_DEBUG_BREAK
+#       define EL_ASSERT(_call) assert(_call)
+#   else
+#       define EL_ASSERT(_call) (void)( \
+                (!!(_call)) || \
+                (debug_break(), 0) \
+                )
+#   endif
 #else
 #    define EL_ASSERT(_call) ((void)(_call))
 #endif
