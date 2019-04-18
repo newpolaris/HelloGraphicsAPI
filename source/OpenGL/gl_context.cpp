@@ -95,15 +95,39 @@ void GLContext::setUniform(const std::string& name, const mat4x4& m0)
     _program->setUniform(name, m0);
 }
 
-void GLContext::draw(GraphicsPrimitiveType primitive, int32_t first, uint32_t count)
+void GLContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset)
 {
     EL_ASSERT(_program);
     GLenum mode = asPrimitiveType(primitive);
-    GL_CHECK(glDrawArrays(mode, first, count));
+    GL_CHECK(glDrawArrays(mode, vertexStartOffset, vertexCount));
 }
 
-// void GLContext::draw()
-// const GLvoid* pointer = reinterpret_cast<GLvoid*>(offset);
-// glDrawElementsBaseVertex()
+void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation)
+{
+    EL_ASSERT(_program);
+    GLenum mode = asPrimitiveType(primitive);
+    const GLvoid* indices = reinterpret_cast<GLvoid*>(startIndexLocation);
+    GL_CHECK(glDrawElements(mode, indexCount, GL_UNSIGNED_INT, indices));
+}
+
+void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
+{
+    EL_ASSERT(_program);
+    GLenum mode = asPrimitiveType(primitive);
+    const GLvoid* indices = reinterpret_cast<GLvoid*>(startIndexLocation);
+
+    // since 3.2 - ARB_draw_elements_base_vertex
+    GL_CHECK(glDrawElementsBaseVertex(mode, indexCount, GL_UNSIGNED_INT, indices, baseVertexLocation));
+}
+
+void GLContext::drawInstanced(GraphicsPrimitiveType primitive, uint32_t vertexCountPerInstance, uint32_t instanceCount,
+                              uint32_t startVertexLocation, uint32_t startInstanceLocation)
+{
+}
+
+void GLContext::drawIndexedInstanced(GraphicsPrimitiveType primitive, uint32_t indexCountPerInstance, uint32_t instanceCount,
+                                     uint32_t startIndexLocation, int32_t vaseVertexLocation, uint32_t startInstanceLocation)
+{
+}
 
 #endif // #if EL_BUILD_OPENGL

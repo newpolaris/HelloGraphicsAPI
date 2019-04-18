@@ -342,6 +342,7 @@ void GLProgram::setIndexBuffer(const GraphicsBufferPtr& buffer)
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
     if (glBuffer != nullptr)
         glBuffer->bind();
+    EL_ASSERT(glBuffer != nullptr);
 }
 
 void GLProgram::setTexture(GLint location, const GraphicsTexturePtr& texture, GLenum unit)
