@@ -26,6 +26,7 @@ namespace el {
         void setProgram(const GraphicsProgramPtr& ptr) override;
         void setTexture(const std::string& name, const GraphicsTexturePtr& texture) override;
         void setVertexBuffer(const std::string& name, const GraphicsBufferPtr& vertex_buffer, uint32_t stride, uint32_t offset) override;
+        void setIndexBuffer(const GraphicsBufferPtr& index_buffer) override;
         void setUniform(const std::string& name, const vec3& v0) override;
         void setUniform(const std::string& name, const mat4x4& m0) override;
 

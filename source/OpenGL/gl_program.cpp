@@ -208,7 +208,7 @@ void GLProgram::setUniform(const std::string& name, const vec3& v0)
     auto it = _activeUniform.find(name);
     if (it == _activeUniform.end())
     {
-        EL_ASSERT(false);
+        // EL_ASSERT(false);
         return;
     }
     auto& uniform = it->second;
@@ -256,10 +256,12 @@ void GLProgram::setVertexBuffer(const std::string& name, const GraphicsBufferPtr
         return;
     }
     auto& attrib = it->second;
-    setVertexBuffer(attrib.index, buffer, 2, GL_FLOAT, stride, offset);
+    const GLvoid* pointer = reinterpret_cast<GLvoid*>(offset);
+    GL_CHECK(glEnableVertexAttribArray(attrib.index));
+    GL_CHECK(glVertexAttribPointer(attrib.index, attrib.size, attrib.type, GL_FALSE, stride, pointer));
 }
 
-void GLProgram::setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void * pointer)
+void GLProgram::setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void* pointer)
 {
     GL_CHECK(glEnableVertexAttribArray(location));
     GL_CHECK(glVertexAttribPointer(location, size, type, GL_FALSE, stride, (void*)pointer));
@@ -274,6 +276,13 @@ void GLProgram::setVertexBuffer(GLint location, const GraphicsBufferPtr& buffer,
     const GLvoid* pointer = reinterpret_cast<GLvoid*>(offset);
     GL_CHECK(glEnableVertexAttribArray(location));
     GL_CHECK(glVertexAttribPointer(location, size, type, GL_FALSE, stride, pointer));
+}
+
+void GLProgram::setIndexBuffer(const GraphicsBufferPtr& buffer)
+{
+    auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
+    if (glBuffer != nullptr)
+        glBuffer->bind();
 }
 
 void GLProgram::setTexture(GLint location, const GraphicsTexturePtr& texture, GLenum unit)

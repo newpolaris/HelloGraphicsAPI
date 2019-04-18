@@ -48,6 +48,10 @@ namespace el {
         void setUniform(const std::string& name, const mat4x4& m0);
         void setUniform(const std::string& name, const GraphicsTexturePtr& texture);
         void setVertexBuffer(const std::string& name, const GraphicsBufferPtr& buffer, uint32_t stride, uint32_t offset);
+        void setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void *pointer);
+        void setVertexBuffer(GLint location, const GraphicsBufferPtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset);
+        void setIndexBuffer(const GraphicsBufferPtr& buffer);
+        void setTexture(GLint location, const GraphicsTexturePtr& texture, GLenum unit);
 
         template <typename T>
         void updateUniform(const std::string& name, T&& value)
@@ -63,10 +67,6 @@ namespace el {
             GLuint location = uniform.index;
             setUniform(location, value);
         }
-
-        void setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void *pointer);
-        void setVertexBuffer(GLint location, const GraphicsBufferPtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset);
-        void setTexture(GLint location, const GraphicsTexturePtr& texture, GLenum unit);
 
         const GraphicsProgramDesc& getProgramDesc() const override;
 

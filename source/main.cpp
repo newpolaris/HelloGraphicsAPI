@@ -57,14 +57,6 @@
 #include <stb/stb_image.h>
 #include <utility.h>
 
-static const vec2 vertices[4] =
-{
-    {0.f, 0.f},
-    {1.f, 0.f},
-    {1.f, 1.f},
-    {0.f, 1.f}
-};
-
 static void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
@@ -157,63 +149,6 @@ static void APIENTRY gl_debug_callback(GLenum source,
 
 namespace el {
 
-    GLenum getComponent(int Components)
-    {
-        switch (Components)
-        {
-        case 1u:
-            return GL_RED;
-        case 2u:
-            return GL_RG;
-        case 3u:
-            return GL_RGB;
-        case 4u:
-            return GL_RGBA;
-        default:
-            EL_ASSERT(false);
-            return 0;
-        };
-    }
-
-    GLenum getInternalComponent(int Components, bool isFloat)
-    {
-        GLenum base = getComponent(Components);
-
-        // TODO: pure 2.1 has float type?
-        if (isFloat)
-        {
-            switch (base)
-            {
-                // TODO: pure 2.1 has red and rg (?)
-
-            case GL_RED:
-                return GL_R16F;
-            case GL_RG:
-                return GL_RG16F;
-            case GL_RGB:
-                return GL_RGB16F;
-            case GL_RGBA:
-                return GL_RGBA16F;
-            }
-        }
-        else
-        {
-            // TODO: pure 2.1 has red and rg (?)
-            switch (base)
-            {
-            case GL_RED:
-                return GL_R8;
-            case GL_RG:
-                return GL_RG8;
-            case GL_RGB:
-                return GL_RGB8;
-            case GL_RGBA:
-                return GL_RGBA8;
-            }
-        }
-        return 0;
-    }
-
     class ImageData
     {
     public:
@@ -235,10 +170,8 @@ namespace el {
         auto imagedata = (stream_t*)stbi_load(filename.c_str(), &width, &height, &components, 0);
         if (!imagedata) return nullptr;
 
-        streamsize_t length = width * height * 4;
-
-        GLenum target = GL_TEXTURE_2D;
-        GLenum type = GL_UNSIGNED_BYTE;
+        // 1-byte aligment image
+        const streamsize_t length = width * height * components;
 
         GraphicsPixelFormat format = GraphicsPixelFormat::GraphicsPixelFormatInvalid;
         switch (components)
@@ -352,7 +285,7 @@ int main(int argc, char** argv)
     GraphicsProgramPtr program;
     GraphicsTexturePtr texture;
 
-    GraphicsBufferPtr vertex_buffer;
+    GraphicsBufferPtr vertex_buffer, index_buffer;
 
     if (true)
     {
@@ -395,6 +328,17 @@ int main(int argc, char** argv)
         texture = device->createTexture(texture_desc);
         EL_ASSERT(texture);
     }
+
+    const vec2 vertices[4] =
+    {
+        {0.f, 0.f},
+        {1.f, 0.f},
+        {1.f, 1.f},
+        {0.f, 1.f}
+    };
+
+    const char indices[] = { 0, 1, 2, 3 };
+
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
@@ -431,12 +375,20 @@ int main(int argc, char** argv)
         vertices_buffer_desc.setDataSize(sizeof(vertices));
 
         vertex_buffer = device->createBuffer(vertices_buffer_desc);
+
+        GraphicsBufferDesc indices_buffer_desc;
+        indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
+        indices_buffer_desc.setData((const char*)indices);
+        indices_buffer_desc.setDataSize(sizeof(indices));
+
+        index_buffer = device->createBuffer(indices_buffer_desc);
     }
 
     GraphicsContextPtr context[2];
     context[0] = device->createDeviceContext();
     context[0]->setProgram(program); context[0]->setTexture("texture", texture);
     context[0]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
+    // context[0]->setIndexBuffer(index_buffer);
 
     GLProfileBusyWait profile[2];
     profile[0].setName("window 0");
@@ -505,6 +457,7 @@ int main(int argc, char** argv)
             // Shared bewteen context
             context[i]->setUniform("color", colors[i]);
             context[i]->draw(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, 0, 4);
+            // context[i]->drawIndex(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, );
 
             profile[i].end();
 

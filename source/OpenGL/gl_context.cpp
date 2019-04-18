@@ -77,6 +77,12 @@ void GLContext::setVertexBuffer(const std::string& name, const GraphicsBufferPtr
     _program->setVertexBuffer(name, vertex_buffer, stride, offset);
 }
 
+void GLContext::setIndexBuffer(const GraphicsBufferPtr& index_buffer)
+{
+    EL_ASSERT(_program);
+    _program->setIndexBuffer(index_buffer);
+}
+
 void GLContext::setUniform(const std::string& name, const vec3& v0)
 {
     EL_ASSERT(_program);
@@ -95,5 +101,9 @@ void GLContext::draw(GraphicsPrimitiveType primitive, int32_t first, uint32_t co
     GLenum mode = asPrimitiveType(primitive);
     GL_CHECK(glDrawArrays(mode, first, count));
 }
+
+// void GLContext::draw()
+// const GLvoid* pointer = reinterpret_cast<GLvoid*>(offset);
+// glDrawElementsBaseVertex()
 
 #endif // #if EL_BUILD_OPENGL
