@@ -11,19 +11,19 @@ namespace el {
 
     struct GLUniform
     {
-        std::string name;
+        GLint location;
         GLenum type;
         GLint size;
-        GLint index;
         GLuint unit;
+        std::string name;
     };
 
     struct GLAttribute
     {
-        std::string name;
+        GLint location;
         GLenum type;
         GLint size;
-        GLint index;
+        std::string name;
     };
 
     class GLProgram final : public GraphicsProgram
@@ -47,6 +47,7 @@ namespace el {
         void setUniform(const std::string& name, const vec3& v0);
         void setUniform(const std::string& name, const mat4x4& m0);
         void setUniform(const std::string& name, const GraphicsTexturePtr& texture);
+        void setVertexBuffer(const GraphicsBufferPtr& buffer);
         void setVertexBuffer(const std::string& name, const GraphicsBufferPtr& buffer, uint32_t stride, uint32_t offset);
         void setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void *pointer);
         void setVertexBuffer(GLint location, const GraphicsBufferPtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset);
@@ -64,7 +65,7 @@ namespace el {
             auto& uniform = _activeUniform[name];
             std::size_t len = asTypeSize(uniform.type);
             EL_ASSERT(len == sizeof(T));
-            GLuint location = uniform.index;
+            GLuint location = uniform.location;
             setUniform(location, value);
         }
 
@@ -79,7 +80,7 @@ namespace el {
         GraphicsProgramDesc _programDesc;
 
         std::map<std::string, GLUniform> _activeUniform;
-        std::map<std::string, GLAttribute> _activeAttribute;
+        std::vector<GLAttribute> _activeAttribute;
     };
 
 } // namespace el {

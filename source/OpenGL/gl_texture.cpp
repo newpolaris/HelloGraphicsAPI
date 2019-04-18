@@ -17,6 +17,11 @@ GLTexture::~GLTexture()
 
 bool GLTexture::create(GraphicsTextureDesc desc)
 {
+    // TODO:
+    // int value;
+    // glGetIntegerv(GL_MAX_TEXTURE_SIZE, &value);   //Returns 1 value
+    // MaxTexture2DWidth = MaxTexture2DHeight = value;
+
 	_target = asTextureTarget(desc.getDim());
 
 	GL_CHECK(glGenTextures(1, &_textureID));

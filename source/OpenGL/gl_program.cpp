@@ -6,7 +6,7 @@
 #include "gl_texture.h"
 #include "gl_buffer.h"
 
-#include <string>
+#include <algorithm>
 
 namespace el {
     namespace gl {
@@ -125,26 +125,27 @@ void GLProgram::setupActiveUniform()
 {
     EL_ASSERT(_programID != 0);
 
-    GLint count;
-    GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_UNIFORMS, &count));
+    GLint uniforms;
+    GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_UNIFORMS, &uniforms));
+    GLint uniformMaxLength;
+    GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformMaxLength));
 
     uint32_t textureUnit = 0;
-
-    const GLsizei bufSize = 16;
-    for (GLint i = 0; i < count; i++)
+    std::string name(uniformMaxLength, 0);
+    
+    for (GLint i = 0; i < uniforms; i++)
     {
-        GLchar nameBuf[bufSize] = { 0 };
         GLsizei length;
         GLenum type;
         GLint size;
-        GL_CHECK(glGetActiveUniform(_programID, i, bufSize, &length, &size, &type, nameBuf));
-        std::string name(nameBuf, length);
+        GL_CHECK(glGetActiveUniform(_programID, i, uniformMaxLength, &length, &size, &type, (GLchar*)name.data()));
+        name = name.substr(0, length);
 
-        EL_ASSERT(i == glGetUniformLocation(_programID, name.c_str()));
+        const GLuint locaation = glGetUniformLocation(_programID, name.c_str());
 
         GLUniform uniform;
         uniform.name = name;
-        uniform.index = i;
+        uniform.location = locaation;
         uniform.unit = 0;
         uniform.type = type;
         uniform.size = size;
@@ -164,27 +165,27 @@ void GLProgram::setupActiveAttribute()
 {
     EL_ASSERT(_programID != 0);
 
-    GLint count;
-    GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_ATTRIBUTES, &count));
+    GLint attributes;
+    GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_ATTRIBUTES, &attributes));
+    GLint attributeMaxLength;
+    GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &attributeMaxLength));
 
-    const GLsizei bufSize = 16;
-    for (GLint i = 0; i < count; i++)
+    std::string name(attributeMaxLength, 0);
+    for (GLint i = 0; i < attributes; i++)
     {
-        GLchar nameBuf[bufSize] = { 0 };
         GLsizei length;
         GLint size;
         GLenum type;
         GLAttribute attribute;
-        GL_CHECK(glGetActiveAttrib(_programID, i, bufSize, &length, &size, &type, nameBuf));
-        std::string name(nameBuf, length);
+        GL_CHECK(glGetActiveAttrib(_programID, i, attributeMaxLength, &length, &size, &type, (GLchar*)name.data()));
 
-        EL_ASSERT(i == glGetAttribLocation(_programID, name.c_str()));
+        const GLint location = glGetAttribLocation(_programID, name.c_str());
 
-        attribute.name = name;
-        attribute.index = i;
+        attribute.name = name.substr(0, length);
+        attribute.location = location;
         attribute.size = asVariableComponentCount(type);
         attribute.type = asVariableComponentType(type);
-        _activeAttribute[name] = std::move(attribute);
+        _activeAttribute.push_back(std::move(attribute));
     }
 }
 
@@ -212,7 +213,7 @@ void GLProgram::setUniform(const std::string& name, const vec3& v0)
         return;
     }
     auto& uniform = it->second;
-    setUniform(uniform.index, v0);
+    setUniform(uniform.location, v0);
 }
 
 void GLProgram::setUniform(const std::string& name, const mat4x4& m0)
@@ -224,7 +225,7 @@ void GLProgram::setUniform(const std::string& name, const mat4x4& m0)
         return;
     }
     auto& uniform = it->second;
-    setUniform(uniform.index, m0);
+    setUniform(uniform.location, m0);
 }
 
 void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& texture)
@@ -242,6 +243,61 @@ void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& te
         glTexture->bind(uniform.unit);
 }
 
+#if 0
+D3D11_INPUT_ELEMENT_DESC layout[] = {
+    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+};
+UINT numElements = ARRAYSIZE(layout);
+
+auto bindingDescription = Vertex::getBindingDescription();
+auto attributeDescriptions = Vertex::getAttributeDescription();
+
+VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
+vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+// vertexInputInfo.vertexBindingDescriptionCount = 1;
+// vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+// vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());;
+// vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+
+struct Vertex {
+    glm::vec2 pos;
+    glm::vec3 color;
+
+    static VkVertexInputBindingDescription getBindingDescription() {
+        VkVertexInputBindingDescription bindingDescription = {};
+        bindingDescription.binding = 0;
+        bindingDescription.stride = sizeof(Vertex);
+        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+        return bindingDescription;
+    }
+
+    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescription() {
+        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions = {};
+
+        attributeDescriptions[0].binding = 0;
+        attributeDescriptions[0].location = 0;
+        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+        attributeDescriptions[1].binding = 0;
+        attributeDescriptions[1].location = 1;
+        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+        attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+        return attributeDescriptions;
+    }
+};
+#endif
+
+void GLProgram::setVertexBuffer(const GraphicsBufferPtr& buffer)
+{
+    auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
+    if (glBuffer != nullptr)
+        glBuffer->bind();
+
+}
+
 void GLProgram::setVertexBuffer(const std::string& name, const GraphicsBufferPtr& buffer, uint32_t stride, uint32_t offset)
 {
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
@@ -249,16 +305,16 @@ void GLProgram::setVertexBuffer(const std::string& name, const GraphicsBufferPtr
         glBuffer->bind();
     EL_ASSERT(glBuffer != nullptr);
 
-    auto it = _activeAttribute.find(name);
+    auto it = std::find_if(_activeAttribute.begin(), _activeAttribute.end(), [&name](const GLAttribute& attrib) { return name == attrib.name; });
     if (it == _activeAttribute.end())
     {
         EL_ASSERT(false);
         return;
     }
-    auto& attrib = it->second;
+    auto& attrib = *it;
     const GLvoid* pointer = reinterpret_cast<GLvoid*>(offset);
-    GL_CHECK(glEnableVertexAttribArray(attrib.index));
-    GL_CHECK(glVertexAttribPointer(attrib.index, attrib.size, attrib.type, GL_FALSE, stride, pointer));
+    GL_CHECK(glEnableVertexAttribArray(attrib.location));
+    GL_CHECK(glVertexAttribPointer(attrib.location, attrib.size, attrib.type, GL_FALSE, stride, pointer));
 }
 
 void GLProgram::setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void* pointer)
