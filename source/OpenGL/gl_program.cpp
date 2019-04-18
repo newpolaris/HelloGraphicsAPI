@@ -131,13 +131,14 @@ void GLProgram::setupActiveUniform()
     GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_UNIFORM_MAX_LENGTH, &uniformMaxLength));
 
     uint32_t textureUnit = 0;
-    std::string name(uniformMaxLength, 0);
     
     for (GLint i = 0; i < uniforms; i++)
     {
         GLsizei length;
         GLenum type;
         GLint size;
+
+        std::string name(uniformMaxLength, 0);
         GL_CHECK(glGetActiveUniform(_programID, i, uniformMaxLength, &length, &size, &type, (GLchar*)name.data()));
         name = name.substr(0, length);
 
@@ -170,22 +171,24 @@ void GLProgram::setupActiveAttribute()
     GLint attributeMaxLength;
     GL_CHECK(glGetProgramiv(_programID, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &attributeMaxLength));
 
-    std::string name(attributeMaxLength, 0);
     for (GLint i = 0; i < attributes; i++)
     {
         GLsizei length;
         GLint size;
         GLenum type;
         GLAttribute attribute;
+
+        std::string name(attributeMaxLength, 0);
         GL_CHECK(glGetActiveAttrib(_programID, i, attributeMaxLength, &length, &size, &type, (GLchar*)name.data()));
+        name = name.substr(0, length);
 
         const GLint location = glGetAttribLocation(_programID, name.c_str());
 
-        attribute.name = name.substr(0, length);
+        attribute.name = name;
         attribute.location = location;
         attribute.size = asVariableComponentCount(type);
         attribute.type = asVariableComponentType(type);
-        _activeAttribute.push_back(std::move(attribute));
+        _activeAttribute[name] = std::move(attribute);
     }
 }
 
@@ -305,13 +308,13 @@ void GLProgram::setVertexBuffer(const std::string& name, const GraphicsBufferPtr
         glBuffer->bind();
     EL_ASSERT(glBuffer != nullptr);
 
-    auto it = std::find_if(_activeAttribute.begin(), _activeAttribute.end(), [&name](const GLAttribute& attrib) { return name == attrib.name; });
+    auto it = _activeAttribute.find(name);
     if (it == _activeAttribute.end())
     {
         EL_ASSERT(false);
         return;
     }
-    auto& attrib = *it;
+    auto& attrib = it->second;
     const GLvoid* pointer = reinterpret_cast<GLvoid*>(offset);
     GL_CHECK(glEnableVertexAttribArray(attrib.location));
     GL_CHECK(glVertexAttribPointer(attrib.location, attrib.size, attrib.type, GL_FALSE, stride, pointer));

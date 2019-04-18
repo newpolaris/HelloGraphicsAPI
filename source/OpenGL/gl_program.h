@@ -80,7 +80,7 @@ namespace el {
         GraphicsProgramDesc _programDesc;
 
         std::map<std::string, GLUniform> _activeUniform;
-        std::vector<GLAttribute> _activeAttribute;
+        std::map<std::string, GLAttribute> _activeAttribute;
     };
 
 } // namespace el {
