@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include "predefine.h"
 
-#if EL_PLAT_WINDOWS 
+#if EL_PLAT_WINDOWS
 extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _str);
 #elif EL_PLAT_APPLE
 #    if defined(__OBJC__)
@@ -20,27 +20,27 @@ extern "C" void NSLog(CFStringRef _format, ...);
 
 void el::trace(const char* format, ...)
 {
-	const int kLength = 1024;
-	char buffer[kLength + 1];
-	try {
-		va_list argList;
-		va_start(argList, format);
-		int len = vsnprintf(buffer, kLength, format, argList);
-		va_end(argList);
-		if (len > kLength)
-			len = kLength;
-		buffer[kLength] = '\0';
+    const int kLength = 1024;
+    char buffer[kLength + 1];
+    try {
+        va_list argList;
+        va_start(argList, format);
+        int len = vsnprintf(buffer, kLength, format, argList);
+        va_end(argList);
+        if (len > kLength)
+            len = kLength;
+        buffer[kLength] = '\0';
 
-		debug_output(buffer);
-	}
-	catch (...) {
-	}
+        debug_output(buffer);
+    }
+    catch (...) {
+    }
 }
 
 void el::debug_output(const char* message)
 {
-#if EL_PLAT_WINDOWS 
-	OutputDebugStringA(message);
+#if EL_PLAT_WINDOWS
+    OutputDebugStringA(message);
 #elif EL_PLAT_APPLE
 #    if defined(__OBJC__)
     NSLog(@"%s", message);
@@ -56,10 +56,10 @@ void el::debug_output(const char* message)
 void el::debug_break()
 {
 #if EL_COMP_MSVC
-	__debugbreak();
+    __debugbreak();
 #elif EL_ARCH_ARM
-	__builtin_trap();
-#eleif
-	__asm int 3;
+    __builtin_trap();
+    #eleif
+        __asm int 3;
 #endif
 }

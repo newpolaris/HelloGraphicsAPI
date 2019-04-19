@@ -52,6 +52,9 @@ namespace el {
     class GraphicsShaderDesc;
     class GraphicsTextureDesc;
     class GraphicsBufferDesc;
+    class GraphicsVertexInputBindingDesc;
+    class GraphicsVertexInputAttributeDesc;
+    class GraphicsInputLayoutDesc;
 
     typedef std::shared_ptr<class GraphicsDevice> GraphicsDevicePtr;
     typedef std::shared_ptr<class GraphicsContext> GraphicsContextPtr;
@@ -59,10 +62,14 @@ namespace el {
     typedef std::shared_ptr<class GraphicsProgram> GraphicsProgramPtr;
     typedef std::shared_ptr<class GraphicsTexture> GraphicsTexturePtr;
     typedef std::shared_ptr<class GraphicsBuffer> GraphicsBufferPtr;
+    typedef std::shared_ptr<class GraphicsInputLayout> GraphicsInputLayoutPtr;
 
-    typedef std::weak_ptr<class GraphicsDevice> GraphicsDeviceWeakPtr;
+    typedef std::weak_ptr<GraphicsDevice> GraphicsDeviceWeakPtr;
 
     typedef std::vector<GraphicsShaderPtr> GraphicsShaders;
+    typedef std::vector<GraphicsVertexInputBindingDesc> GraphicsVertexInputBindingDescs;
+    typedef std::vector<GraphicsVertexInputAttributeDesc> GraphicsVertexInputAttributeDescs;
+
 
     enum GraphicsDeviceType
     {

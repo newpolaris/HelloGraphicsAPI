@@ -389,6 +389,7 @@ int main(int argc, char** argv)
     context[0]->setProgram(program); 
     context[0]->setTexture("texture", texture);
     context[0]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
+    // TODO:
     // context[0]->setIndexBuffer(index_buffer);
 
     GLProfileBusyWait profile[2];

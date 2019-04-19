@@ -14,13 +14,12 @@ GraphicsProgramDesc::GraphicsProgramDesc()
 {
 }
 
-void GraphicsProgramDesc::addShader(GraphicsShaderPtr ptr) 
+void GraphicsProgramDesc::addShader(const GraphicsShaderPtr& ptr)
 {
-	_shaders.push_back(std::move(ptr));
+    _shaders.push_back(ptr);
 }
 
 const GraphicsShaders& GraphicsProgramDesc::getShaders() const
 {
-	return _shaders;
+    return _shaders;
 }
-
