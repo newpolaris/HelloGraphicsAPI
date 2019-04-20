@@ -10,7 +10,7 @@ namespace el {
 
 		GraphicsProgramDesc();
 
-		void addShader(GraphicsShaderPtr ptr);
+		void addShader(const GraphicsShaderPtr& ptr);
 
 		const GraphicsShaders& getShaders() const;
 

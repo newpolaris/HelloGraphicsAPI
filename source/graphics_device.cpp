@@ -5,7 +5,7 @@
 
 using namespace el;
 
-GraphicsDeviceDesc::GraphicsDeviceDesc() : 
+GraphicsDeviceDesc::GraphicsDeviceDesc() :
     _type(GraphicsDeviceTypeOpenGL)
 {
 }
@@ -35,7 +35,7 @@ GraphicsDevicePtr el::createDevice(GraphicsDeviceDesc desc)
         auto device = std::make_shared<GLDevice>();
         if (device->create(std::move(desc)))
             return device;
-    } 
+    }
 #if EL_PLAT_APPLE
     else if (desc.getType() == GraphicsDeviceTypeMetal)
     {

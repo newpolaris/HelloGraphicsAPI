@@ -53,21 +53,7 @@ namespace el {
         void setVertexBuffer(GLint location, const GraphicsBufferPtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset);
         void setIndexBuffer(const GraphicsBufferPtr& buffer);
         void setTexture(GLint location, const GraphicsTexturePtr& texture, GLenum unit);
-
-        template <typename T>
-        void updateUniform(const std::string& name, T&& value)
-        {
-            if (_activeUniform.find(name) == _activeUniform.end())
-            {
-                EL_ASSERT(false);
-                return;
-            }
-            auto& uniform = _activeUniform[name];
-            std::size_t len = asTypeSize(uniform.type);
-            EL_ASSERT(len == sizeof(T));
-            GLuint location = uniform.location;
-            setUniform(location, value);
-        }
+        void setInputLayout(const GraphicsInputLayoutPtr& layout);
 
         const GraphicsProgramDesc& getProgramDesc() const override;
 
@@ -77,10 +63,13 @@ namespace el {
         void setupActiveAttribute();
 
         GLuint _programID;
-        GraphicsProgramDesc _programDesc;
+
+        GraphicsInputLayoutPtr _inputLayout;
 
         std::map<std::string, GLUniform> _activeUniform;
         std::map<std::string, GLAttribute> _activeAttribute;
+
+        GraphicsProgramDesc _programDesc;
     };
 
 } // namespace el {
