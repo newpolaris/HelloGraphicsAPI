@@ -373,6 +373,7 @@ void GLProgram::setVertexBuffer(const GraphicsBufferPtr& buffer)
     if (glBuffer != nullptr)
         glBuffer->bind();
 
+#if 0
     auto& desc = _inputLayout->getDesc();
     auto& bindings = desc.getBindings()[binding];
     for (auto& location : desc.getAttributes()[binding])
@@ -390,6 +391,7 @@ void GLProgram::setVertexBuffer(const GraphicsBufferPtr& buffer)
         GL_CHECK(glEnableVertexAttribArray(it->location));
         GL_CHECK(glVertexAttribPointer(it->location, it->size, it->type, GL_FALSE, stride, pointer));
     }
+#endif
 }
 
 void GLProgram::setVertexBuffer(const std::string& name, const GraphicsBufferPtr& buffer, uint32_t stride, uint32_t offset)
