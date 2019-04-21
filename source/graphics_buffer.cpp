@@ -4,13 +4,14 @@ using namespace el;
 
 GraphicsBufferDesc::GraphicsBufferDesc() :
     _data(nullptr),
-    _dataSize(0),
+    _numElements(0),
+    _elementSize(0),
     _dataType(GraphicsDataTypeNone),
     _usage(0)
 {
 }
 
-void GraphicsBufferDesc::setData(const char* data)
+void GraphicsBufferDesc::setData(const stream_t* data)
 {
     _data = data;
 }
@@ -20,14 +21,24 @@ const char* GraphicsBufferDesc::getData() const
     return _data;
 }
 
-void GraphicsBufferDesc::setDataSize(size_t size)
+void GraphicsBufferDesc::setElementSize(size_t elementSize)
 {
-    _dataSize = size;
+    _elementSize = elementSize;
 }
 
-size_t GraphicsBufferDesc::getDataSize() const
+size_t GraphicsBufferDesc::getElementSize() const
 {
-    return _dataSize;
+    return _elementSize;
+}
+
+void GraphicsBufferDesc::setNumElements(size_t numElements)
+{
+    _numElements = numElements;
+}
+
+size_t GraphicsBufferDesc::getNumElements() const
+{
+    return _numElements;
 }
 
 void GraphicsBufferDesc::setDataType(GraphicsDataType dataType)

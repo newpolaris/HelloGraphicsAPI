@@ -6,7 +6,8 @@ using namespace el;
 GLBuffer::GLBuffer() :
     _target(0),
     _usage(0),
-    _bufferID(0)
+    _bufferID(0),
+    _bufferSize(0)
 {
 }
 
@@ -37,9 +38,11 @@ bool GLBuffer::create(GraphicsBufferDesc desc)
             _usage = GL_DYNAMIC_READ;
     } 
 
+    _bufferSize = desc.getElementSize() * desc.getNumElements();
+
     GL_CHECK(glGenBuffers(1, &_bufferID));
     GL_CHECK(glBindBuffer(_target, _bufferID));
-    GL_CHECK(glBufferData(_target, desc.getDataSize(), desc.getData(), _usage));
+    GL_CHECK(glBufferData(_target, _bufferSize, desc.getData(), _usage));
 
     if (GLAD_GL_KHR_debug) // GLEW_KHR_debug
         GL_CHECK(glObjectLabel(GL_BUFFER, _bufferID, -1, "Vertex Array Buffer object"));

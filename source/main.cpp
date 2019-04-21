@@ -337,7 +337,7 @@ int main(int argc, char** argv)
         {0.f, 1.f}
     };
 
-    const char indices[] = { 0, 1, 2, 3 };
+    const uint32_t indices[] = { 0, 1, 2, 3 };
 
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
@@ -371,15 +371,17 @@ int main(int argc, char** argv)
 
         GraphicsBufferDesc vertices_buffer_desc;
         vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
-        vertices_buffer_desc.setData((const char*)vertices);
-        vertices_buffer_desc.setDataSize(sizeof(vertices));
+        vertices_buffer_desc.setData((const stream_t*)vertices);
+        // vertices_buffer_desc.setDataSize(sizeof(vertices));
+        // vertices_buffer_desc.setElementSize();
+        // vertices_buffer_desc.setNumElements();
 
         vertex_buffer = device->createBuffer(vertices_buffer_desc);
 
         GraphicsBufferDesc indices_buffer_desc;
         indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
         indices_buffer_desc.setData((const char*)indices);
-        indices_buffer_desc.setDataSize(sizeof(indices));
+        // indices_buffer_desc.setDataSize(sizeof(indices));
 
         index_buffer = device->createBuffer(indices_buffer_desc);
     }
@@ -426,6 +428,7 @@ int main(int argc, char** argv)
     context[1]->setProgram(program);
     context[1]->setTexture("texture", texture);
     context[1]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
+    context[1]->setIndexBuffer(index_buffer);
 
     mat4x4 mvp;
     mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
@@ -457,8 +460,7 @@ int main(int argc, char** argv)
 
             // Shared bewteen context
             context[i]->setUniform("color", colors[i]);
-            context[i]->draw(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, 4);
-            // context[i]->drawIndex(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, );
+            context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, 4);
 
             profile[i].end();
 

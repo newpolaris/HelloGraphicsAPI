@@ -10,11 +10,14 @@ namespace el {
 
         GraphicsBufferDesc();
 
-        void setData(const char* data);
-        const char* getData() const;
+        void setData(const stream_t* data);
+        const stream_t* getData() const;
 
-        void setDataSize(size_t size);
-        size_t getDataSize() const;
+        void setElementSize(size_t elementSize);
+        size_t getElementSize() const;
+
+        void setNumElements(size_t numElements);
+        size_t getNumElements() const;
 
         void setDataType(GraphicsDataType dataType);
         GraphicsDataType getDataType() const;
@@ -24,8 +27,9 @@ namespace el {
 
     private:
 
-        const char* _data;
-        size_t _dataSize;
+        const stream_t* _data;
+        size_t _numElements;
+        size_t _elementSize;
         GraphicsDataType _dataType;
         GraphicsUsageFlags _usage;
     };

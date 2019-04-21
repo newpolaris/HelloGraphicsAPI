@@ -16,6 +16,7 @@ namespace el {
     const GLint defaultPixelAlignement = 4;
 
     bool isSamplerType(GLenum type);
+    GLenum asIndexType(GraphicsIndexType type);
 
 	GLenum asPrimitiveType(GraphicsPrimitiveType primitiveType);
     GLenum getShaderStage(GraphicsShaderStageFlagBits stage);

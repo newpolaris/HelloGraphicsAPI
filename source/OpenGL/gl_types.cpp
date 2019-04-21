@@ -14,6 +14,19 @@ bool el::isSamplerType(GLenum type)
     return false;
 }
 
+GLenum el::asIndexType(GraphicsIndexType type)
+{
+    switch (type)
+    {
+    case GraphicsIndexType::GraphicsIndexTypeUInt8:  return GL_UNSIGNED_BYTE;
+    case GraphicsIndexType::GraphicsIndexTypeUInt16: return GL_UNSIGNED_SHORT;
+    case GraphicsIndexType::GraphicsIndexTypeUInt32: return GL_UNSIGNED_INT;
+    default:
+        EL_ASSERT(false);
+        return 0;
+    }
+}
+
 GLuint el::asVariableComponentCount(GLenum type)
 {
     return asVariableColumnCount(type) * asVariableRowCount(type);

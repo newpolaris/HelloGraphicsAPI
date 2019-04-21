@@ -24,6 +24,7 @@ namespace el {
         GLenum _target;
         GLenum _usage;
         GLuint _bufferID;
+        size_t _bufferSize;
     };
 
 } // namespace el {

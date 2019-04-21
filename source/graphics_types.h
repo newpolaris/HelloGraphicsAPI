@@ -115,6 +115,13 @@ namespace el {
         GraphicsDataTypeStorageIndexBuffer = 8,
     };
 
+    enum class GraphicsIndexType: std::uint8_t
+    {
+        GraphicsIndexTypeUInt8 = 0,
+        GraphicsIndexTypeUInt16 = 1,
+        GraphicsIndexTypeUInt32 = 2,
+    };
+
     // https://www.khronos.org/opengl/wiki/Buffer_Object
     enum GraphicsUsageFlagBits
     {
