@@ -457,7 +457,7 @@ int main(int argc, char** argv)
 
             // Shared bewteen context
             context[i]->setUniform("color", colors[i]);
-            context[i]->draw(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, 0, 4);
+            context[i]->draw(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, 4);
             // context[i]->drawIndex(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, );
 
             profile[i].end();
