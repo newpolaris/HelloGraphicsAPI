@@ -54,8 +54,8 @@
 // TODO:
 #include <OpenGL/gl_profile.h>
 
-#include <stb/stb_image.h>
 #include <utility.h>
+#include <image.h>
 
 static void error_callback(int error, const char* description)
 {
@@ -146,62 +146,6 @@ static void APIENTRY gl_debug_callback(GLenum source,
     el::debug_break();
 }
 #endif // EL_CONFIG_DEBUG
-
-namespace el {
-
-    class ImageData
-    {
-    public:
-
-        uint32_t width;
-        uint32_t height;
-        uint32_t depth;
-        std::vector<stream_t> stream;
-        GraphicsPixelFormat format;
-    };
-
-    typedef std::shared_ptr<class ImageData> ImageDataPtr;
-
-    ImageDataPtr ImageLoader(const std::string& filename)
-    {
-        stbi_set_flip_vertically_on_load(true);
-
-        int width = 0, height = 0, components = 0;
-        auto imagedata = (stream_t*)stbi_load(filename.c_str(), &width, &height, &components, 0);
-        if (!imagedata) return nullptr;
-
-        // 1-byte aligment image
-        const streamsize_t length = width * height * components;
-
-        GraphicsPixelFormat format = GraphicsPixelFormat::GraphicsPixelFormatInvalid;
-        switch (components)
-        {
-        case 1: format = GraphicsPixelFormat::GraphicsPixelFormatR8Unorm; break;
-        case 2: format = GraphicsPixelFormat::GraphicsPixelFormatRG8Unorm; break;
-        case 3: format = GraphicsPixelFormat::GraphicsPixelFormatRGB8Unorm; break;
-        case 4: format = GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm; break;
-        }
-
-        auto container = std::make_shared<ImageData>();
-        container->format = format;
-        container->stream = std::vector<stream_t>(imagedata, imagedata + length);
-        container->width = (int32_t)width;
-        container->height = (int32_t)height;
-
-        stbi_image_free(imagedata);
-
-        return container;
-    }
-
-    // Reference(S):
-    // - https://web.archive.org/web/20181115035420/http://cnicholson.net/2011/01/stupid-c-tricks-a-better-sizeof_array/
-    // - https://stackoverflow.com/questions/4415530/equivalents-to-msvcs-countof-in-other-compilers 
-    template <typename T, size_t N>
-    size_t countof(T(&arr)[N])
-    {
-        return std::extent< T[N] >::value;
-    }
-}
 
 class GraphicsApplication
 {
@@ -296,9 +240,9 @@ int main(int argc, char** argv)
 
     GraphicsStoragePtr vertex_buffer, index_buffer;
 
-    if (true)
+    if (false)
     {
-        const ImageDataPtr image = ImageLoader("miku.png");
+        const ImageDataPtr image = ImageData::load("miku.png");
         EL_ASSERT(image);
 
         GraphicsTextureDesc texture_desc;
@@ -331,8 +275,11 @@ int main(int argc, char** argv)
         texture_desc.setPixelFormat(GraphicsPixelFormat::GraphicsPixelFormatR8Unorm);
         texture_desc.setWidth(16);
         texture_desc.setHeight(16);
+        texture_desc.setMinFilter(GraphicsFilterNearest);
+        texture_desc.setMagFilter(GraphicsFilterNearest);
         texture_desc.setStream(static_cast<stream_t*>(pixels));
         texture_desc.setStreamSize(16 * 16);
+        texture_desc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment8);
 
         texture = device->createTexture(texture_desc);
         EL_ASSERT(texture);
