@@ -1,28 +1,3 @@
-//========================================================================
-// Context sharing example
-// Copyright (c) Camilla Löwy <elmindreda@glfw.org>
-//
-// This software is provided 'as-is', without any express or implied
-// warranty. In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would
-//    be appreciated but is not required.
-//
-// 2. Altered source versions must be plainly marked as such, and must not
-//    be misrepresented as being the original software.
-//
-// 3. This notice may not be removed or altered from any source
-//    distribution.
-//
-//========================================================================
-
 #include "predefine.h"
 #include "debug.h"
 #include <OpenGL/gl.h>
@@ -37,8 +12,8 @@
 #include <array>
 #include <chrono>
 
-#include "getopt.h"
-#include "linmath.h"
+#include <getopt.h>
+#include <linmath.h>
 
 #include <graphics_device.h>
 #include <graphics_context.h>
@@ -51,11 +26,13 @@
 
 #include <cstdio>
 
-// TODO:
-#include <OpenGL/gl_profile.h>
-
 #include <utility.h>
 #include <image.h>
+#include <objparser.h>
+#include <meshoptimizer.h>
+
+// TODO:
+#include <OpenGL/gl_profile.h>
 
 static void error_callback(int error, const char* description)
 {
@@ -152,6 +129,46 @@ class GraphicsApplication
 public:
 };
 
+namespace el {
+
+#if 0
+    struct Vertex
+    {
+        float x, y, z;
+        float nx, ny, nz;
+        float tu, tv;
+    };
+
+    bool LoadMesh()
+    {
+        ObjFile obj;
+        if (!objParseFile(obj, ""))
+            return false;
+
+        std::vector<Vertex> vertices;
+        Vertex v;
+        vertices[0] = v;;
+    }
+    struct Vertex
+    {
+        vec2 pos;
+        vec3 color;
+    };
+
+    const std::vector<Vertex> vertices = {
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+    };
+
+    const std::vector<uint16_t> indices = {
+        0, 2, 1, 0, 3, 2
+    };
+#endif
+
+} // namespace el {
+
 int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
@@ -240,50 +257,20 @@ int main(int argc, char** argv)
 
     GraphicsStoragePtr vertex_buffer, index_buffer;
 
-    if (false)
-    {
-        const ImageDataPtr image = ImageData::load("miku.png");
-        EL_ASSERT(image);
+	const ImageDataPtr image = ImageData::load("resource/miku.png");
+	EL_ASSERT(image);
 
-        GraphicsTextureDesc texture_desc;
-        texture_desc.setDim(GraphicsTextureDim2D);
-        texture_desc.setPixelFormat(image->format);
-        texture_desc.setWidth(image->width);
-        texture_desc.setHeight(image->height);
-        texture_desc.setStream(static_cast<stream_t*>(image->stream.data()));
-        texture_desc.setStreamSize(image->stream.size());
-        texture_desc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment1);
+	GraphicsTextureDesc texture_desc;
+	texture_desc.setDim(GraphicsTextureDim2D);
+	texture_desc.setPixelFormat(image->format);
+	texture_desc.setWidth(image->width);
+	texture_desc.setHeight(image->height);
+	texture_desc.setStream(static_cast<stream_t*>(image->stream.data()));
+	texture_desc.setStreamSize(image->stream.size());
+	texture_desc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment1);
 
-        texture = device->createTexture(texture_desc);
-        EL_ASSERT(texture);
-    }
-    else
-    {
-        int x, y;
-        char pixels[16 * 16];
-
-        srand((unsigned int)glfwGetTimerValue());
-
-        for (y = 0; y < 16; y++)
-        {
-            for (x = 0; x < 16; x++)
-                pixels[y * 16 + x] = rand() % 256;
-        }
-
-        GraphicsTextureDesc texture_desc;
-        texture_desc.setDim(GraphicsTextureDim2D);
-        texture_desc.setPixelFormat(GraphicsPixelFormat::GraphicsPixelFormatR8Unorm);
-        texture_desc.setWidth(16);
-        texture_desc.setHeight(16);
-        texture_desc.setMinFilter(GraphicsFilterNearest);
-        texture_desc.setMagFilter(GraphicsFilterNearest);
-        texture_desc.setStream(static_cast<stream_t*>(pixels));
-        texture_desc.setStreamSize(16 * 16);
-        texture_desc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment8);
-
-        texture = device->createTexture(texture_desc);
-        EL_ASSERT(texture);
-    }
+	texture = device->createTexture(texture_desc);
+	EL_ASSERT(texture);
 
     const vec2 vertices[4] =
     {
@@ -298,7 +285,7 @@ int main(int argc, char** argv)
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
-        const auto vertex_shader_text = fileread("main.vert");
+        const auto vertex_shader_text = fileread("shader/sample/image/main.vert");
         EL_ASSERT(vertex_shader_text);
 
         GraphicsShaderDesc vertex_desc;
@@ -308,7 +295,7 @@ int main(int argc, char** argv)
         vertex_shader = device->createShader(vertex_desc);
         EL_ASSERT(vertex_shader);
 
-        const auto frag_shader_text = fileread("main.frag");
+        const auto frag_shader_text = fileread("shader/sample/image/main.frag");
         EL_ASSERT(frag_shader_text);
 
         GraphicsShaderDesc fragment_desc;
@@ -433,6 +420,8 @@ int main(int argc, char** argv)
     vertex_shader.reset();
     fragment_shader.reset();
     program.reset();
+    vertex_buffer.reset();
+    index_buffer.reset();
     context[0].reset();
     context[1].reset();
     device.reset();

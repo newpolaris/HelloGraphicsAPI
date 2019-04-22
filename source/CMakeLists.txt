@@ -1,3 +1,18 @@
+project(lib3d)
+
+set(LIB_NAME lib3d)
+
+add_definitions(-DTW_STATIC)
+add_definitions(-DTW_NO_LIB_PRAGMA)
+add_definitions(-DTW_NO_DIRECT3D)
+add_definitions(-DGLEW_STATIC)
+
+include_directories(${ROOT_PATH}/source)
+include_directories(${GLFW_INCLUDE_DIRS})
+include_directories(${GLFW_SOURCE_DIR}/deps)
+include_directories(${DEPENDENCIES_PATH})
+include_directories(${DEPENDENCIES_PATH}/glm)
+
 set(SOURCE_PATH ${CMAKE_SOURCE_DIR}/source)
 
 file(GLOB RENDERER_CORE_HEADER "*.h")
@@ -12,6 +27,8 @@ if(APPLE)
 endif()
 
 if(BUILD_OPENGL)
+	find_package(OpenGL REQUIRED)
+
     file(GLOB RENDERER_OGL_HEADER "OpenGL/*.h")
     file(GLOB RENDERER_OGL_SOURCE "OpenGL/*.cpp")
 
@@ -26,7 +43,7 @@ if(BUILD_METAL)
 
     set(RENDERER_MTL ${RENDERER_MTL_HEADER} ${RENDERER_MTL_SOURCE})
 
-    source_group("OpenGL" FILES ${RENDERER_OGL})
+	source_group("Metal" FILES ${RENDERER_OGL})
 endif()
 
 set(RENDERER_LIST ${RENDERER_CORE})
@@ -39,38 +56,21 @@ if(BUILD_METAL)
     set(RENDERER_LIST ${RENDERER_LIST} ${RENDERER_MTL})
 endif()
 
-add_definitions(
-	-DTW_STATIC
-	-DTW_NO_LIB_PRAGMA
-	-DTW_NO_DIRECT3D
-	-DGLEW_STATIC
-	-D_CRT_SECURE_NO_WARNINGS
-)
+# GLAD
+set(GLAD_DIR "${DEPENDENCIES_PATH}/glad")
+add_library("glad" "${GLAD_DIR}/src/glad.c")
+target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
 
-set(OSX_SOURCE
-    OSX/AppDelegate.mm
-    OSX/GameViewController.mm
-    OSX/main.mm
-    OSX/AppDelegate.h
-    OSX/GameViewController.h
-    OSX/SharedStructures.h)
+# STB
+set(STB_DIR "${DEPENDENCIES_PATH}/stb")
+add_library("stb" "${STB_DIR}/stb_image.cpp")
+target_include_directories("stb" PRIVATE "${STB_DIR}")
 
-add_executable(
-    ${APP_TARGET} 
-    #MACOSX_BUNDLE 
-    ${RENDERER_LIST} 
-    ${GLAD} 
-    ${STB}
-    #${OSX_SOURCE} 
-    #OSX/MainMenu.xib 
-    #OSX/Shaders.metal
-    )
+add_library(${LIB_NAME} ${RENDERER_LIST})
 
-target_include_directories(${APP_TARGET} PRIVATE "${GLAD_DIR}/include" "{STB_DIR}")
-target_link_libraries(${APP_TARGET} ${ALL_LIBS})
+target_link_libraries(${LIB_NAME} PRIVATE glfw)
+target_link_libraries(${LIB_NAME} PRIVATE glad)
+target_link_libraries(${LIB_NAME} PRIVATE stb)
 
-# Xcode and Visual working directories
-if (APPLE)
-	set_target_properties(${APP_TARGET} PROPERTIES XCODE_ATTRIBUTE_CONFIGURATION_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/")
-endif()
-create_target_launcher(${APP_TARGET} WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/")
+target_include_directories(${LIB_NAME} PRIVATE "${GLAD_DIR}/include") 
+target_include_directories(${LIB_NAME} PRIVATE "${STB_DIR}")
