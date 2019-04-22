@@ -56,16 +56,6 @@ if(BUILD_METAL)
     set(RENDERER_LIST ${RENDERER_LIST} ${RENDERER_MTL})
 endif()
 
-# GLAD
-set(GLAD_DIR "${DEPENDENCIES_PATH}/glad")
-add_library("glad" "${GLAD_DIR}/src/glad.c")
-target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
-
-# STB
-set(STB_DIR "${DEPENDENCIES_PATH}/stb")
-add_library("stb" "${STB_DIR}/stb_image.cpp")
-target_include_directories("stb" PRIVATE "${STB_DIR}")
-
 add_library(${LIB_NAME} ${RENDERER_LIST})
 
 target_link_libraries(${LIB_NAME} PRIVATE glfw)
@@ -74,3 +64,4 @@ target_link_libraries(${LIB_NAME} PRIVATE stb)
 
 target_include_directories(${LIB_NAME} PRIVATE "${GLAD_DIR}/include") 
 target_include_directories(${LIB_NAME} PRIVATE "${STB_DIR}")
+set_target_properties(${LIB_NAME} PROPERTIES FOLDER "core")
