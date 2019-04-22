@@ -104,19 +104,25 @@ void GLContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int3
 
 void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation)
 {
+    const GLenum _indexType = GL_UNSIGNED_INT;
+
+    // const uint32_t rangeCheck;
+
     EL_ASSERT(_program);
     GLenum mode = asPrimitiveType(primitive);
-    const GLvoid* indices = reinterpret_cast<GLvoid*>(startIndexLocation);
-    GL_CHECK(glDrawElements(mode, indexCount, GL_UNSIGNED_INT, indices));
+    const GLvoid* offset = reinterpret_cast<GLvoid*>(startIndexLocation);
+    GL_CHECK(glDrawElements(mode, indexCount, _indexType, offset));
 }
 
 void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
 {
+    const GLenum _indexType = GL_UNSIGNED_INT;
+
     EL_ASSERT(_program);
     GLenum mode = asPrimitiveType(primitive);
     const GLvoid* indices = reinterpret_cast<GLvoid*>(startIndexLocation);
 
-    // since 3.2 - ARB_draw_elements_base_vertex
+    // since Core 3.2 or requires ARB_draw_elements_base_vertex
     GL_CHECK(glDrawElementsBaseVertex(mode, indexCount, GL_UNSIGNED_INT, indices, baseVertexLocation));
 }
 

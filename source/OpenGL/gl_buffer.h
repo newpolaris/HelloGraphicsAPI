@@ -17,6 +17,8 @@ namespace el {
 
         void bind() const;
 
+        const GraphicsBufferDesc& getDesc() const override;
+
     private:
 
         GraphicsBufferDesc _desc;
@@ -24,7 +26,6 @@ namespace el {
         GLenum _target;
         GLenum _usage;
         GLuint _bufferID;
-        size_t _bufferSize;
     };
 
 } // namespace el {

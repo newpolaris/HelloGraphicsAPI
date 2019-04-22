@@ -21,6 +21,11 @@ const char* GraphicsBufferDesc::getData() const
     return _data;
 }
 
+streamsize_t GraphicsBufferDesc::getDataSize() const
+{
+    return _elementSize * _numElements;
+}
+
 void GraphicsBufferDesc::setElementSize(size_t elementSize)
 {
     _elementSize = elementSize;

@@ -192,6 +192,15 @@ namespace el {
 
         return container;
     }
+
+    // Reference(S):
+    // - https://web.archive.org/web/20181115035420/http://cnicholson.net/2011/01/stupid-c-tricks-a-better-sizeof_array/
+    // - https://stackoverflow.com/questions/4415530/equivalents-to-msvcs-countof-in-other-compilers 
+    template <typename T, size_t N>
+    size_t countof(T(&arr)[N])
+    {
+        return std::extent< T[N] >::value;
+    }
 }
 
 class GraphicsApplication
@@ -372,16 +381,16 @@ int main(int argc, char** argv)
         GraphicsBufferDesc vertices_buffer_desc;
         vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
         vertices_buffer_desc.setData((const stream_t*)vertices);
-        // vertices_buffer_desc.setDataSize(sizeof(vertices));
-        // vertices_buffer_desc.setElementSize();
-        // vertices_buffer_desc.setNumElements();
+        vertices_buffer_desc.setElementSize(sizeof(vec2));
+        vertices_buffer_desc.setNumElements(countof(vertices));
 
         vertex_buffer = device->createBuffer(vertices_buffer_desc);
 
         GraphicsBufferDesc indices_buffer_desc;
         indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
         indices_buffer_desc.setData((const char*)indices);
-        // indices_buffer_desc.setDataSize(sizeof(indices));
+        indices_buffer_desc.setElementSize(sizeof(uint32_t));
+        indices_buffer_desc.setNumElements(countof(indices));
 
         index_buffer = device->createBuffer(indices_buffer_desc);
     }

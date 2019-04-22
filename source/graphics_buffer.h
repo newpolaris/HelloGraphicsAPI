@@ -13,11 +13,13 @@ namespace el {
         void setData(const stream_t* data);
         const stream_t* getData() const;
 
-        void setElementSize(size_t elementSize);
-        size_t getElementSize() const;
+        streamsize_t getDataSize() const;
 
         void setNumElements(size_t numElements);
         size_t getNumElements() const;
+
+        void setElementSize(size_t elementSize);
+        size_t getElementSize() const;
 
         void setDataType(GraphicsDataType dataType);
         GraphicsDataType getDataType() const;
@@ -42,6 +44,8 @@ namespace el {
         virtual ~GraphicsBuffer();
 
         virtual bool create(GraphicsBufferDesc desc) = 0;
+
+        virtual const GraphicsBufferDesc& getDesc() const = 0;
 
     private:
 
