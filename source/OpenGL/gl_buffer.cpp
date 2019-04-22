@@ -14,7 +14,7 @@ GLBuffer::~GLBuffer()
 {
 }
 
-bool GLBuffer::create(GraphicsBufferDesc desc)
+bool GLBuffer::create(GraphicsDataDesc desc)
 {
     auto type = desc.getDataType();
     if (type == GraphicsDataTypeStorageVertexBuffer)
@@ -37,11 +37,11 @@ bool GLBuffer::create(GraphicsBufferDesc desc)
             _usage = GL_DYNAMIC_READ;
     } 
 
-    const streamsize_t bufferSize = desc.getDataSize();
+    const streamsize_t dataSize = desc.getDataSize();
 
     GL_CHECK(glGenBuffers(1, &_bufferID));
     GL_CHECK(glBindBuffer(_target, _bufferID));
-    GL_CHECK(glBufferData(_target, bufferSize, desc.getData(), _usage));
+    GL_CHECK(glBufferData(_target, dataSize, desc.getData(), _usage));
 
     if (GLAD_GL_KHR_debug) // GLEW_KHR_debug
         GL_CHECK(glObjectLabel(GL_BUFFER, _bufferID, -1, "Vertex Array Buffer object"));
@@ -63,7 +63,7 @@ void GLBuffer::bind() const
     GL_CHECK(glBindBuffer(_target, _bufferID));
 }
 
-const GraphicsBufferDesc& GLBuffer::getDesc() const
+const GraphicsDataDesc& GLBuffer::getDesc() const
 {
     return _desc;
 }

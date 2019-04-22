@@ -71,13 +71,13 @@ void GLContext::setTexture(const std::string& name, const GraphicsTexturePtr& te
     _program->setUniform(name, texture);
 }
 
-void GLContext::setVertexBuffer(const std::string& name, const GraphicsBufferPtr& vertex_buffer, uint32_t stride, uint32_t offset)
+void GLContext::setVertexBuffer(const std::string& name, const GraphicsStoragePtr& vertex_buffer, uint32_t stride, uint32_t offset)
 {
     EL_ASSERT(_program);
     _program->setVertexBuffer(name, vertex_buffer, stride, offset);
 }
 
-void GLContext::setIndexBuffer(const GraphicsBufferPtr& index_buffer)
+void GLContext::setIndexBuffer(const GraphicsStoragePtr& index_buffer)
 {
     EL_ASSERT(_program);
     _program->setIndexBuffer(index_buffer);

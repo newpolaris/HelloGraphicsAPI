@@ -47,7 +47,7 @@
 #include <graphics_shader.h>
 #include <graphics_program.h>
 #include <graphics_texture.h>
-#include <graphics_buffer.h>
+#include <graphics_data.h>
 
 #include <cstdio>
 
@@ -294,7 +294,7 @@ int main(int argc, char** argv)
     GraphicsProgramPtr program;
     GraphicsTexturePtr texture;
 
-    GraphicsBufferPtr vertex_buffer, index_buffer;
+    GraphicsStoragePtr vertex_buffer, index_buffer;
 
     if (true)
     {
@@ -378,7 +378,7 @@ int main(int argc, char** argv)
         program = device->createProgram(program_desc);
         EL_ASSERT(program);
 
-        GraphicsBufferDesc vertices_buffer_desc;
+        GraphicsDataDesc vertices_buffer_desc;
         vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
         vertices_buffer_desc.setData((const stream_t*)vertices);
         vertices_buffer_desc.setElementSize(sizeof(vec2));
@@ -386,7 +386,7 @@ int main(int argc, char** argv)
 
         vertex_buffer = device->createBuffer(vertices_buffer_desc);
 
-        GraphicsBufferDesc indices_buffer_desc;
+        GraphicsDataDesc indices_buffer_desc;
         indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
         indices_buffer_desc.setData((const char*)indices);
         indices_buffer_desc.setElementSize(sizeof(uint32_t));

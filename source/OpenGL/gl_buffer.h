@@ -1,27 +1,27 @@
 #pragma once
 
-#include "graphics_buffer.h"
+#include "graphics_data.h"
 #include "gl.h"
 
 namespace el {
 
-    class GLBuffer final : public GraphicsBuffer
+    class GLBuffer final : public GraphicsData
     {
     public:
 
         GLBuffer();
         ~GLBuffer();
 
-        bool create(GraphicsBufferDesc desc) override;
+        bool create(GraphicsDataDesc desc) override;
         void destroy();
 
         void bind() const;
 
-        const GraphicsBufferDesc& getDesc() const override;
+        const GraphicsDataDesc& getDesc() const override;
 
     private:
 
-        GraphicsBufferDesc _desc;
+        GraphicsDataDesc _desc;
 
         GLenum _target;
         GLenum _usage;

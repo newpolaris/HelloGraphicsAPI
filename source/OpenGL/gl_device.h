@@ -13,7 +13,7 @@ namespace el {
 		GraphicsProgramPtr createProgram(GraphicsProgramDesc desc) override;
 		GraphicsShaderPtr createShader(GraphicsShaderDesc desc) override;
 		GraphicsTexturePtr createTexture(GraphicsTextureDesc desc) override;
-		GraphicsBufferPtr createBuffer(GraphicsBufferDesc desc) override;
+		GraphicsStoragePtr createBuffer(GraphicsDataDesc desc) override;
         GraphicsContextPtr createDeviceContext() override;
 	};
 

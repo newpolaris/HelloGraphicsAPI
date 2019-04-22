@@ -4,11 +4,11 @@
 
 namespace el {
 
-    class GraphicsBufferDesc final
+    class GraphicsDataDesc final
     {
     public:
 
-        GraphicsBufferDesc();
+        GraphicsDataDesc();
 
         void setData(const stream_t* data);
         const stream_t* getData() const;
@@ -36,21 +36,21 @@ namespace el {
         GraphicsUsageFlags _usage;
     };
 
-    class GraphicsBuffer
+    class GraphicsData
     {
     public:
 
-        GraphicsBuffer();
-        virtual ~GraphicsBuffer();
+        GraphicsData();
+        virtual ~GraphicsData();
 
-        virtual bool create(GraphicsBufferDesc desc) = 0;
+        virtual bool create(GraphicsDataDesc desc) = 0;
 
-        virtual const GraphicsBufferDesc& getDesc() const = 0;
+        virtual const GraphicsDataDesc& getDesc() const = 0;
 
     private:
 
-        GraphicsBuffer(const GraphicsBuffer&) = delete;
-        GraphicsBuffer& operator=(const GraphicsBuffer&) = delete;
+        GraphicsData(const GraphicsData&) = delete;
+        GraphicsData& operator=(const GraphicsData&) = delete;
     };
 
 } // namespace el {

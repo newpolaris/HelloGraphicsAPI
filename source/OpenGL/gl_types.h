@@ -5,6 +5,7 @@
 #include "debug.h"
 
 namespace el {
+    typedef std::shared_ptr<class GLBuffer> GLBufferPtr;
     typedef std::shared_ptr<class GLProgram> GLProgramPtr;
 }
 

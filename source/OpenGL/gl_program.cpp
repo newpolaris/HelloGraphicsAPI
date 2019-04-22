@@ -359,7 +359,7 @@ attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 attributeDescriptions[1].offset = offsetof(Vertex, color);
 #endif
 
-void GLProgram::setVertexBuffer(const GraphicsBufferPtr& buffer)
+void GLProgram::setVertexBuffer(const GraphicsStoragePtr& buffer)
 {
     const uint32_t binding = 0;
 
@@ -394,7 +394,7 @@ void GLProgram::setVertexBuffer(const GraphicsBufferPtr& buffer)
 #endif
 }
 
-void GLProgram::setVertexBuffer(const std::string& name, const GraphicsBufferPtr& buffer, uint32_t stride, uint32_t offset)
+void GLProgram::setVertexBuffer(const std::string& name, const GraphicsStoragePtr& buffer, uint32_t stride, uint32_t offset)
 {
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
     if (glBuffer != nullptr)
@@ -419,7 +419,7 @@ void GLProgram::setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei
     GL_CHECK(glVertexAttribPointer(location, size, type, GL_FALSE, stride, (void*)pointer));
 }
 
-void GLProgram::setVertexBuffer(GLint location, const GraphicsBufferPtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset)
+void GLProgram::setVertexBuffer(GLint location, const GraphicsStoragePtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset)
 {
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
     if (glBuffer != nullptr)
@@ -430,7 +430,7 @@ void GLProgram::setVertexBuffer(GLint location, const GraphicsBufferPtr& buffer,
     GL_CHECK(glVertexAttribPointer(location, size, type, GL_FALSE, stride, pointer));
 }
 
-void GLProgram::setIndexBuffer(const GraphicsBufferPtr& buffer)
+void GLProgram::setIndexBuffer(const GraphicsStoragePtr& buffer)
 {
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
     if (glBuffer != nullptr)
