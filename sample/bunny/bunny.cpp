@@ -124,10 +124,54 @@ static void APIENTRY gl_debug_callback(GLenum source,
 }
 #endif // EL_CONFIG_DEBUG
 
+namespace el {
+
 class GraphicsApplication
 {
 public:
+
+    GraphicsApplication();
+
+    void run();
+
+private:
+
+    void initWindow();
+    void initGraphics();
+    void mainLoop();
+    void cleanup();
+
 };
+
+GraphicsApplication::GraphicsApplication()
+{
+}
+
+void GraphicsApplication::initWindow()
+{
+}
+
+void GraphicsApplication::initGraphics()
+{
+}
+
+void GraphicsApplication::mainLoop()
+{
+}
+
+void GraphicsApplication::cleanup()
+{
+}
+
+void GraphicsApplication::run()
+{
+    initWindow();
+    initGraphics();
+    mainLoop();
+    cleanup();
+}
+
+} // namespace el {
 
 namespace el {
 
@@ -194,8 +238,6 @@ namespace el {
 
 int main(int argc, char** argv)
 {
-    GLFWwindow* windows[2];
-
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
@@ -221,6 +263,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
 
+    GLFWwindow* windows[2];
     windows[0] = glfwCreateWindow(400, 400, "First", NULL, NULL);
     if (!windows[0])
     {
@@ -232,6 +275,14 @@ int main(int argc, char** argv)
 
     glfwMakeContextCurrent(windows[0]);
 
+    // Only enable vsync for the first of the windows to be swapped to
+    // avoid waiting out the interval for each window
+    glfwSwapInterval(1);
+
+    // The contexts are created with the same APIs so the function
+    // pointers should be re-usable between them
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
     // TODO:
     // how to handle glad_glGenFramebuffersEXT?
     // GL_IMPORT_EXT__(true, PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
@@ -241,14 +292,6 @@ int main(int argc, char** argv)
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
-
-    // Only enable vsync for the first of the windows to be swapped to
-    // avoid waiting out the interval for each window
-    glfwSwapInterval(1);
-
-    // The contexts are created with the same APIs so the function
-    // pointers should be re-usable between them
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
 #if EL_CONFIG_DEBUG
     if (glDebugMessageCallback) {
