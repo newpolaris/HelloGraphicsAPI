@@ -270,7 +270,7 @@ int main(int argc, char** argv)
     GraphicsProgramPtr program;
     GraphicsTexturePtr texture;
 
-    GraphicsStoragePtr vertex_buffer, index_buffer;
+    GraphicsDataPtr vertex_buffer, index_buffer;
 
 	const ImageDataPtr image = ImageData::load(getResourcePath() + "miku.png");
 	EL_ASSERT(image);

@@ -202,6 +202,8 @@ GLenum el::asPrimitiveType(GraphicsPrimitiveType primitiveType)
 {
     switch (primitiveType)
     {
+    case GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle:
+        return GL_TRIANGLES;
     case GraphicsPrimitiveType::GraphicsPrimitiveTypeFan:
         return GL_TRIANGLE_FAN;
     default:

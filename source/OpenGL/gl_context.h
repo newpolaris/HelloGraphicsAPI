@@ -25,8 +25,8 @@ namespace el {
         void setViewport(const Viewport& viewport) override;
         void setProgram(const GraphicsProgramPtr& ptr) override;
         void setTexture(const std::string& name, const GraphicsTexturePtr& texture) override;
-        void setVertexBuffer(const std::string& name, const GraphicsStoragePtr& vertex_buffer, uint32_t stride, uint32_t offset) override;
-        void setIndexBuffer(const GraphicsStoragePtr& index_buffer) override;
+        void setVertexBuffer(const std::string& name, const GraphicsDataPtr& vertex_buffer, uint32_t stride, uint32_t offset) override;
+        void setIndexBuffer(const GraphicsDataPtr& index_buffer) override;
         void setUniform(const std::string& name, const vec3& v0) override;
         void setUniform(const std::string& name, const mat4x4& m0) override;
 
@@ -40,6 +40,10 @@ namespace el {
 
     private:
 
+        size_t _indexSize;
+        size_t _numIndices;
+        size_t _vertexSize;
+        size_t _numVertices;
         Viewport _viewport;
         GLProgramPtr _program;
     };

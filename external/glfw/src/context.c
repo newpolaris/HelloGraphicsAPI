@@ -712,7 +712,6 @@ GLFWAPI int glfwExtensionSupported(const char* extension)
                                 "Extension string retrieval is broken");
                 return GLFW_FALSE;
             }
-            printf("%s\n", en);
             if (strcmp(en, extension) == 0)
                 return GLFW_TRUE;
         }
@@ -729,7 +728,6 @@ GLFWAPI int glfwExtensionSupported(const char* extension)
                             "Extension string retrieval is broken");
             return GLFW_FALSE;
         }
-        printf("%s\n", extensions);
         if (_glfwStringInExtensionString(extension, extensions))
             return GLFW_TRUE;
     }

@@ -280,7 +280,7 @@ int main(int argc, char** argv)
     GraphicsProgramPtr program;
     GraphicsTexturePtr texture;
 
-    GraphicsStoragePtr vertex_buffer, index_buffer;
+    GraphicsDataPtr vertex_buffer, index_buffer;
 
 	int x, y;
 	char pixels[16 * 16];

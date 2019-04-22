@@ -212,7 +212,7 @@ void GLProgram::setUniform(const std::string& name, const vec3& v0)
     auto it = _activeUniform.find(name);
     if (it == _activeUniform.end())
     {
-        EL_TRACE("Can't find uniform %s\n", name.c_str());
+        EL_TRACE("Can't find uniform '%s'\n", name.c_str());
         return;
     }
     auto& uniform = it->second;
@@ -359,7 +359,7 @@ attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
 attributeDescriptions[1].offset = offsetof(Vertex, color);
 #endif
 
-void GLProgram::setVertexBuffer(const GraphicsStoragePtr& buffer)
+void GLProgram::setVertexBuffer(const GraphicsDataPtr& buffer)
 {
     const uint32_t binding = 0;
 
@@ -394,7 +394,7 @@ void GLProgram::setVertexBuffer(const GraphicsStoragePtr& buffer)
 #endif
 }
 
-void GLProgram::setVertexBuffer(const std::string& name, const GraphicsStoragePtr& buffer, uint32_t stride, uint32_t offset)
+void GLProgram::setVertexBuffer(const std::string& name, const GraphicsDataPtr& buffer, uint32_t stride, uint32_t offset)
 {
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
     if (glBuffer != nullptr)
@@ -419,7 +419,7 @@ void GLProgram::setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei
     GL_CHECK(glVertexAttribPointer(location, size, type, GL_FALSE, stride, (void*)pointer));
 }
 
-void GLProgram::setVertexBuffer(GLint location, const GraphicsStoragePtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset)
+void GLProgram::setVertexBuffer(GLint location, const GraphicsDataPtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset)
 {
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
     if (glBuffer != nullptr)
@@ -430,7 +430,7 @@ void GLProgram::setVertexBuffer(GLint location, const GraphicsStoragePtr& buffer
     GL_CHECK(glVertexAttribPointer(location, size, type, GL_FALSE, stride, pointer));
 }
 
-void GLProgram::setIndexBuffer(const GraphicsStoragePtr& buffer)
+void GLProgram::setIndexBuffer(const GraphicsDataPtr& buffer)
 {
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
     if (glBuffer != nullptr)
