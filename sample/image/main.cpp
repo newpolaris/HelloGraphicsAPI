@@ -131,6 +131,21 @@ public:
 
 namespace el {
 
+    const std::string getResourcePath()
+    {
+#if EL_PLAT_IOS
+        return[NSBundle.mainBundle.resourcePath stringByAppendingString : @"/data / "].UTF8String;
+#elif EL_PLAT_ANDROID
+        return "";
+#else
+        return RESOURCE_PATH;
+#endif
+    }
+
+}
+
+namespace el {
+
 #if 0
     struct Vertex
     {
@@ -257,7 +272,7 @@ int main(int argc, char** argv)
 
     GraphicsStoragePtr vertex_buffer, index_buffer;
 
-	const ImageDataPtr image = ImageData::load("resource/miku.png");
+	const ImageDataPtr image = ImageData::load(getResourcePath() + "miku.png");
 	EL_ASSERT(image);
 
 	GraphicsTextureDesc texture_desc;
@@ -285,7 +300,7 @@ int main(int argc, char** argv)
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
-        const auto vertex_shader_text = fileread("shader/sample/image/main.vert");
+        const auto vertex_shader_text = fileread("main.vert");
         EL_ASSERT(vertex_shader_text);
 
         GraphicsShaderDesc vertex_desc;
@@ -295,7 +310,7 @@ int main(int argc, char** argv)
         vertex_shader = device->createShader(vertex_desc);
         EL_ASSERT(vertex_shader);
 
-        const auto frag_shader_text = fileread("shader/sample/image/main.frag");
+        const auto frag_shader_text = fileread("main.frag");
         EL_ASSERT(frag_shader_text);
 
         GraphicsShaderDesc fragment_desc;

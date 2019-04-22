@@ -320,7 +320,7 @@ int main(int argc, char** argv)
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
-        const auto vertex_shader_text = fileread("shader/sample/sharing/main.vert");
+        const auto vertex_shader_text = fileread("main.vert");
         EL_ASSERT(vertex_shader_text);
 
         GraphicsShaderDesc vertex_desc;
@@ -330,7 +330,7 @@ int main(int argc, char** argv)
         vertex_shader = device->createShader(vertex_desc);
         EL_ASSERT(vertex_shader);
 
-        const auto frag_shader_text = fileread("shader/sample/sharing/main.frag");
+        const auto frag_shader_text = fileread("main.frag");
         EL_ASSERT(frag_shader_text);
 
         GraphicsShaderDesc fragment_desc;
