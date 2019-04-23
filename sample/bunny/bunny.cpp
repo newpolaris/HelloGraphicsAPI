@@ -420,18 +420,18 @@ int main(int argc, char** argv)
         index_buffer = device->createBuffer(indices_buffer_desc);
 
         GraphicsInputLayoutDesc input_layout_desc;
-        input_layout_desc.addAttribute(GraphicsInputAttribute());
-        input_layout_desc.addBinding();
+        input_layout_desc.addAttribute(GraphicsInputAttribute(0, "vPos", 0, VertexFormat::Float2, 0));
+        input_layout_desc.addAttribute(GraphicsInputAttribute(0, "vCol", 1, VertexFormat::Float3, sizeof(vec2)));
+        input_layout_desc.addBinding(GraphicsInputBinding(0, sizeof(Vertex)));
 
         input_layout = device->createInputLayout(input_layout_desc);
-
     }
 
     GraphicsContextPtr context[2];
     context[0] = device->createDeviceContext();
     context[0]->setProgram(program);
-    context[0]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
-    context[0]->setVertexBuffer("vCol", vertex_buffer, sizeof(vertices[0]), sizeof(vec2));
+    context[0]->setInputLayout(input_layout);
+    context[0]->setVertexBuffer(vertex_buffer);
     context[0]->setIndexBuffer(index_buffer);
 
     GLProfileBusyWait profile[2];

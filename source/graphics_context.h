@@ -18,10 +18,13 @@ namespace el {
         virtual void setViewport(const Viewport& viewport) = 0;
         virtual void setProgram(const GraphicsProgramPtr& program) = 0;
         virtual void setTexture(const std::string& name, const GraphicsTexturePtr& texture) = 0;
+        [[deprecate]]
         virtual void setVertexBuffer(const std::string& name, const GraphicsDataPtr& vertex_buffer, uint32_t stride, uint32_t offset) = 0;
+        virtual void setVertexBuffer(uint32_t binding, const GraphicsDataPtr& vertex_buffer, uint32_t offset = 0);
         virtual void setIndexBuffer(const GraphicsDataPtr& index_buffer) = 0;
         virtual void setUniform(const std::string& name, const vec3& v0) = 0;
         virtual void setUniform(const std::string& name, const mat4x4& m0) = 0;
+        virtual void setInputLayout(const GraphicsInputLayoutPtr& input_layout) = 0;
 
         virtual void draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset = 0) = 0;
         virtual void drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation = 0) = 0;

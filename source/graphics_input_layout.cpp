@@ -54,17 +54,9 @@ GraphicsInputAttribute::GraphicsInputAttribute() :
 {
 }
 
-GraphicsInputAttribute::GraphicsInputAttribute(uint32_t binding, std::string name, VertexFormat format, uint32_t offset) :
+GraphicsInputAttribute::GraphicsInputAttribute(uint32_t binding, std::string name, uint32_t location, VertexFormat format, uint32_t offset) :
     _binding(binding),
-    _location(0u),
     _name(std::move(name)),
-    _format(format),
-    _offset(offset)
-{
-}
-
-GraphicsInputAttribute::GraphicsInputAttribute(uint32_t binding, uint32_t location, VertexFormat format, uint32_t offset) :
-    _binding(binding),
     _location(location),
     _format(format),
     _offset(offset)

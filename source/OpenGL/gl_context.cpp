@@ -81,6 +81,12 @@ void GLContext::setVertexBuffer(const std::string& name, const GraphicsDataPtr& 
     _program->setVertexBuffer(name, vertex_buffer, stride, offset);
 }
 
+void GLContext::setVertexBuffer(uint32_t binding, const GraphicsDataPtr& vertex_buffer, uint32_t offset)
+{
+    EL_ASSERT(_program);
+    _program->setVertexBuffer(name, vertex_buffer, stride, offset);
+}
+
 void GLContext::setIndexBuffer(const GraphicsDataPtr& index_buffer)
 {
     EL_ASSERT(_program);
