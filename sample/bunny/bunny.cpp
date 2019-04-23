@@ -1,7 +1,7 @@
 #include "predefine.h"
 #include "debug.h"
-
 #include <OpenGL/gl.h>
+
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
@@ -124,10 +124,54 @@ static void APIENTRY gl_debug_callback(GLenum source,
 }
 #endif // EL_CONFIG_DEBUG
 
+namespace el {
+
 class GraphicsApplication
 {
 public:
+
+    GraphicsApplication();
+
+    void run();
+
+private:
+
+    void initWindow();
+    void initGraphics();
+    void mainLoop();
+    void cleanup();
+
 };
+
+GraphicsApplication::GraphicsApplication()
+{
+}
+
+void GraphicsApplication::initWindow()
+{
+}
+
+void GraphicsApplication::initGraphics()
+{
+}
+
+void GraphicsApplication::mainLoop()
+{
+}
+
+void GraphicsApplication::cleanup()
+{
+}
+
+void GraphicsApplication::run()
+{
+    initWindow();
+    initGraphics();
+    mainLoop();
+    cleanup();
+}
+
+} // namespace el {
 
 namespace el {
 
@@ -164,6 +208,8 @@ namespace el {
         Vertex v;
         vertices[0] = v;;
     }
+#endif
+
     struct Vertex
     {
         vec2 pos;
@@ -180,19 +226,18 @@ namespace el {
     const std::vector<uint16_t> indices = {
         0, 2, 1, 0, 3, 2
     };
-#endif
 
-} // namespace el {
-namespace el {
-
-    void init();
+    const uint32_t startVertice = 0;
+    const uint32_t startIndice = 0;
+    const uint32_t startInstances = 0;
+    const uint32_t numVertices = vertices.size();
+    const uint32_t numIndices = indices.size();
+    const uint32_t numInstances = 1;
 
 } // namespace el {
 
 int main(int argc, char** argv)
 {
-    GLFWwindow* windows[2];
-
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
@@ -218,6 +263,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 #endif
 
+    GLFWwindow* windows[2];
     windows[0] = glfwCreateWindow(400, 400, "First", NULL, NULL);
     if (!windows[0])
     {
@@ -275,32 +321,22 @@ int main(int argc, char** argv)
     GraphicsProgramPtr program;
     GraphicsTexturePtr texture;
 
-    GraphicsStoragePtr vertex_buffer, index_buffer;
+    GraphicsDataPtr vertex_buffer, index_buffer;
 
-	const ImageDataPtr image = ImageData::load(getResourcePath() + "miku.png");
-	EL_ASSERT(image);
+    const ImageDataPtr image = ImageData::load(getResourcePath() + "miku.png");
+    EL_ASSERT(image);
 
-	GraphicsTextureDesc texture_desc;
-	texture_desc.setDim(GraphicsTextureDim2D);
-	texture_desc.setPixelFormat(image->format);
-	texture_desc.setWidth(image->width);
-	texture_desc.setHeight(image->height);
-	texture_desc.setStream(static_cast<stream_t*>(image->stream.data()));
-	texture_desc.setStreamSize(image->stream.size());
-	texture_desc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment1);
+    GraphicsTextureDesc texture_desc;
+    texture_desc.setDim(GraphicsTextureDim2D);
+    texture_desc.setPixelFormat(image->format);
+    texture_desc.setWidth(image->width);
+    texture_desc.setHeight(image->height);
+    texture_desc.setStream(static_cast<stream_t*>(image->stream.data()));
+    texture_desc.setStreamSize(image->stream.size());
+    texture_desc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment1);
 
-	texture = device->createTexture(texture_desc);
-	EL_ASSERT(texture);
-
-    const vec2 vertices[4] =
-    {
-        {0.f, 0.f},
-        {1.f, 0.f},
-        {1.f, 1.f},
-        {0.f, 1.f}
-    };
-
-    const uint32_t indices[] = { 0, 1, 2, 3 };
+    texture = device->createTexture(texture_desc);
+    EL_ASSERT(texture);
 
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
@@ -334,26 +370,26 @@ int main(int argc, char** argv)
 
         GraphicsDataDesc vertices_buffer_desc;
         vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
-        vertices_buffer_desc.setData((const stream_t*)vertices);
-        vertices_buffer_desc.setElementSize(sizeof(vec2));
-        vertices_buffer_desc.setNumElements(countof(vertices));
+        vertices_buffer_desc.setData((const stream_t*)vertices.data());
+        vertices_buffer_desc.setElementSize(sizeof(Vertex));
+        vertices_buffer_desc.setNumElements(vertices.size());
 
         vertex_buffer = device->createBuffer(vertices_buffer_desc);
 
         GraphicsDataDesc indices_buffer_desc;
         indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
-        indices_buffer_desc.setData((const char*)indices);
-        indices_buffer_desc.setElementSize(sizeof(uint32_t));
-        indices_buffer_desc.setNumElements(countof(indices));
+        indices_buffer_desc.setData((const stream_t*)indices.data());
+        indices_buffer_desc.setElementSize(sizeof(uint16_t));
+        indices_buffer_desc.setNumElements(indices.size());
 
         index_buffer = device->createBuffer(indices_buffer_desc);
     }
 
     GraphicsContextPtr context[2];
     context[0] = device->createDeviceContext();
-    context[0]->setProgram(program); 
-    context[0]->setTexture("texture", texture);
+    context[0]->setProgram(program);
     context[0]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
+    context[0]->setVertexBuffer("vCol", vertex_buffer, sizeof(vertices[0]), sizeof(vec2));
     context[0]->setIndexBuffer(index_buffer);
 
     GLProfileBusyWait profile[2];
@@ -389,24 +425,18 @@ int main(int argc, char** argv)
     // need to be set up for each context
     context[1] = device->createDeviceContext();
     context[1]->setProgram(program);
-    context[1]->setTexture("texture", texture);
     context[1]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
+    context[1]->setVertexBuffer("vCol", vertex_buffer, sizeof(vertices[0]), sizeof(vec2));
     context[1]->setIndexBuffer(index_buffer);
 
     mat4x4 mvp;
-    mat4x4_ortho(mvp, 0.f, 1.f, 0.f, 1.f, 0.f, 1.f);
+    mat4x4_ortho(mvp, -0.5f, 0.5f, -0.5f, 0.5f, 0.f, 1.f);
 
     context[1]->setUniform("MVP", mvp);
 
     while (!glfwWindowShouldClose(windows[0]) &&
         !glfwWindowShouldClose(windows[1]))
     {
-        const vec3 colors[2] =
-        {
-            {0.8f, 0.4f, 1.f},
-            {0.3f, 0.4f, 1.f}
-        };
-
         int i;
         for (i = 0; i < 2; i++)
         {
@@ -422,15 +452,14 @@ int main(int argc, char** argv)
             context[i]->setViewport(Viewport(0, 0, width, height));
 
             // Shared bewteen context
-            context[i]->setUniform("color", colors[i]);
-            context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, 4);
+            context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle, numIndices, startIndice);
 
             profile[i].end();
 
             glfwSwapBuffers(windows[i]);
             char profileBuf[256] = {'\0'};
-            sprintf(profileBuf, "%s CPU %.3f, GPU %.3f", profile[i].getName().c_str(),
-                profile[i].getCpuTime(), profile[i].getGpuTime());
+            sprintf(profileBuf, "%s CPU %.3f ms, GPU %.3f ms", 
+                    profile[i].getName().c_str(), profile[i].getCpuTime(), profile[i].getGpuTime());
             glfwSetWindowTitle(windows[i], profileBuf);
         }
 

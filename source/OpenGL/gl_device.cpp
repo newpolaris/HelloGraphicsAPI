@@ -49,7 +49,7 @@ GraphicsTexturePtr GLDevice::createTexture(GraphicsTextureDesc desc)
 	return nullptr;
 }
 
-GraphicsStoragePtr GLDevice::createBuffer(GraphicsDataDesc desc)
+GraphicsDataPtr GLDevice::createBuffer(GraphicsDataDesc desc)
 {
 	auto buffer = std::make_shared<GLBuffer>();
     if (buffer == nullptr)

@@ -1,13 +1,17 @@
 #include "gl_context.h"
-
 #if EL_BUILD_OPENGL
 
+#include "graphics_data.h"
 #include "gl.h"
 #include "gl_program.h"
 
 using namespace el;
 
-GLContext::GLContext()
+GLContext::GLContext() :
+    _indexSize(0u),
+    _numIndices(0u),
+    _vertexSize(0u),
+    _numVertices(0u)
 {
 }
 
@@ -71,15 +75,21 @@ void GLContext::setTexture(const std::string& name, const GraphicsTexturePtr& te
     _program->setUniform(name, texture);
 }
 
-void GLContext::setVertexBuffer(const std::string& name, const GraphicsStoragePtr& vertex_buffer, uint32_t stride, uint32_t offset)
+void GLContext::setVertexBuffer(const std::string& name, const GraphicsDataPtr& vertex_buffer, uint32_t stride, uint32_t offset)
 {
     EL_ASSERT(_program);
     _program->setVertexBuffer(name, vertex_buffer, stride, offset);
 }
 
-void GLContext::setIndexBuffer(const GraphicsStoragePtr& index_buffer)
+void GLContext::setIndexBuffer(const GraphicsDataPtr& index_buffer)
 {
     EL_ASSERT(_program);
+    EL_ASSERT(index_buffer);
+
+    _indexSize = index_buffer->getDesc().getElementSize();
+    _numIndices = index_buffer->getDesc().getNumElements();
+    EL_ASSERT(_numIndices >= 0);
+    EL_ASSERT(_indexSize > 0);
     _program->setIndexBuffer(index_buffer);
 }
 
@@ -102,21 +112,35 @@ void GLContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int3
     GL_CHECK(glDrawArrays(mode, vertexStartOffset, vertexCount));
 }
 
+GLenum getIndexType(size_t elementSize)
+{
+    switch (elementSize)
+    {
+    case 1: return GL_UNSIGNED_BYTE;
+    case 2: return GL_UNSIGNED_SHORT;
+    case 4: return GL_UNSIGNED_INT;
+    default:
+        EL_ASSERT(false);
+        return 0;
+    }
+}
+
 void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation)
 {
-    const GLenum _indexType = GL_UNSIGNED_INT;
-
-    // const uint32_t rangeCheck;
+    const GLenum indexType = getIndexType(_indexSize);
+    EL_ASSERT(indexCount + startIndexLocation <= _numIndices); 
 
     EL_ASSERT(_program);
     GLenum mode = asPrimitiveType(primitive);
     const GLvoid* offset = reinterpret_cast<GLvoid*>(startIndexLocation);
-    GL_CHECK(glDrawElements(mode, indexCount, _indexType, offset));
+    GL_CHECK(glDrawElements(mode, indexCount, indexType, offset));
 }
 
 void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
 {
-    const GLenum _indexType = GL_UNSIGNED_INT;
+    const GLenum indexType = getIndexType(_indexSize);
+    EL_ASSERT(indexCount + startIndexLocation <= _numIndices); 
+    EL_ASSERT(baseVertexLocation <= int32_t(_numVertices));
 
     EL_ASSERT(_program);
     GLenum mode = asPrimitiveType(primitive);
