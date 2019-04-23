@@ -52,9 +52,9 @@ namespace el {
     class GraphicsShaderDesc;
     class GraphicsTextureDesc;
     class GraphicsDataDesc;
-    class GraphicsVertexInputBindingDesc;
-    class GraphicsVertexInputAttributeDesc;
     class GraphicsInputLayoutDesc;
+    class GraphicsInputBinding;
+    class GraphicsInputAttribute;
 
     typedef std::shared_ptr<class GraphicsDevice> GraphicsDevicePtr;
     typedef std::shared_ptr<class GraphicsContext> GraphicsContextPtr;
@@ -63,13 +63,14 @@ namespace el {
     typedef std::shared_ptr<class GraphicsTexture> GraphicsTexturePtr;
     typedef std::shared_ptr<class GraphicsData> GraphicsDataPtr;
     typedef std::shared_ptr<class GraphicsInputLayout> GraphicsInputLayoutPtr;
+    typedef std::shared_ptr<class GraphicsVertexAttribute> GraphicsVertexAttributePtr;
 
     typedef std::weak_ptr<GraphicsDevice> GraphicsDeviceWeakPtr;
 
+    typedef std::vector<GraphicsVertexAttributePtr> GraphicsVertexAttributes;
     typedef std::vector<GraphicsShaderPtr> GraphicsShaders;
-    typedef std::vector<GraphicsVertexInputBindingDesc> GraphicsVertexInputBindingDescs;
-    typedef std::vector<GraphicsVertexInputAttributeDesc> GraphicsVertexInputAttributeDescs;
-
+    typedef std::vector<GraphicsInputBinding> GraphicsInputBindings;
+    typedef std::vector<GraphicsInputAttribute> GraphicsInputAttributes;
 
     enum GraphicsDeviceType
     {
@@ -320,6 +321,7 @@ namespace el {
         GraphicsPixelFormatX24_Stencil8 = 262,
 
         // TODO: replace with vulan pixel format?
+        // Not supported in Metal but in OpenGL
         GraphicsPixelFormatRGB8Unorm = 265,
     };
 

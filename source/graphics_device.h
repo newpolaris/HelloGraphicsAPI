@@ -30,6 +30,7 @@ namespace el {
 		virtual GraphicsShaderPtr createShader(GraphicsShaderDesc desc) = 0;
 		virtual GraphicsTexturePtr createTexture(GraphicsTextureDesc desc) = 0;
 		virtual GraphicsDataPtr createBuffer(GraphicsDataDesc desc) = 0;
+        virtual GraphicsInputLayoutPtr createInputLayout(GraphicsInputLayoutDesc desc) = 0;
         virtual GraphicsContextPtr createDeviceContext() = 0;
 	};
 

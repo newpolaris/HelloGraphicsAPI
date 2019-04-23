@@ -1,9 +1,27 @@
 #include "gl_input_layout.h"
 
-el::GLVertexInputState::GLVertexInputState()
+using namespace el;
+
+GLInputLayout::GLInputLayout()
 {
 }
 
-el::GLVertexInputState::~GLVertexInputState()
+GLInputLayout::~GLInputLayout()
 {
+}
+
+bool GLInputLayout::create(GraphicsInputLayoutDesc desc)
+{
+    _desc = std::move(desc);
+
+    return true;
+}
+
+void GLInputLayout::destory()
+{
+}
+
+const GraphicsInputLayoutDesc& GLInputLayout::getDesc() const
+{
+    return _desc;
 }

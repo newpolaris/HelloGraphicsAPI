@@ -1,3 +1,26 @@
-add_subdirectory(sharing)
-add_subdirectory(image)
-add_subdirectory(bunny)
+# Function for building single sample
+function(buildSample SAMPLE_NAME)
+	set(SAMPLE_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
+    message(STATUS "Generating project file for example in ${SAMPLE_FOLDER}")
+
+	project(${SAMPLE_NAME})
+	file(GLOB HEADER_LIST ${SAMPLE_NAME}/*.h ${SAMPLE_NAME}/*.hpp)
+	file(GLOB SOURCE_LIST ${SAMPLE_NAME}/*.cpp)
+	source_group(${SAMPLE_NAME} FILES ${HEADER_LIST})
+	source_group(${SAMPLE_NAME} FILES ${SOURCE_LIST})
+
+	set(SHADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
+    file(GLOB SHADER_HEADERS "${SHADER_DIR}/*.h")
+	file(GLOB SHADERS "${SHADER_DIR}/*.vert" "${SHADER_DIR}/*.frag" "${SHADER_DIR}/*.comp" "${SHADER_DIR}/*.geom" "${SHADER_DIR}/*.tesc" "${SHADER_DIR}/*.tese" "${SHADER_DIR}/*.mesh")
+    source_group("shaders" FILES ${SHADERS} ${SHADER_HEADERS})
+
+	add_executable(${SAMPLE_NAME} ${HEADER_LIST} ${SOURCE_LIST} ${SHADERS} ${SHADER_HEADERS})
+	target_link_libraries(${SAMPLE_NAME} PRIVATE "lib3d")
+	set_target_properties(${SAMPLE_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
+	set_target_properties(${SAMPLE_NAME} PROPERTIES PROJECT_LABEL ${SAMPLE_NAME})
+	set_target_properties(${SAMPLE_NAME} PROPERTIES FOLDER "sample")
+endfunction(buildSample)
+
+buildSample("sharing")
+buildSample("image")
+buildSample("bunny")

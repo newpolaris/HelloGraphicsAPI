@@ -4,6 +4,13 @@
 
 namespace el {
 
+    class GraphicsVertexAttribute
+    {
+    public:
+
+        virtual bool isMatch(const GraphicsInputAttribute& layout) const = 0;
+    };
+
 	class GraphicsProgramDesc final
 	{
 	public:
@@ -30,6 +37,7 @@ namespace el {
 		GraphicsProgram& operator=(const GraphicsProgram&) = delete;
 
 		virtual const GraphicsProgramDesc& getProgramDesc() const = 0;
+        virtual const GraphicsVertexAttributes& getVertexAttributes() const = 0;
 	};
 
 } // namespace el {

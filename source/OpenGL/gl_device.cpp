@@ -4,6 +4,7 @@
 #include "gl_texture.h"
 #include "gl_buffer.h"
 #include "gl_context.h"
+#include "gl_input_layout.h"
 
 using namespace el;
 
@@ -57,6 +58,16 @@ GraphicsDataPtr GLDevice::createBuffer(GraphicsDataDesc desc)
 	if (buffer->create(std::move(desc)))
 		return buffer;
 	return nullptr;
+}
+
+GraphicsInputLayoutPtr GLDevice::createInputLayout(GraphicsInputLayoutDesc desc)
+{
+    auto layout = std::make_shared<GLInputLayout>();
+    if (layout == nullptr)
+        return nullptr;
+    if (layout->create(std::move(desc)))
+        return layout;
+    return nullptr;
 }
 
 GraphicsContextPtr GLDevice::createDeviceContext()

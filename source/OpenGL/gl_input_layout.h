@@ -4,12 +4,21 @@
 
 namespace el {
 
-    class GLVertexInputState final : public GraphicsInputLayout
+    class GLInputLayout final : public GraphicsInputLayout
     {
     public:
 
-        GLVertexInputState();
-        ~GLVertexInputState();
+        GLInputLayout();
+        ~GLInputLayout();
+
+        bool create(GraphicsInputLayoutDesc desc);
+        void destory();
+
+        const GraphicsInputLayoutDesc& getDesc() const override;
+
+    private:
+
+        GraphicsInputLayoutDesc _desc;
     };
 
 } // namespace el {

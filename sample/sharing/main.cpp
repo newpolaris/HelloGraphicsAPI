@@ -237,7 +237,7 @@ int main(int argc, char** argv)
     // TODO:
     // how to handle glad_glGenFramebuffersEXT?
     // GL_IMPORT_EXT__(true, PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
-    if (glGenFramebuffers == 0)
+    if (glGenFramebuffers != 0)
     {
         EL_TRACE("Require GL_ARB_framebuffer_object");
         glfwTerminate();

@@ -14,6 +14,7 @@ namespace el {
 		GraphicsShaderPtr createShader(GraphicsShaderDesc desc) override;
 		GraphicsTexturePtr createTexture(GraphicsTextureDesc desc) override;
 		GraphicsDataPtr createBuffer(GraphicsDataDesc desc) override;
+        GraphicsInputLayoutPtr createInputLayout(GraphicsInputLayoutDesc desc) override;
         GraphicsContextPtr createDeviceContext() override;
 	};
 

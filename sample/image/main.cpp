@@ -1,28 +1,3 @@
-//========================================================================
-// Context sharing example
-// Copyright (c) Camilla Löwy <elmindreda@glfw.org>
-//
-// This software is provided 'as-is', without any express or implied
-// warranty. In no event will the authors be held liable for any damages
-// arising from the use of this software.
-//
-// Permission is granted to anyone to use this software for any purpose,
-// including commercial applications, and to alter it and redistribute it
-// freely, subject to the following restrictions:
-//
-// 1. The origin of this software must not be misrepresented; you must not
-//    claim that you wrote the original software. If you use this software
-//    in a product, an acknowledgment in the product documentation would
-//    be appreciated but is not required.
-//
-// 2. Altered source versions must be plainly marked as such, and must not
-//    be misrepresented as being the original software.
-//
-// 3. This notice may not be removed or altered from any source
-//    distribution.
-//
-//========================================================================
-
 #include "predefine.h"
 #include "debug.h"
 
@@ -156,6 +131,21 @@ public:
 
 namespace el {
 
+    const std::string getResourcePath()
+    {
+#if EL_PLAT_IOS
+        return[NSBundle.mainBundle.resourcePath stringByAppendingString : @"/data / "].UTF8String;
+#elif EL_PLAT_ANDROID
+        return "";
+#else
+        return RESOURCE_PATH;
+#endif
+    }
+
+}
+
+namespace el {
+
 #if 0
     struct Vertex
     {
@@ -191,6 +181,11 @@ namespace el {
         0, 2, 1, 0, 3, 2
     };
 #endif
+
+} // namespace el {
+namespace el {
+
+    void init();
 
 } // namespace el {
 
@@ -234,16 +229,6 @@ int main(int argc, char** argv)
 
     glfwMakeContextCurrent(windows[0]);
 
-    // TODO:
-    // how to handle glad_glGenFramebuffersEXT?
-    // GL_IMPORT_EXT__(true, PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
-    if (glGenFramebuffers == 0)
-    {
-        EL_TRACE("Require GL_ARB_framebuffer_object");
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-
     // Only enable vsync for the first of the windows to be swapped to
     // avoid waiting out the interval for each window
     glfwSwapInterval(1);
@@ -251,6 +236,16 @@ int main(int argc, char** argv)
     // The contexts are created with the same APIs so the function
     // pointers should be re-usable between them
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+    // TODO:
+    // how to handle glad_glGenFramebuffersEXT?
+    // GL_IMPORT_EXT__(true, PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
+    if (glGenFramebuffers != 0)
+    {
+        EL_TRACE("Require GL_ARB_framebuffer_object");
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
 
 #if EL_CONFIG_DEBUG
     if (glDebugMessageCallback) {
@@ -282,27 +277,17 @@ int main(int argc, char** argv)
 
     GraphicsDataPtr vertex_buffer, index_buffer;
 
-	int x, y;
-	char pixels[16 * 16];
-
-	srand((unsigned int)glfwGetTimerValue());
-
-	for (y = 0; y < 16; y++)
-	{
-		for (x = 0; x < 16; x++)
-			pixels[y * 16 + x] = rand() % 256;
-	}
+	const ImageDataPtr image = ImageData::load(getResourcePath() + "miku.png");
+	EL_ASSERT(image);
 
 	GraphicsTextureDesc texture_desc;
 	texture_desc.setDim(GraphicsTextureDim2D);
-	texture_desc.setPixelFormat(GraphicsPixelFormat::GraphicsPixelFormatR8Unorm);
-	texture_desc.setWidth(16);
-	texture_desc.setHeight(16);
-	texture_desc.setMinFilter(GraphicsFilterNearest);
-	texture_desc.setMagFilter(GraphicsFilterNearest);
-	texture_desc.setStream(static_cast<stream_t*>(pixels));
-	texture_desc.setStreamSize(16 * 16);
-	texture_desc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment8);
+	texture_desc.setPixelFormat(image->format);
+	texture_desc.setWidth(image->width);
+	texture_desc.setHeight(image->height);
+	texture_desc.setStream(static_cast<stream_t*>(image->stream.data()));
+	texture_desc.setStreamSize(image->stream.size());
+	texture_desc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment1);
 
 	texture = device->createTexture(texture_desc);
 	EL_ASSERT(texture);

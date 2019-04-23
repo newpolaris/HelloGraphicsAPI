@@ -4,6 +4,8 @@
 
 namespace el {
 
+    // tempolar
+    // from apple format;
     enum class VertexFormat
     {
         Invalid = 0,
@@ -65,17 +67,18 @@ namespace el {
 
     // from vulkan spec.
 
-    enum class GraphicsVertexInputRate
+    enum GraphicsInputRate
     {
-        GraphicsVertexInputRateVertex = 0,
-        GraphicsVertexInputRateInstance = 1
+        GraphicsInputRateVertex = 0,
+        GraphicsInputRateInstance = 1
     };
 
-    class GraphicsVertexInputBindingDesc final
+    class GraphicsInputBinding final
     {
     public:
 
-        GraphicsVertexInputBindingDesc();
+        GraphicsInputBinding();
+        GraphicsInputBinding(uint32_t binding, uint32_t stride, GraphicsInputRate rate = GraphicsInputRateVertex);
 
         void setBinding(uint32_t binding);
         uint32_t getBinding() const;
@@ -83,16 +86,47 @@ namespace el {
         void setStride(uint32_t stride);
         uint32_t getStride() const;
 
+        void setInputRate(GraphicsInputRate rate);
+        GraphicsInputRate getInputRate() const;
+
     private:
 
         uint32_t _binding;
         uint32_t _stride;
-        GraphicsVertexInputRate _inputRate;
+        GraphicsInputRate _inputRate;
     };
 
-    class GraphicsVertexInputAttributeDesc final
+    class GraphicsInputAttribute final
     {
     public:
+
+        GraphicsInputAttribute();
+        GraphicsInputAttribute(uint32_t binding, std::string name, VertexFormat format, uint32_t offset = 0);
+        GraphicsInputAttribute(uint32_t binding, uint32_t location, VertexFormat format, uint32_t offset = 0);
+
+        void setBinding(uint32_t binding);
+        uint32_t getBinding() const;
+
+        void setLocation(uint32_t location);
+        uint32_t getLocation() const;
+
+        void setName(std::string name);
+        const std::string& getName() const;
+
+        void setFormat(VertexFormat format);
+        VertexFormat getFormat() const;
+
+        void setOffset(uint32_t offset);
+        uint32_t getOffset() const;
+
+
+    private:
+
+        uint32_t _binding;
+        uint32_t _location;
+        std::string _name;
+        VertexFormat _format;
+        uint32_t _offset;
     };
 
     class GraphicsInputLayoutDesc final
@@ -101,16 +135,19 @@ namespace el {
 
         GraphicsInputLayoutDesc();
 
-        void setAttributes(GraphicsVertexInputAttributeDescs descs);
-        const GraphicsVertexInputAttributeDescs& getAttributes() const;
+        void addAttribute(GraphicsInputAttribute attrib);
+        void addBinding(GraphicsInputBinding binding);
 
-        void setBindings(GraphicsVertexInputBindingDescs descs);
-        const GraphicsVertexInputBindingDescs& getBindings() const;
+        void setAttributes(GraphicsInputAttributes attrib);
+        const GraphicsInputAttributes& getAttributes() const;
+
+        void setBindings(GraphicsInputBindings bindings);
+        const GraphicsInputBindings& getBindings() const;
 
     private:
 
-        GraphicsVertexInputAttributeDescs _attributes;
-        GraphicsVertexInputBindingDescs _bindings;
+        GraphicsInputAttributes _attributes;
+        GraphicsInputBindings _bindings;
     };
 
     class GraphicsInputLayout
@@ -120,10 +157,7 @@ namespace el {
         GraphicsInputLayout();
         virtual ~GraphicsInputLayout();
 
-        bool create(GraphicsInputLayoutDesc desc);
-        void destory();
-
-        virtual const GraphicsInputLayoutDesc& getDesc();
+        virtual const GraphicsInputLayoutDesc& getDesc() const = 0;
 
     private:
 

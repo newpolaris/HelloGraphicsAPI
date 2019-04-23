@@ -23,6 +23,7 @@
 #include <graphics_program.h>
 #include <graphics_texture.h>
 #include <graphics_data.h>
+#include <graphics_input_layout.h>
 
 #include <cstdio>
 
@@ -214,6 +215,39 @@ namespace el {
     {
         vec2 pos;
         vec3 color;
+
+        static GraphicsInputBindings getBindingDescription() 
+        {
+            GraphicsInputBindings bindingDescription;
+
+            GraphicsInputBinding binding;
+            binding.setBinding(0);
+            binding.setStride(sizeof(Vertex));
+            binding.setInputRate(GraphicsInputRate::GraphicsInputRateVertex);
+
+            bindingDescription.push_back(binding);
+
+            return bindingDescription;
+        }
+
+        static GraphicsInputAttributes getAttributeDescription() 
+        {
+            GraphicsInputAttributes attributeDescriptions(2);
+
+#if 0
+            attributeDescriptions[0]._binding = 0;
+            attributeDescriptions[0]._location = 0;
+            attributeDescriptions[0]._format = VertexFormat::Float2;
+            attributeDescriptions[0]._offset = offsetof(Vertex, pos);
+
+            attributeDescriptions[1]._binding = 0;
+            attributeDescriptions[1]._location = 1;
+            attributeDescriptions[1]._format = VertexFormat::Float3;
+            attributeDescriptions[1]._offset = offsetof(Vertex, color);
+#endif
+
+            return attributeDescriptions;
+        }
     };
 
     const std::vector<Vertex> vertices = {
@@ -264,7 +298,7 @@ int main(int argc, char** argv)
 #endif
 
     GLFWwindow* windows[2];
-    windows[0] = glfwCreateWindow(400, 400, "First", NULL, NULL);
+    windows[0] = glfwCreateWindow(800, 600, "First", NULL, NULL);
     if (!windows[0])
     {
         glfwTerminate();
@@ -286,7 +320,7 @@ int main(int argc, char** argv)
     // TODO:
     // how to handle glad_glGenFramebuffersEXT?
     // GL_IMPORT_EXT__(true, PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
-    if (glGenFramebuffers != 0)
+    if (glGenFramebuffers == 0)
     {
         EL_TRACE("Require GL_ARB_framebuffer_object");
         glfwTerminate();
@@ -320,8 +354,9 @@ int main(int argc, char** argv)
     GraphicsShaderPtr fragment_shader;
     GraphicsProgramPtr program;
     GraphicsTexturePtr texture;
-
-    GraphicsDataPtr vertex_buffer, index_buffer;
+    GraphicsDataPtr vertex_buffer;
+    GraphicsDataPtr index_buffer;
+    GraphicsInputLayoutPtr input_layout;
 
     const ImageDataPtr image = ImageData::load(getResourcePath() + "miku.png");
     EL_ASSERT(image);
@@ -383,6 +418,13 @@ int main(int argc, char** argv)
         indices_buffer_desc.setNumElements(indices.size());
 
         index_buffer = device->createBuffer(indices_buffer_desc);
+
+        GraphicsInputLayoutDesc input_layout_desc;
+        input_layout_desc.addAttribute(GraphicsInputAttribute());
+        input_layout_desc.addBinding();
+
+        input_layout = device->createInputLayout(input_layout_desc);
+
     }
 
     GraphicsContextPtr context[2];
@@ -448,6 +490,7 @@ int main(int argc, char** argv)
             profile[i].start();
 
             context[i]->beginRendering();
+            // TODO: setPipeline etc;
             context[i]->setProgram(program);
             context[i]->setViewport(Viewport(0, 0, width, height));
 
@@ -455,8 +498,10 @@ int main(int argc, char** argv)
             context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle, numIndices, startIndice);
 
             profile[i].end();
+            context[i]->endRendering();
 
             glfwSwapBuffers(windows[i]);
+
             char profileBuf[256] = {'\0'};
             sprintf(profileBuf, "%s CPU %.3f ms, GPU %.3f ms", 
                     profile[i].getName().c_str(), profile[i].getCpuTime(), profile[i].getGpuTime());

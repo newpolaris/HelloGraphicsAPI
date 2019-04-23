@@ -66,6 +66,11 @@ namespace el {
 
 using namespace el;
 
+bool GLVertexAttribute::isMatch(const GraphicsInputAttribute& layout) const
+{
+    return name == layout.getName();
+}
+
 GLProgram::GLProgram() :
     _programID(0)
 {
@@ -116,11 +121,10 @@ const GraphicsProgramDesc& GLProgram::getProgramDesc() const
     return _programDesc;
 }
 
-struct SymbolicConstant
+const GraphicsVertexAttributes& GLProgram::getVertexAttributes() const
 {
-    std::string name;
-    size_t size;
-};
+    return _activeAttributeList;
+}
 
 void GLProgram::setupActiveUniform()
 {
@@ -142,11 +146,11 @@ void GLProgram::setupActiveUniform()
         GL_CHECK(glGetActiveUniform(_programID, i, uniformMaxLength, &length, &size, &type, (GLchar*)name.data()));
         name = name.substr(0, length);
 
-        const GLuint locaation = glGetUniformLocation(_programID, name.c_str());
+        const GLuint location = glGetUniformLocation(_programID, name.c_str());
 
         GLUniform uniform;
         uniform.name = name;
-        uniform.location = locaation;
+        uniform.location = location;
         uniform.unit = 0;
         uniform.type = type;
         uniform.size = size;
@@ -159,7 +163,7 @@ void GLProgram::setupActiveUniform()
             uniform.unit = textureUnit++;
         }
 
-        _activeUniform.emplace(name, std::move(uniform));
+        _activeUniforms.emplace(name, std::move(uniform));
     }
 }
 
@@ -177,7 +181,7 @@ void GLProgram::setupActiveAttribute()
         GLsizei length;
         GLint size;
         GLenum type;
-        GLAttribute attribute;
+        GLVertexAttribute attribute;
         std::string name(attributeMaxLength, 0);
         GL_CHECK(glGetActiveAttrib(_programID, i, attributeMaxLength, &length, &size, &type, (GLchar*)name.data()));
         name = name.substr(0, length);
@@ -186,9 +190,14 @@ void GLProgram::setupActiveAttribute()
 
         attribute.name = name;
         attribute.location = location;
-        attribute.size = asVariableComponentCount(type);
+        attribute.count = asVariableComponentCount(type);
         attribute.type = asVariableComponentType(type);
-        _activeAttribute.emplace(name, std::move(attribute));
+
+        // move is removed to support additional vector
+        _activeAttributes.emplace(name, attribute);
+
+        auto attrib = std::make_shared<GLVertexAttribute>(attribute);
+        _activeAttributeList.push_back(attrib);
     }
 }
 
@@ -209,8 +218,8 @@ void GLProgram::setUniform(GLint location, const mat4x4& m0)
 
 void GLProgram::setUniform(const std::string& name, const vec3& v0)
 {
-    auto it = _activeUniform.find(name);
-    if (it == _activeUniform.end())
+    auto it = _activeUniforms.find(name);
+    if (it == _activeUniforms.end())
     {
         EL_TRACE("Can't find uniform '%s'\n", name.c_str());
         return;
@@ -221,8 +230,8 @@ void GLProgram::setUniform(const std::string& name, const vec3& v0)
 
 void GLProgram::setUniform(const std::string& name, const mat4x4& m0)
 {
-    auto it = _activeUniform.find(name);
-    if (it == _activeUniform.end())
+    auto it = _activeUniforms.find(name);
+    if (it == _activeUniforms.end())
     {
         EL_ASSERT(false);
         return;
@@ -233,8 +242,8 @@ void GLProgram::setUniform(const std::string& name, const mat4x4& m0)
 
 void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& texture)
 {
-    auto it = _activeUniform.find(name);
-    if (it == _activeUniform.end())
+    auto it = _activeUniforms.find(name);
+    if (it == _activeUniforms.end())
     {
         EL_ASSERT(false);
         return;
@@ -246,128 +255,29 @@ void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& te
         glTexture->bind(uniform.unit);
 }
 
-#if 0
-D3D11_INPUT_ELEMENT_DESC layout[] = {
-    { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-};
-UINT numElements = ARRAYSIZE(layout);
-
-auto bindingDescription = Vertex::getBindingDescription();
-auto attributeDescriptions = Vertex::getAttributeDescription();
-
-VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
-vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-// vertexInputInfo.vertexBindingDescriptionCount = 1;
-// vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-// vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());;
-// vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
-
-struct Vertex {
-    glm::vec2 pos;
-    glm::vec3 color;
-
-    static VkVertexInputBindingDescription getBindingDescription() {
-        VkVertexInputBindingDescription bindingDescription = {};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(Vertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-        return bindingDescription;
-    }
-
-    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescription() {
-        std::array<VkVertexInputAttributeDescription, 2> attributeDescriptions = {};
-
-        attributeDescriptions[0].binding = 0;
-        attributeDescriptions[0].location = 0;
-        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-        attributeDescriptions[1].binding = 0;
-        attributeDescriptions[1].location = 1;
-        attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-        return attributeDescriptions;
-    }
-};
-
-
-    MTLVertexDescriptor *RectDescriptor = [MTLVertexDescriptor vertexDescriptor];
-
-    MTLVertexAttributeDescriptor *PositionDescriptor = [MTLVertexAttributeDescriptor new];
-    PositionDescriptor.format = MTLVertexFormatFloat2;
-    PositionDescriptor.offset = offsetof(VertexData, position);
-    PositionDescriptor.bufferIndex = 0;
-    [RectDescriptor.attributes setObject : PositionDescriptor atIndexedSubscript : 0];
-
-    MTLVertexAttributeDescriptor *TexCoordDescriptor = [MTLVertexAttributeDescriptor new];
-    TexCoordDescriptor.format = MTLVertexFormatFloat2;
-    TexCoordDescriptor.offset = offsetof(VertexData, texCoord);
-    TexCoordDescriptor.bufferIndex = 0;
-    [RectDescriptor.attributes setObject : TexCoordDescriptor atIndexedSubscript : 1];
-
-    MTLVertexBufferLayoutDescriptor *LayoutDescriptor = [MTLVertexBufferLayoutDescriptor new];
-    LayoutDescriptor.stride = sizeof(VertexData);
-    LayoutDescriptor.stepFunction = MTLVertexStepFunctionPerVertex;
-    LayoutDescriptor.stepRate = 1;
-    [RectDescriptor.layouts setObject : LayoutDescriptor atIndexedSubscript : 0];
-
-
-    Check out MTLVertexBufferLayoutDescriptor, which is part of MTLRenderPipelineDescriptor.It has the stride member.
-
-    Below is the example of settings up three vertex attributes stored in one vertex buffer in the interleaved fashion.The stride is set next to the end : vertexDescriptor.layouts[0].stride = 32;
-
-    MTLRenderPipelineDescriptor *pipelineDescriptor = [[MTLRenderPipelineDescriptor alloc] init];
-
-    MTLVertexDescriptor *vertexDescriptor = [MTLVertexDescriptor vertexDescriptor];
-    vertexDescriptor.attributes[0].offset = 0;
-    vertexDescriptor.attributes[0].format = MTLVertexFormatFloat3; // position
-    vertexDescriptor.attributes[0].bufferIndex = 0;
-    vertexDescriptor.attributes[1].offset = 12;
-    vertexDescriptor.attributes[1].format = MTLVertexFormatFloat3; // normal
-    vertexDescriptor.attributes[1].bufferIndex = 0;
-    vertexDescriptor.attributes[2].offset = 24;
-    vertexDescriptor.attributes[2].format = MTLVertexFormatFloat2; // texCoords
-    vertexDescriptor.attributes[2].bufferIndex = 0;
-
-    vertexDescriptor.layouts[0].stepRate = 1;
-    vertexDescriptor.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
-    vertexDescriptor.layouts[0].stride = 32;
-
-    pipelineDescriptor.vertexDescriptor = vertexDescriptor;
-
-    static VkVertexInputBindingDescription getBindingDescription() {
-        VkVertexInputBindingDescription bindingDescription = {};
-        bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(Vertex);
-        bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-        return bindingDescription;
-    }
-
-    static std::array<VkVertexInputAttributeDescription, 2> getAttributeDescription() {
-
-attributeDescriptions[0].binding = 0;
-attributeDescriptions[0].location = 0;
-attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-attributeDescriptions[1].binding = 0;
-attributeDescriptions[1].location = 1;
-attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-attributeDescriptions[1].offset = offsetof(Vertex, color);
-#endif
-
 void GLProgram::setVertexBuffer(const GraphicsDataPtr& buffer)
 {
     const uint32_t binding = 0;
 
-    // { "vPosition", GraphicsPixelFormat::GraphicsPixelFormatRG32Float, offsetof(Vertex, pos) }
-    // { "vTexcoord", GraphicsPixelFormat::GraphicsPixelFormatRGB32Float, offsetof(Vertex, pos) }
-
-
+    EL_ASSERT(buffer != nullptr);
     EL_ASSERT(_inputLayout != nullptr);
+
+    auto& inputDesc = _inputLayout->getDesc();
+    for (auto& activeAttrib : _activeAttributeList)
+    {
+        for (auto& inputAttrib : inputDesc.getAttributes())
+        {
+            if (activeAttrib->isMatch(inputAttrib))
+            {
+                auto attrib = std::static_pointer_cast<GLVertexAttribute>(activeAttrib);
+                attrib->location;
+                attrib->type;
+                attrib->count;
+            }
+        }
+    }
+
+    auto& bindings = _inputLayout->getDesc().getBindings();
 
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
     if (glBuffer != nullptr)
@@ -401,8 +311,8 @@ void GLProgram::setVertexBuffer(const std::string& name, const GraphicsDataPtr& 
         glBuffer->bind();
     EL_ASSERT(glBuffer != nullptr);
 
-    auto it = _activeAttribute.find(name);
-    if (it == _activeAttribute.end())
+    auto it = _activeAttributes.find(name);
+    if (it == _activeAttributes.end())
     {
         EL_ASSERT(false);
         return;
@@ -410,7 +320,7 @@ void GLProgram::setVertexBuffer(const std::string& name, const GraphicsDataPtr& 
     auto& attrib = it->second;
     const GLvoid* pointer = reinterpret_cast<GLvoid*>(offset);
     GL_CHECK(glEnableVertexAttribArray(attrib.location));
-    GL_CHECK(glVertexAttribPointer(attrib.location, attrib.size, attrib.type, GL_FALSE, stride, pointer));
+    GL_CHECK(glVertexAttribPointer(attrib.location, attrib.count, attrib.type, GL_FALSE, stride, pointer));
 }
 
 void GLProgram::setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void* pointer)
