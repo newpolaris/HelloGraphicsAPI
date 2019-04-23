@@ -1,7 +1,7 @@
 #include "predefine.h"
 #include "debug.h"
-#include <OpenGL/gl.h>
 
+#include <OpenGL/gl.h>
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
@@ -183,6 +183,11 @@ namespace el {
 #endif
 
 } // namespace el {
+namespace el {
+
+    void init();
+
+} // namespace el {
 
 int main(int argc, char** argv)
 {
@@ -224,6 +229,14 @@ int main(int argc, char** argv)
 
     glfwMakeContextCurrent(windows[0]);
 
+    // Only enable vsync for the first of the windows to be swapped to
+    // avoid waiting out the interval for each window
+    glfwSwapInterval(1);
+
+    // The contexts are created with the same APIs so the function
+    // pointers should be re-usable between them
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
     // TODO:
     // how to handle glad_glGenFramebuffersEXT?
     // GL_IMPORT_EXT__(true, PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
@@ -233,14 +246,6 @@ int main(int argc, char** argv)
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
-
-    // Only enable vsync for the first of the windows to be swapped to
-    // avoid waiting out the interval for each window
-    glfwSwapInterval(1);
-
-    // The contexts are created with the same APIs so the function
-    // pointers should be re-usable between them
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
 #if EL_CONFIG_DEBUG
     if (glDebugMessageCallback) {

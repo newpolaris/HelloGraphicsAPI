@@ -25,8 +25,8 @@
 
 #include "predefine.h"
 #include "debug.h"
-#include <OpenGL/gl.h>
 
+#include <OpenGL/gl.h>
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
