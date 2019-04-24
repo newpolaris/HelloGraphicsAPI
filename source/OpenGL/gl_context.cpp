@@ -3,7 +3,10 @@
 
 #include "graphics_data.h"
 #include "gl.h"
+#include "gl_types.h"
+#include "gl_buffer.h"
 #include "gl_program.h"
+#include "gl_input_layout.h"
 
 using namespace el;
 
@@ -34,11 +37,21 @@ bool GLContext::create()
         glBindVertexArrayAPPLE(_globalVao);
     }
 #endif
+
+    // enough to store maximum vertex attributes
+    const uint32_t maxVertexBufferBindings = 16; 
+    _vertexBuffers.resize(maxVertexBufferBindings);
+
+    // TODO: GL_MAX_DRAW_BUFFERS - glDrawBuffers
+
     return true;
 }
 
 void GLContext::destory()
 {
+    // _attributes.clear();
+    _vertexBuffers.clear();
+
     _program.reset();
 }
 
@@ -52,7 +65,8 @@ void GLContext::endRendering()
 
 void GLContext::setViewport(const Viewport& viewport)
 {
-    if (_viewport != viewport)
+    // TODO;
+    // if (_viewport != viewport)
     {
         _viewport = viewport;
         GL_CHECK(glViewport(_viewport.x, _viewport.y, _viewport.width, _viewport.height));
@@ -62,7 +76,8 @@ void GLContext::setViewport(const Viewport& viewport)
 void GLContext::setProgram(const GraphicsProgramPtr& ptr)
 {
     GLProgramPtr program = std::static_pointer_cast<GLProgram>(ptr);
-    if (_program != program)
+    // TODO:
+    // if (_program != program)
     {
         _program = program;
         _program->apply();
@@ -75,28 +90,29 @@ void GLContext::setTexture(const std::string& name, const GraphicsTexturePtr& te
     _program->setUniform(name, texture);
 }
 
-void GLContext::setVertexBuffer(const std::string& name, const GraphicsDataPtr& vertex_buffer, uint32_t stride, uint32_t offset)
+void GLContext::setVertexBuffer(const std::string& name, const GraphicsDataPtr& vertexData, uint32_t stride, uint32_t offset)
 {
     EL_ASSERT(_program);
-    _program->setVertexBuffer(name, vertex_buffer, stride, offset);
+    _program->setVertexBuffer(name, vertexData, stride, offset);
 }
 
-void GLContext::setVertexBuffer(uint32_t binding, const GraphicsDataPtr& vertex_buffer, uint32_t offset)
+void GLContext::setVertexBuffer(uint32_t binding, const GraphicsDataPtr& vertexData, uint32_t offset)
 {
-    EL_ASSERT(_program);
-    _program->setVertexBuffer(name, vertex_buffer, stride, offset);
+    EL_ASSERT(vertexData);
+    EL_ASSERT(_vertexBuffers.size() > binding);
+    _vertexBuffers[binding] = GLVertexBuffer(vertexData, offset);
 }
 
-void GLContext::setIndexBuffer(const GraphicsDataPtr& index_buffer)
+void GLContext::setIndexBuffer(const GraphicsDataPtr& indexData)
 {
     EL_ASSERT(_program);
-    EL_ASSERT(index_buffer);
+    EL_ASSERT(indexData);
 
-    _indexSize = index_buffer->getDesc().getElementSize();
-    _numIndices = index_buffer->getDesc().getNumElements();
+    _indexSize = indexData->getDesc().getElementSize();
+    _numIndices = indexData->getDesc().getNumElements();
     EL_ASSERT(_numIndices >= 0);
     EL_ASSERT(_indexSize > 0);
-    _program->setIndexBuffer(index_buffer);
+    _program->setIndexBuffer(indexData);
 }
 
 void GLContext::setUniform(const std::string& name, const vec3& v0)
@@ -111,32 +127,72 @@ void GLContext::setUniform(const std::string& name, const mat4x4& m0)
     _program->setUniform(name, m0);
 }
 
+void GLContext::setInputLayout(const GraphicsInputLayoutPtr& inputLayout)
+{
+    EL_ASSERT(_program);
+    EL_ASSERT(inputLayout);
+
+    _inputLayout = inputLayout;
+
+    // TODO:
+    auto& inputDesc = _inputLayout->getDesc();
+    auto& activeAttribs = _program->getVertexAttributes();
+    for (auto& activeAttrib : activeAttribs)
+    {
+        auto attrib = std::static_pointer_cast<GLVertexAttribute>(activeAttrib);
+
+        GLuint attribProgramLocation = GL_INVALID_VALUE;
+        for (auto& inputAttrib : inputDesc.getAttributes())
+        {
+            if (activeAttrib->isMatch(inputAttrib))
+            {
+                const uint32_t attribSize = asVariableComponentSize(attrib->type) * attrib->count;
+                const uint32_t vertexAttrbSize = asVertexFormatSize(inputAttrib.getFormat());
+                EL_ASSERT(attribSize == vertexAttrbSize);
+
+                attribProgramLocation = attrib->location;
+                uint32_t binding = inputAttrib.getBinding();
+                break;
+            }
+        }
+        if (attribProgramLocation != GL_INVALID_VALUE)
+        {
+            attrib->count;
+            attrib->location;
+            attrib->type;
+        }
+    }
+
+    for (auto& inputBinding : inputDesc.getBindings())
+    {
+        inputBinding.getStride();
+        inputBinding.getInputRate();
+        inputBinding.getBinding();
+    }
+    // _attributes
+}
+
+void GLContext::bindVertexBuffers(const GLVertexBuffers& buffers)
+{
+}
+
 void GLContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset)
 {
     EL_ASSERT(_program);
+    bindVertexBuffers(_vertexBuffers);
+
     GLenum mode = asPrimitiveType(primitive);
     GL_CHECK(glDrawArrays(mode, vertexStartOffset, vertexCount));
 }
 
-GLenum getIndexType(size_t elementSize)
-{
-    switch (elementSize)
-    {
-    case 1: return GL_UNSIGNED_BYTE;
-    case 2: return GL_UNSIGNED_SHORT;
-    case 4: return GL_UNSIGNED_INT;
-    default:
-        EL_ASSERT(false);
-        return 0;
-    }
-}
-
 void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation)
 {
+    EL_ASSERT(_program);
+    bindVertexBuffers(_vertexBuffers);
+
     const GLenum indexType = getIndexType(_indexSize);
     EL_ASSERT(indexCount + startIndexLocation <= _numIndices); 
 
-    EL_ASSERT(_program);
     GLenum mode = asPrimitiveType(primitive);
     const GLvoid* offset = reinterpret_cast<GLvoid*>(startIndexLocation);
     GL_CHECK(glDrawElements(mode, indexCount, indexType, offset));
@@ -144,11 +200,13 @@ void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount
 
 void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
 {
+    EL_ASSERT(_program);
+    bindVertexBuffers(_vertexBuffers);
+
     const GLenum indexType = getIndexType(_indexSize);
     EL_ASSERT(indexCount + startIndexLocation <= _numIndices); 
     EL_ASSERT(baseVertexLocation <= int32_t(_numVertices));
 
-    EL_ASSERT(_program);
     GLenum mode = asPrimitiveType(primitive);
     const GLvoid* indices = reinterpret_cast<GLvoid*>(startIndexLocation);
 

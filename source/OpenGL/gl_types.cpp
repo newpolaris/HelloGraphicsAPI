@@ -226,6 +226,19 @@ GLenum el::getShaderStage(GraphicsShaderStageFlagBits stage)
     return 0;
 }
 
+GLenum el::getIndexType(size_t elementSize)
+{
+    switch (elementSize)
+    {
+    case 1: return GL_UNSIGNED_BYTE;
+    case 2: return GL_UNSIGNED_SHORT;
+    case 4: return GL_UNSIGNED_INT;
+    default:
+        EL_ASSERT(false);
+        return 0;
+    }
+}
+
 GLenum el::asTextureTarget(GraphicsTextureDim dim)
 {
     GLenum target = 0;

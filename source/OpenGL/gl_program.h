@@ -9,6 +9,16 @@
 
 namespace el {
 
+    struct Limits
+    {
+        Limits() :
+            maxVertexAttributes(8)
+        {
+        }
+
+        GLint maxVertexAttributes;
+    };
+
     struct GLUniform
     {
         GLint location;
@@ -49,6 +59,7 @@ namespace el {
         void setUniform(const std::string& name, const GraphicsTexturePtr& texture);
 
         void setVertexBuffer(const GraphicsDataPtr& buffer);
+        [[deprecated]]
         void setVertexBuffer(const std::string& name, const GraphicsDataPtr& buffer, uint32_t stride, uint32_t offset);
         [[deprecated]]
         void setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void *pointer);
@@ -70,6 +81,8 @@ namespace el {
 
         void setupActiveUniform();
         void setupActiveAttribute();
+
+        Limits _limits;
 
         GLuint _programID;
 

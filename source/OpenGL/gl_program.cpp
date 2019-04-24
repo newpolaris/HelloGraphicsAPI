@@ -95,6 +95,10 @@ bool GLProgram::create(GraphicsProgramDesc desc)
     _programID = id;
     _programDesc = std::move(desc);
 
+    // glVertexAttribPointer's maximum index value
+    // minimum values in OpenGL 2.1 = 16, ES 2.0 = 8
+    // GL_CHECK(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, (GLint*)&_limits.maxVertexAttributes));
+
     setupActiveUniform();
     setupActiveAttribute();
 
@@ -186,7 +190,8 @@ void GLProgram::setupActiveAttribute()
         GL_CHECK(glGetActiveAttrib(_programID, i, attributeMaxLength, &length, &size, &type, (GLchar*)name.data()));
         name = name.substr(0, length);
 
-        const GLint location = glGetAttribLocation(_programID, name.c_str());
+        const GLint location = GL_CHECK_RET(glGetAttribLocation(_programID, name.c_str()));
+        EL_WARN_IF(location >= _limits.maxVertexAttributes, "!!Exceeded the limits maximum vertex attributes");
 
         attribute.name = name;
         attribute.location = location;
@@ -257,26 +262,6 @@ void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& te
 
 void GLProgram::setVertexBuffer(const GraphicsDataPtr& buffer)
 {
-    const uint32_t binding = 0;
-
-    EL_ASSERT(buffer != nullptr);
-    EL_ASSERT(_inputLayout != nullptr);
-
-    auto& inputDesc = _inputLayout->getDesc();
-    for (auto& activeAttrib : _activeAttributeList)
-    {
-        for (auto& inputAttrib : inputDesc.getAttributes())
-        {
-            if (activeAttrib->isMatch(inputAttrib))
-            {
-                auto attrib = std::static_pointer_cast<GLVertexAttribute>(activeAttrib);
-                attrib->location;
-                attrib->type;
-                attrib->count;
-            }
-        }
-    }
-
     auto& bindings = _inputLayout->getDesc().getBindings();
 
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
@@ -306,17 +291,18 @@ void GLProgram::setVertexBuffer(const GraphicsDataPtr& buffer)
 
 void GLProgram::setVertexBuffer(const std::string& name, const GraphicsDataPtr& buffer, uint32_t stride, uint32_t offset)
 {
-    auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
-    if (glBuffer != nullptr)
-        glBuffer->bind();
-    EL_ASSERT(glBuffer != nullptr);
-
     auto it = _activeAttributes.find(name);
     if (it == _activeAttributes.end())
     {
         EL_ASSERT(false);
         return;
     }
+
+    auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
+    if (glBuffer != nullptr)
+        glBuffer->bind();
+    EL_ASSERT(glBuffer != nullptr);
+
     auto& attrib = it->second;
     const GLvoid* pointer = reinterpret_cast<GLvoid*>(offset);
     GL_CHECK(glEnableVertexAttribArray(attrib.location));

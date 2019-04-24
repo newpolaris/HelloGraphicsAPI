@@ -117,6 +117,16 @@ GraphicsInputLayoutDesc::GraphicsInputLayoutDesc()
 {
 }
 
+void GraphicsInputLayoutDesc::addAttribute(GraphicsInputAttribute attrib)
+{
+    _attributes.push_back(std::move(attrib));
+}
+
+void GraphicsInputLayoutDesc::addBinding(GraphicsInputBinding binding)
+{
+    _bindings.push_back(std::move(binding));
+}
+
 void GraphicsInputLayoutDesc::setAttributes(GraphicsInputAttributes attrib)
 {
     _attributes = std::move(attrib);

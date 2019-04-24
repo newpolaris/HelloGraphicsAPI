@@ -7,6 +7,7 @@
 namespace el {
     typedef std::shared_ptr<class GLBuffer> GLBufferPtr;
     typedef std::shared_ptr<class GLProgram> GLProgramPtr;
+    typedef std::vector<class GLVertexBuffer> GLVertexBuffers;
 }
 
 namespace el {
@@ -21,6 +22,7 @@ namespace el {
 
 	GLenum asPrimitiveType(GraphicsPrimitiveType primitiveType);
     GLenum getShaderStage(GraphicsShaderStageFlagBits stage);
+    GLenum getIndexType(size_t elementSize);
 
     GLuint asVariableComponentCount(GLenum type);
     GLuint asVariableRowCount(GLenum type);

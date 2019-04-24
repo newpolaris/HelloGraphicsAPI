@@ -430,8 +430,13 @@ int main(int argc, char** argv)
     GraphicsContextPtr context[2];
     context[0] = device->createDeviceContext();
     context[0]->setProgram(program);
+#if 0
     context[0]->setInputLayout(input_layout);
-    context[0]->setVertexBuffer(vertex_buffer);
+    context[0]->setVertexBuffer(0, vertex_buffer);
+#else
+    context[0]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
+    context[0]->setVertexBuffer("vCol", vertex_buffer, sizeof(vertices[0]), sizeof(vec2));
+#endif
     context[0]->setIndexBuffer(index_buffer);
 
     GLProfileBusyWait profile[2];

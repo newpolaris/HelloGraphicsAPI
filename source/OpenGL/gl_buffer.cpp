@@ -67,3 +67,24 @@ const GraphicsDataDesc& GLBuffer::getDesc() const
 {
     return _desc;
 }
+
+GLVertexBuffer::GLVertexBuffer() :
+    _offset(0)
+{
+}
+
+GLVertexBuffer::GLVertexBuffer(const GraphicsDataPtr& data, int32_t offset) :
+    _offset(offset)
+{
+    _data = std::static_pointer_cast<GLBuffer>(data);
+}
+
+const GLBufferPtr& GLVertexBuffer::getData() const
+{
+    return _data;
+}
+
+int32_t GLVertexBuffer::getOffset() const
+{
+    return _offset;
+}

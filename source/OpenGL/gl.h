@@ -37,10 +37,20 @@ namespace gl {
 		el::gl::error_handler(__FILE__, __LINE__); \
 	} while (0)
 
+#define _GL_CHECK_RET(_call) \
+    ([=](){ \
+        auto ret = _call; \
+        el::gl::error_handler(__FILE__, __LINE__); \
+        return ret; \
+    }())
+
 #if EL_CONFIG_DEBUG
 #    define GL_CHECK(_call) _GL_CHECK(_call)
+
+#    define GL_CHECK_RET(_call) _GL_CHECK_RET(_call)
 #else
 #    define GL_CHECK(_call) ((void)(_call))
+#    define GL_CHECK_RET(_call) ((void)(_call))
 #endif
 
 #define _EMPTY_OUT_ 0
