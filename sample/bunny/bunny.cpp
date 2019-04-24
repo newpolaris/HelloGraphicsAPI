@@ -29,8 +29,8 @@
 
 #include <utility.h>
 #include <image.h>
-#include <objparser.h>
-#include <meshoptimizer.h>
+
+#include "mesh.h"
 
 // TODO:
 #include <OpenGL/gl_profile.h>
@@ -189,86 +189,6 @@ namespace el {
 
 }
 
-namespace el {
-
-    struct Vertex
-    {
-        float vx, vy, vz;
-        float nx, ny, nz;
-        float tu, tv;
-
-        static GraphicsInputBindings getBindingDescription() 
-        {
-            GraphicsInputBindings bindingDescription;
-
-            GraphicsInputBinding binding;
-            binding.setBinding(0);
-            binding.setStride(sizeof(Vertex));
-            binding.setInputRate(GraphicsInputRate::GraphicsInputRateVertex);
-
-            bindingDescription.push_back(binding);
-
-            return bindingDescription;
-        }
-
-        static GraphicsInputAttributes getAttributeDescription() 
-        {
-            GraphicsInputAttributes attributeDescriptions(3);
-
-            attributeDescriptions[0] = GraphicsInputAttribute(0, "vPosition", 0, VertexFormat::Float3, offsetof(Vertex, vx));
-            attributeDescriptions[1] = GraphicsInputAttribute(0, "vNormal", 1, VertexFormat::Float3, offsetof(Vertex, nx));
-            attributeDescriptions[2] = GraphicsInputAttribute(0, "vTexcoord", 2, VertexFormat::Float2, offsetof(Vertex, tu));
-
-            return attributeDescriptions;
-        }
-    };
-
-    struct Mesh
-    {
-        std::vector<Vertex> vertices;
-        std::vector<uint32_t> indices;
-    };
-
-    bool loadMesh(Mesh& result, const std::string& path)
-    {
-        ObjFile file;
-        if (objParseFile(file, path.c_str()))
-        {
-            size_t index_count = file.f_size / 3;
-
-            std::vector<Vertex> vertices(index_count);
-
-            for (size_t i = 0; i < index_count; i++)
-            {
-                Vertex& v = vertices[i];
-
-                int vi = file.f[i * 3 + 0];
-                int vti = file.f[i * 3 + 1];
-                int vni = file.f[i * 3 + 2];
-
-                v.vx = file.v[vi * 3 + 0];
-                v.vy = file.v[vi * 3 + 1];
-                v.vz = file.v[vi * 3 + 2];
-
-                v.nx = vni < 0 ? 0.f : file.vn[vi * 3 + 0];
-                v.ny = vni < 0 ? 0.f : file.vn[vi * 3 + 1];
-                v.nz = vni < 0 ? 1.f : file.vn[vi * 3 + 2];
-
-                v.tu = vti < 0 ? 0.f : file.vt[vi * 3 + 0];
-                v.tv = vti < 0 ? 0.f : file.vt[vi * 3 + 2];
-            }
-
-            result.vertices = vertices;
-            result.indices.resize(index_count);
-
-            for (size_t i = 0; i < index_count; i++)
-                result.indices[i] = uint32_t(i);
-            return true;
-        }
-        return false;
-    }
-
-} // namespace el {
 
 int main(int argc, char** argv)
 {
@@ -359,7 +279,7 @@ int main(int argc, char** argv)
     GraphicsInputLayoutPtr input_layout;
 
     Mesh mesh;
-    EL_ASSERT(loadMesh(mesh, getResourcePath() + "bunny.obj"));
+    EL_ASSERT(loadMesh(mesh, getResourcePath() + "kitten.obj"));
 
     const uint32_t startVertice = 0;
     const uint32_t startIndice = 0;
@@ -482,6 +402,9 @@ int main(int argc, char** argv)
     mat4x4 mvp;
     mat4x4_ortho(mvp, -0.5f, 0.5f, -0.5f, 0.5f, 0.f, 1.f);
 
+    // mat4x4_perspective(proj, )
+    // (glm::radians(70.f), aspect, 0.01f)
+
     context[1]->setUniform("MVP", mvp);
 
     while (!glfwWindowShouldClose(windows[0]) &&
@@ -500,7 +423,7 @@ int main(int argc, char** argv)
             context[i]->beginRendering();
             // TODO: setPipeline etc;
             context[i]->setViewport(Viewport(0, 0, width, height));
-            context[i]->setVertexBuffer("vPosition", vertex_buffer, sizeof(Vertex), offsetof(Vertex, vx));
+            context[i]->setVertexBuffer("vPosition", vertex_buffer, sizeof(Vertex), offsetof(Vertex, x));
             context[i]->setVertexBuffer("vNormal", vertex_buffer, sizeof(Vertex), offsetof(Vertex, nx));
             context[i]->setVertexBuffer("vTexcoord", vertex_buffer, sizeof(Vertex), offsetof(Vertex, tu));
             context[i]->setIndexBuffer(index_buffer);
