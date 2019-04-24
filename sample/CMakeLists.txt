@@ -16,6 +16,8 @@ function(buildSample SAMPLE_NAME)
 
 	add_executable(${SAMPLE_NAME} ${HEADER_LIST} ${SOURCE_LIST} ${SHADERS} ${SHADER_HEADERS})
 	target_link_libraries(${SAMPLE_NAME} PRIVATE "lib3d")
+	target_link_libraries(${SAMPLE_NAME} PRIVATE "objparser")
+	target_link_libraries(${SAMPLE_NAME} PRIVATE "meshoptimizer")
 	set_target_properties(${SAMPLE_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
 	set_target_properties(${SAMPLE_NAME} PROPERTIES PROJECT_LABEL ${SAMPLE_NAME})
 	set_target_properties(${SAMPLE_NAME} PROPERTIES FOLDER "sample")

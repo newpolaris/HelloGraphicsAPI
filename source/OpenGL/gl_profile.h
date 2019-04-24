@@ -12,13 +12,13 @@ class GLProfileBusyWait final
 {
 public:
 
-	using time_point = std::chrono::high_resolution_clock::time_point;
+    using time_point = std::chrono::high_resolution_clock::time_point;
 
-	GLProfileBusyWait();
-	~GLProfileBusyWait();
+    GLProfileBusyWait();
+    ~GLProfileBusyWait();
 
-	void start();
-	void end();
+    void start();
+    void end();
 
     void create();
     void destroy();
@@ -26,11 +26,11 @@ public:
     void setDevice(const GraphicsDevicePtr& device);
     GraphicsDevicePtr getDevice();
 
-	void setName(std::string name);
-	const std::string& getName() const;
+    void setName(std::string name);
+    const std::string& getName() const;
 
-	float getCpuTime() const;
-	float getGpuTime() const;
+    float getCpuTime() const;
+    float getGpuTime() const;
 
 private:
 
@@ -39,11 +39,11 @@ private:
 
     bool _isSupportTimerQuery;
 
-	GLuint _query[2];
-	float _cpuTime, _gpuTime;
+    GLuint _query[2];
+    float _cpuTime, _gpuTime;
 
-	std::string _name;
-	time_point _cpuTimePoint[2];
+    std::string _name;
+    time_point _cpuTimePoint[2];
 
     GraphicsDeviceWeakPtr _device;
 };

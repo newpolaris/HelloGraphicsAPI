@@ -5,8 +5,8 @@
 using namespace el;
 
 GLTexture::GLTexture() : 
-	_textureID(0u), 
-	_target(0u)
+    _textureID(0u), 
+    _target(0u)
 {
 }
 
@@ -22,35 +22,35 @@ bool GLTexture::create(GraphicsTextureDesc desc)
     // glGetIntegerv(GL_MAX_TEXTURE_SIZE, &value);   //Returns 1 value
     // MaxTexture2DWidth = MaxTexture2DHeight = value;
 
-	_target = asTextureTarget(desc.getDim());
+    _target = asTextureTarget(desc.getDim());
 
-	GL_CHECK(glGenTextures(1, &_textureID));
-	if (_textureID == 0)
-		return false;
+    GL_CHECK(glGenTextures(1, &_textureID));
+    if (_textureID == 0)
+        return false;
 
-	EL_ASSERT(_target != 0);
-	EL_ASSERT(_textureID != 0);
+    EL_ASSERT(_target != 0);
+    EL_ASSERT(_textureID != 0);
 
-	GL_CHECK(glBindTexture(_target, _textureID));
+    GL_CHECK(glBindTexture(_target, _textureID));
 
-	const GLint border = 0;
+    const GLint border = 0;
 
     const GLint levels = desc.getLevels();
 
     // unsupport multi-level images
     EL_ASSERT(levels == 1);
-	const GLint level = 0;
+    const GLint level = 0;
 
     // https://stackoverflow.com/questions/34497195/difference-between-format-and-internalformat
-	GLint internalformat = asTextureInternalFormat(desc.getPixelFormat());
-	GLenum format = asTextureFormat(desc.getPixelFormat());
+    GLint internalformat = asTextureInternalFormat(desc.getPixelFormat());
+    GLenum format = asTextureFormat(desc.getPixelFormat());
 
-	GLenum type = asTextureType(desc.getPixelFormat());
+    GLenum type = asTextureType(desc.getPixelFormat());
 
-	uint32_t width = desc.getWidth();
-	uint32_t height = desc.getHeight();
+    uint32_t width = desc.getWidth();
+    uint32_t height = desc.getHeight();
 
-	const stream_t* stream = desc.getStream();
+    const stream_t* stream = desc.getStream();
 
     auto pixelAlignment = static_cast<GLint>(desc.getPixelAlignment());
 
@@ -59,7 +59,7 @@ bool GLTexture::create(GraphicsTextureDesc desc)
     if (oldPixelAlignment != pixelAlignment)
         GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, pixelAlignment));
 
-	GL_CHECK(glTexImage2D(_target, level, internalformat, width, height, border, format, type, stream));
+    GL_CHECK(glTexImage2D(_target, level, internalformat, width, height, border, format, type, stream));
 
     if (oldPixelAlignment != pixelAlignment)
         GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, oldPixelAlignment));
@@ -114,11 +114,11 @@ bool GLTexture::create(GraphicsTextureDesc desc)
         GL_CHECK(glTexParameterf(_target, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisoLevel));
 #endif
 
-	GL_CHECK(glBindTexture(_target, 0));
+    GL_CHECK(glBindTexture(_target, 0));
 
-	_textureDesc = std::move(desc);
+    _textureDesc = std::move(desc);
     
-	return true;
+    return true;
 }
 
 void GLTexture::destroy()
@@ -129,24 +129,24 @@ void GLTexture::destroy()
 
 void GLTexture::bind(GLuint unit) const
 {
-	EL_ASSERT(_textureID != 0u);
-	GL_CHECK(glActiveTexture(GL_TEXTURE0 + unit));
-	GL_CHECK(glBindTexture(_target, _textureID));
+    EL_ASSERT(_textureID != 0u);
+    GL_CHECK(glActiveTexture(GL_TEXTURE0 + unit));
+    GL_CHECK(glBindTexture(_target, _textureID));
 }
 
 void GLTexture::unbind(GLuint unit) const
 {
-	EL_ASSERT(_textureID != 0u);
-	GL_CHECK(glActiveTexture(GL_TEXTURE0 + unit));
-	GL_CHECK(glBindTexture(_target, 0));
+    EL_ASSERT(_textureID != 0u);
+    GL_CHECK(glActiveTexture(GL_TEXTURE0 + unit));
+    GL_CHECK(glBindTexture(_target, 0));
 }
 
 GLuint GLTexture::getTextureID() const
 {
-	return _textureID;
+    return _textureID;
 }
 
 const GraphicsTextureDesc& GLTexture::getTextureDesc() const
 {
-	return _textureDesc;
+    return _textureDesc;
 }

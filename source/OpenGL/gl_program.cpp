@@ -198,7 +198,6 @@ void GLProgram::setupActiveAttribute()
         attribute.count = asVariableComponentCount(type);
         attribute.type = asVariableComponentType(type);
 
-        // move is removed to support additional vector
         _activeAttributes.emplace(name, attribute);
 
         auto attrib = std::make_shared<GLVertexAttribute>(attribute);
@@ -238,7 +237,7 @@ void GLProgram::setUniform(const std::string& name, const mat4x4& m0)
     auto it = _activeUniforms.find(name);
     if (it == _activeUniforms.end())
     {
-        EL_ASSERT(false);
+        EL_TRACE("Can't find uniform '%s'\n", name.c_str());
         return;
     }
     auto& uniform = it->second;
@@ -250,7 +249,7 @@ void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& te
     auto it = _activeUniforms.find(name);
     if (it == _activeUniforms.end())
     {
-        EL_ASSERT(false);
+        EL_TRACE("Can't find uniform '%s'\n", name.c_str());
         return;
     }
     auto& uniform = it->second;
@@ -294,7 +293,7 @@ void GLProgram::setVertexBuffer(const std::string& name, const GraphicsDataPtr& 
     auto it = _activeAttributes.find(name);
     if (it == _activeAttributes.end())
     {
-        EL_ASSERT(false);
+        EL_TRACE("Can't find attributes '%s'\n", name.c_str());
         return;
     }
 

@@ -12,14 +12,23 @@ set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 add_subdirectory(glfw)
 set_target_properties(glfw PROPERTIES FOLDER "external")
 
-# GLAD
+# glad
 set(GLAD_DIR "${DEPENDENCIES_PATH}/glad")
 add_library("glad" "${GLAD_DIR}/src/glad.c")
 target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
 set_target_properties("glad" PROPERTIES FOLDER "external")
 
-# STB
+# stb
 set(STB_DIR "${DEPENDENCIES_PATH}/stb")
 add_library("stb" "${STB_DIR}/stb_image.cpp")
 target_include_directories("stb" PRIVATE "${STB_DIR}")
 set_target_properties("stb" PROPERTIES FOLDER "external")
+
+# objparser
+set(OBJPARSER_DIR "${DEPENDENCIES_PATH}/objparser")
+add_library("objparser" "${OBJPARSER_DIR}/objparser.cpp")
+target_include_directories("objparser" PRIVATE "${OBJPARSER_DIR}")
+set_target_properties("objparser" PROPERTIES FOLDER "external")
+
+add_subdirectory(meshoptimizer)
+set_target_properties(meshoptimizer PROPERTIES FOLDER "external")

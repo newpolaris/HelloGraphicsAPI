@@ -43,7 +43,7 @@ if(BUILD_METAL)
 
     set(RENDERER_MTL ${RENDERER_MTL_HEADER} ${RENDERER_MTL_SOURCE})
 
-	source_group("Metal" FILES ${RENDERER_OGL})
+    source_group("Metal" FILES ${RENDERER_OGL})
 endif()
 
 set(RENDERER_LIST ${RENDERER_CORE})

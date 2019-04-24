@@ -42,3 +42,26 @@ namespace el {
 #   define EL_ASSERT(_call) ((void)(_call))
 #   define EL_WARN(_cond, _format, ...) ((void)(_cond))
 #endif
+
+// TODO: move to somewhere
+#if defined(__cplusplus)
+#   if __cplusplus >= 201402
+#       define EL_DEPRECATED(x) [[deprecated(x)]]
+#   elif defined(_MSC_VER)
+#       if _MSC_VER > 1900
+#           define EL_DEPRECATED(x) [[deprecated(x)]]
+#       else
+#           define EL_DEPRECATED(x) __declspec(deprecated(x))
+#       endif // _MSC_VER > 1900
+#   endif
+#elif defined(__clang__)
+#   define EL_DEPRECATED(x) __attribute__((deprecated(x)))
+#elif defined(__GNUC__)
+#   if GCC_VERSION >= 40500
+#       define EL_DEPRECATED(x) __attribute__((deprecated(x)))
+#   else
+#       define EL_DEPRECATED(x) __attribute__((deprecated))
+#   endif
+#else
+#   define EL_DPRECATED(x) (void)(x)
+#endif

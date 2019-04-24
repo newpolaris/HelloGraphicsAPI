@@ -7,25 +7,25 @@
 
 namespace el {
 
-	class GLShader final : public GraphicsShader
-	{
-	public:
+    class GLShader final : public GraphicsShader
+    {
+    public:
 
-		GLShader();
-		~GLShader();
+        GLShader();
+        ~GLShader();
 
-		bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
-		void destroy();
+        bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
+        void destroy();
 
-		GLuint getID() const;
+        GLuint getID() const;
 
-		virtual const GraphicsShaderDesc& getDesc() const noexcept;
+        virtual const GraphicsShaderDesc& getDesc() const noexcept;
 
-	private:
+    private:
 
-		GLuint _id;
-		GraphicsShaderStageFlagBits _stage;
-		GraphicsShaderDesc _shaderDesc;
-	};
+        GLuint _id;
+        GraphicsShaderStageFlagBits _stage;
+        GraphicsShaderDesc _shaderDesc;
+    };
 
 } // namespace el {

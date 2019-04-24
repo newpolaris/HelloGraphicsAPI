@@ -191,30 +191,11 @@ namespace el {
 
 namespace el {
 
-#if 0
     struct Vertex
     {
-        float x, y, z;
+        float vx, vy, vz;
         float nx, ny, nz;
         float tu, tv;
-    };
-
-    bool LoadMesh()
-    {
-        ObjFile obj;
-        if (!objParseFile(obj, ""))
-            return false;
-
-        std::vector<Vertex> vertices;
-        Vertex v;
-        vertices[0] = v;;
-    }
-#endif
-
-    struct Vertex
-    {
-        vec2 pos;
-        vec3 color;
 
         static GraphicsInputBindings getBindingDescription() 
         {
@@ -232,41 +213,60 @@ namespace el {
 
         static GraphicsInputAttributes getAttributeDescription() 
         {
-            GraphicsInputAttributes attributeDescriptions(2);
+            GraphicsInputAttributes attributeDescriptions(3);
 
-#if 0
-            attributeDescriptions[0]._binding = 0;
-            attributeDescriptions[0]._location = 0;
-            attributeDescriptions[0]._format = VertexFormat::Float2;
-            attributeDescriptions[0]._offset = offsetof(Vertex, pos);
-
-            attributeDescriptions[1]._binding = 0;
-            attributeDescriptions[1]._location = 1;
-            attributeDescriptions[1]._format = VertexFormat::Float3;
-            attributeDescriptions[1]._offset = offsetof(Vertex, color);
-#endif
+            attributeDescriptions[0] = GraphicsInputAttribute(0, "vPosition", 0, VertexFormat::Float3, offsetof(Vertex, vx));
+            attributeDescriptions[1] = GraphicsInputAttribute(0, "vNormal", 1, VertexFormat::Float3, offsetof(Vertex, nx));
+            attributeDescriptions[2] = GraphicsInputAttribute(0, "vTexcoord", 2, VertexFormat::Float2, offsetof(Vertex, tu));
 
             return attributeDescriptions;
         }
     };
 
-    const std::vector<Vertex> vertices = {
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
+    struct Mesh
+    {
+        std::vector<Vertex> vertices;
+        std::vector<uint32_t> indices;
     };
 
-    const std::vector<uint16_t> indices = {
-        0, 2, 1, 0, 3, 2
-    };
+    bool loadMesh(Mesh& result, const std::string& path)
+    {
+        ObjFile file;
+        if (objParseFile(file, path.c_str()))
+        {
+            size_t index_count = file.f_size / 3;
 
-    const uint32_t startVertice = 0;
-    const uint32_t startIndice = 0;
-    const uint32_t startInstances = 0;
-    const uint32_t numVertices = vertices.size();
-    const uint32_t numIndices = indices.size();
-    const uint32_t numInstances = 1;
+            std::vector<Vertex> vertices(index_count);
+
+            for (size_t i = 0; i < index_count; i++)
+            {
+                Vertex& v = vertices[i];
+
+                int vi = file.f[i * 3 + 0];
+                int vti = file.f[i * 3 + 1];
+                int vni = file.f[i * 3 + 2];
+
+                v.vx = file.v[vi * 3 + 0];
+                v.vy = file.v[vi * 3 + 1];
+                v.vz = file.v[vi * 3 + 2];
+
+                v.nx = vni < 0 ? 0.f : file.vn[vi * 3 + 0];
+                v.ny = vni < 0 ? 0.f : file.vn[vi * 3 + 1];
+                v.nz = vni < 0 ? 1.f : file.vn[vi * 3 + 2];
+
+                v.tu = vti < 0 ? 0.f : file.vt[vi * 3 + 0];
+                v.tv = vti < 0 ? 0.f : file.vt[vi * 3 + 2];
+            }
+
+            result.vertices = vertices;
+            result.indices.resize(index_count);
+
+            for (size_t i = 0; i < index_count; i++)
+                result.indices[i] = uint32_t(i);
+            return true;
+        }
+        return false;
+    }
 
 } // namespace el {
 
@@ -358,6 +358,18 @@ int main(int argc, char** argv)
     GraphicsDataPtr index_buffer;
     GraphicsInputLayoutPtr input_layout;
 
+    Mesh mesh;
+    EL_ASSERT(loadMesh(mesh, getResourcePath() + "bunny.obj"));
+
+    const uint32_t startVertice = 0;
+    const uint32_t startIndice = 0;
+    const uint32_t startInstances = 0;
+    const uint32_t numVertices = mesh.vertices.size();
+    const uint32_t numIndices = mesh.indices.size();
+    const uint32_t numInstances = 1;
+    const stream_t* meshVertexData = (stream_t*)mesh.vertices.data();
+    const stream_t* meshIndexData = (stream_t*)mesh.indices.data();
+
     const ImageDataPtr image = ImageData::load(getResourcePath() + "miku.png");
     EL_ASSERT(image);
 
@@ -405,39 +417,33 @@ int main(int argc, char** argv)
 
         GraphicsDataDesc vertices_buffer_desc;
         vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
-        vertices_buffer_desc.setData((const stream_t*)vertices.data());
+        vertices_buffer_desc.setData(meshVertexData);
         vertices_buffer_desc.setElementSize(sizeof(Vertex));
-        vertices_buffer_desc.setNumElements(vertices.size());
+        vertices_buffer_desc.setNumElements(numVertices);
 
         vertex_buffer = device->createBuffer(vertices_buffer_desc);
 
         GraphicsDataDesc indices_buffer_desc;
         indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
-        indices_buffer_desc.setData((const stream_t*)indices.data());
-        indices_buffer_desc.setElementSize(sizeof(uint16_t));
-        indices_buffer_desc.setNumElements(indices.size());
+        indices_buffer_desc.setData(meshIndexData);
+        indices_buffer_desc.setElementSize(sizeof(uint32_t));
+        indices_buffer_desc.setNumElements(numIndices);
 
         index_buffer = device->createBuffer(indices_buffer_desc);
 
         GraphicsInputLayoutDesc input_layout_desc;
-        input_layout_desc.addAttribute(GraphicsInputAttribute(0, "vPos", 0, VertexFormat::Float2, 0));
-        input_layout_desc.addAttribute(GraphicsInputAttribute(0, "vCol", 1, VertexFormat::Float3, sizeof(vec2)));
-        input_layout_desc.addBinding(GraphicsInputBinding(0, sizeof(Vertex)));
-
+        input_layout_desc.setAttributes(Vertex::getAttributeDescription());
+        input_layout_desc.setBindings(Vertex::getBindingDescription());
         input_layout = device->createInputLayout(input_layout_desc);
     }
+
+    // TODO:
+    // context[0]->setInputLayout(input_layout);
+    // context[0]->setVertexBuffer(0, vertex_buffer);
 
     GraphicsContextPtr context[2];
     context[0] = device->createDeviceContext();
     context[0]->setProgram(program);
-#if 0
-    context[0]->setInputLayout(input_layout);
-    context[0]->setVertexBuffer(0, vertex_buffer);
-#else
-    context[0]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
-    context[0]->setVertexBuffer("vCol", vertex_buffer, sizeof(vertices[0]), sizeof(vec2));
-#endif
-    context[0]->setIndexBuffer(index_buffer);
 
     GLProfileBusyWait profile[2];
     profile[0].setName("window 0");
@@ -472,9 +478,6 @@ int main(int argc, char** argv)
     // need to be set up for each context
     context[1] = device->createDeviceContext();
     context[1]->setProgram(program);
-    context[1]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
-    context[1]->setVertexBuffer("vCol", vertex_buffer, sizeof(vertices[0]), sizeof(vec2));
-    context[1]->setIndexBuffer(index_buffer);
 
     mat4x4 mvp;
     mat4x4_ortho(mvp, -0.5f, 0.5f, -0.5f, 0.5f, 0.f, 1.f);
@@ -496,8 +499,11 @@ int main(int argc, char** argv)
 
             context[i]->beginRendering();
             // TODO: setPipeline etc;
-            context[i]->setProgram(program);
             context[i]->setViewport(Viewport(0, 0, width, height));
+            context[i]->setVertexBuffer("vPosition", vertex_buffer, sizeof(Vertex), offsetof(Vertex, vx));
+            context[i]->setVertexBuffer("vNormal", vertex_buffer, sizeof(Vertex), offsetof(Vertex, nx));
+            context[i]->setVertexBuffer("vTexcoord", vertex_buffer, sizeof(Vertex), offsetof(Vertex, tu));
+            context[i]->setIndexBuffer(index_buffer);
 
             // Shared bewteen context
             context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle, numIndices, startIndice);

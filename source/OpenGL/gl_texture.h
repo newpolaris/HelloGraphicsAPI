@@ -5,29 +5,29 @@
 
 namespace el
 {
-	class GLTexture final : public GraphicsTexture
-	{
-		public:
+    class GLTexture final : public GraphicsTexture
+    {
+        public:
 
-			GLTexture();
-			~GLTexture();
+            GLTexture();
+            ~GLTexture();
 
-			bool create(GraphicsTextureDesc desc);
-			void destroy();
+            bool create(GraphicsTextureDesc desc);
+            void destroy();
 
-			void bind(GLuint unit) const; 
-			void unbind(GLuint unit) const; 
+            void bind(GLuint unit) const; 
+            void unbind(GLuint unit) const; 
 
-			GLuint getTextureID() const;
+            GLuint getTextureID() const;
 
-			const GraphicsTextureDesc& getTextureDesc() const override;
+            const GraphicsTextureDesc& getTextureDesc() const override;
 
-		private:
+        private:
 
-			GLuint _textureID;
-			GLenum _target;
+            GLuint _textureID;
+            GLenum _target;
 
-			GraphicsTextureDesc _textureDesc;
-	};
+            GraphicsTextureDesc _textureDesc;
+    };
 } // namespace el
 
