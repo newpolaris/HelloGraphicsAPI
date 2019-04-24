@@ -115,10 +115,22 @@ void GLContext::setIndexBuffer(const GraphicsDataPtr& indexData)
     _program->setIndexBuffer(indexData);
 }
 
+void GLContext::setUniform(const std::string& name, float v0)
+{
+    EL_ASSERT(_program);
+    _program->setUniform(name, v0);
+}
+
 void GLContext::setUniform(const std::string& name, const vec3& v0)
 {
     EL_ASSERT(_program);
     _program->setUniform(name, v0);
+}
+
+void GLContext::setUniform(const std::string& name, const quat& q0)
+{
+    EL_ASSERT(_program);
+    _program->setUniform(name, q0);
 }
 
 void GLContext::setUniform(const std::string& name, const mat4x4& m0)

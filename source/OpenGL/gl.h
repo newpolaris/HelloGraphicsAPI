@@ -50,7 +50,7 @@ namespace gl {
 #    define GL_CHECK_RET(_call) _GL_CHECK_RET(_call)
 #else
 #    define GL_CHECK(_call) ((void)(_call))
-#    define GL_CHECK_RET(_call) ((void)(_call))
+#    define GL_CHECK_RET(_call) (_call)
 #endif
 
 #define _EMPTY_OUT_ 0

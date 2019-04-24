@@ -23,7 +23,7 @@ namespace el {
     {
         GLint location;
         GLenum type;
-        GLint size;
+        GLint count;
         GLuint unit;
         std::string name;
     };
@@ -54,7 +54,9 @@ namespace el {
 
         void apply() const;
 
+        void setUniform(const std::string& name, float v0);
         void setUniform(const std::string& name, const vec3& v0);
+        void setUniform(const std::string& name, const vec4& v0);
         void setUniform(const std::string& name, const mat4x4& m0);
         void setUniform(const std::string& name, const GraphicsTexturePtr& texture);
 

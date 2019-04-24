@@ -26,6 +26,8 @@
 #include <graphics_input_layout.h>
 
 #include <cstdio>
+#include <cmath>
+#include <random>
 
 #include <utility.h>
 #include <image.h>
@@ -187,6 +189,12 @@ namespace el {
 #endif
     }
 
+    float radians(float degrees)
+    {
+        const float pi = std::acos(-1.f);
+        return degrees * pi / 180.f;
+    }
+
 }
 
 
@@ -218,7 +226,7 @@ int main(int argc, char** argv)
 #endif
 
     GLFWwindow* windows[2];
-    windows[0] = glfwCreateWindow(800, 600, "First", NULL, NULL);
+    windows[0] = glfwCreateWindow(1024, 768, "First", NULL, NULL);
     if (!windows[0])
     {
         glfwTerminate();
@@ -278,17 +286,14 @@ int main(int argc, char** argv)
     GraphicsDataPtr index_buffer;
     GraphicsInputLayoutPtr input_layout;
 
-    Mesh mesh;
-    EL_ASSERT(loadMesh(mesh, getResourcePath() + "kitten.obj"));
-
-    const uint32_t startVertice = 0;
-    const uint32_t startIndice = 0;
-    const uint32_t startInstances = 0;
-    const uint32_t numVertices = mesh.vertices.size();
-    const uint32_t numIndices = mesh.indices.size();
-    const uint32_t numInstances = 1;
-    const stream_t* meshVertexData = (stream_t*)mesh.vertices.data();
-    const stream_t* meshIndexData = (stream_t*)mesh.indices.data();
+    std::vector<std::string> objfiles = {
+        "kitten.obj",
+        "rabbit.obj",
+        "wolf.obj",
+    };
+    Geometry geometry;
+    for (uint32_t i = 0; i < objfiles.size(); i++)
+        EL_ASSERT(LoadMesh(&geometry, getResourcePath() + objfiles[i]));
 
     const ImageDataPtr image = ImageData::load(getResourcePath() + "miku.png");
     EL_ASSERT(image);
@@ -337,17 +342,17 @@ int main(int argc, char** argv)
 
         GraphicsDataDesc vertices_buffer_desc;
         vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
-        vertices_buffer_desc.setData(meshVertexData);
+        vertices_buffer_desc.setData(geometry.getVertexData());
         vertices_buffer_desc.setElementSize(sizeof(Vertex));
-        vertices_buffer_desc.setNumElements(numVertices);
+        vertices_buffer_desc.setNumElements(geometry.getVertexCount());
 
         vertex_buffer = device->createBuffer(vertices_buffer_desc);
 
         GraphicsDataDesc indices_buffer_desc;
         indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
-        indices_buffer_desc.setData(meshIndexData);
+        indices_buffer_desc.setData(geometry.getIndexData());
         indices_buffer_desc.setElementSize(sizeof(uint32_t));
-        indices_buffer_desc.setNumElements(numIndices);
+        indices_buffer_desc.setNumElements(geometry.getIndexCount());
 
         index_buffer = device->createBuffer(indices_buffer_desc);
 
@@ -360,6 +365,26 @@ int main(int argc, char** argv)
     // TODO:
     // context[0]->setInputLayout(input_layout);
     // context[0]->setVertexBuffer(0, vertex_buffer);
+
+    std::default_random_engine eng {10};
+    std::uniform_real_distribution<float> urd(0, 1);
+    const uint32_t draw_count = 2000;
+    std::vector<MeshDraw> draws(draw_count);
+    for (uint32_t i = 0; i < draw_count; i++) {
+        vec3 axis;
+        axis[0] = urd(eng)*2 - 1;
+        axis[1] = urd(eng)*2 - 1;
+        axis[2] = urd(eng)*2 - 1;
+
+        const float angle = radians(urd(eng) * 90.f);
+
+        draws[i].translate[0] = urd(eng) * 20.f - 10.f;
+        draws[i].translate[1] = urd(eng) * 20.f - 10.f;
+        draws[i].translate[2] = urd(eng) * 20.f - 10.f;
+        draws[i].scale = urd(eng) + 0.5f;
+        quat_rotate(draws[i].orientation, angle, axis); 
+        draws[i].mesh_index = static_cast<uint32_t>(urd(eng) * geometry.meshes.size());
+    }
 
     GraphicsContextPtr context[2];
     context[0] = device->createDeviceContext();
@@ -399,16 +424,8 @@ int main(int argc, char** argv)
     context[1] = device->createDeviceContext();
     context[1]->setProgram(program);
 
-    mat4x4 mvp;
-    mat4x4_ortho(mvp, -0.5f, 0.5f, -0.5f, 0.5f, 0.f, 1.f);
-
-    // mat4x4_perspective(proj, )
-    // (glm::radians(70.f), aspect, 0.01f)
-
-    context[1]->setUniform("MVP", mvp);
-
-    while (!glfwWindowShouldClose(windows[0]) &&
-        !glfwWindowShouldClose(windows[1]))
+    while (!glfwWindowShouldClose(windows[0]) 
+        && !glfwWindowShouldClose(windows[1]))
     {
         int i;
         for (i = 0; i < 2; i++)
@@ -421,15 +438,30 @@ int main(int argc, char** argv)
             profile[i].start();
 
             context[i]->beginRendering();
+
+            mat4x4 project;
+            const float aspect = static_cast<float>(width) / height;
+            mat4x4_perspective(project, radians(70.f), aspect, 0.01f, 1000.f);
+            context[i]->setUniform("uProject", project);
+
             // TODO: setPipeline etc;
             context[i]->setViewport(Viewport(0, 0, width, height));
-            context[i]->setVertexBuffer("vPosition", vertex_buffer, sizeof(Vertex), offsetof(Vertex, x));
-            context[i]->setVertexBuffer("vNormal", vertex_buffer, sizeof(Vertex), offsetof(Vertex, nx));
-            context[i]->setVertexBuffer("vTexcoord", vertex_buffer, sizeof(Vertex), offsetof(Vertex, tu));
             context[i]->setIndexBuffer(index_buffer);
+            for (uint32_t k = 0; k < draws.size(); k++)
+            {
+                const auto& mesh = geometry.meshes[draws[i].mesh_index];
 
-            // Shared bewteen context
-            context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle, numIndices, startIndice);
+                context[i]->setVertexBuffer("vPosition", vertex_buffer, sizeof(Vertex), offsetof(Vertex, x) + mesh.vertexOffset);
+                context[i]->setVertexBuffer("vNormal", vertex_buffer, sizeof(Vertex), offsetof(Vertex, nx) + mesh.vertexOffset);
+                context[i]->setVertexBuffer("vTexcoord", vertex_buffer, sizeof(Vertex), offsetof(Vertex, tu) + mesh.vertexOffset);
+
+                context[i]->setUniform("uScale", draws[k].scale);
+                context[i]->setUniform("uTranslate", draws[k].translate);
+                context[i]->setUniform("uOrientation", draws[k].orientation);
+
+                // Shared bewteen context
+                context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle, mesh.indexCount, mesh.indexOffset);
+            }
 
             profile[i].end();
             context[i]->endRendering();

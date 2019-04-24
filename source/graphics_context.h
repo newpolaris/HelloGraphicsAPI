@@ -22,7 +22,9 @@ namespace el {
         virtual void setVertexBuffer(const std::string& name, const GraphicsDataPtr& vertexData, uint32_t stride, uint32_t offset) = 0;
         virtual void setVertexBuffer(uint32_t binding, const GraphicsDataPtr& vertexData, uint32_t offset = 0) = 0;
         virtual void setIndexBuffer(const GraphicsDataPtr& indexData) = 0;
+        virtual void setUniform(const std::string& name, float v0) = 0;
         virtual void setUniform(const std::string& name, const vec3& v0) = 0;
+        virtual void setUniform(const std::string& name, const quat& q0) = 0;
         virtual void setUniform(const std::string& name, const mat4x4& m0) = 0;
         virtual void setInputLayout(const GraphicsInputLayoutPtr& inputLayout) = 0;
 

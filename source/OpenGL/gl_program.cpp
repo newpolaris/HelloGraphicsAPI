@@ -156,8 +156,8 @@ void GLProgram::setupActiveUniform()
         uniform.name = name;
         uniform.location = location;
         uniform.unit = 0;
-        uniform.type = type;
-        uniform.size = size;
+        uniform.type = asVariableComponentType(type);
+        uniform.count = asVariableComponentCount(type);;
 
         if (type == GL_SAMPLER_1D ||
             type == GL_SAMPLER_2D ||
@@ -220,6 +220,18 @@ void GLProgram::setUniform(GLint location, const mat4x4& m0)
     GL_CHECK(glUniformMatrix4fv(location, 1, GL_FALSE, (const GLfloat*)m0));
 }
 
+void GLProgram::setUniform(const std::string& name, float v0)
+{
+    auto it = _activeUniforms.find(name);
+    if (it == _activeUniforms.end())
+    {
+        EL_TRACE("Can't find uniform '%s'\n", name.c_str());
+        return;
+    }
+    auto& uniform = it->second;
+    GL_CHECK(glUniform1f(uniform.location, v0));
+}
+
 void GLProgram::setUniform(const std::string& name, const vec3& v0)
 {
     auto it = _activeUniforms.find(name);
@@ -229,7 +241,19 @@ void GLProgram::setUniform(const std::string& name, const vec3& v0)
         return;
     }
     auto& uniform = it->second;
-    setUniform(uniform.location, v0);
+    GL_CHECK(glUniform3fv(uniform.location, 1, v0));
+}
+
+void GLProgram::setUniform(const std::string& name, const vec4& v0)
+{
+    auto it = _activeUniforms.find(name);
+    if (it == _activeUniforms.end())
+    {
+        EL_TRACE("Can't find uniform '%s'\n", name.c_str());
+        return;
+    }
+    auto& uniform = it->second;
+    GL_CHECK(glUniform4fv(uniform.location, 1, v0));
 }
 
 void GLProgram::setUniform(const std::string& name, const mat4x4& m0)
@@ -241,7 +265,7 @@ void GLProgram::setUniform(const std::string& name, const mat4x4& m0)
         return;
     }
     auto& uniform = it->second;
-    setUniform(uniform.location, m0);
+    GL_CHECK(glUniformMatrix4fv(uniform.location, 1, GL_FALSE, (const GLfloat*)m0));
 }
 
 void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& texture)
