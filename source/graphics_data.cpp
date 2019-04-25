@@ -41,7 +41,7 @@ void GraphicsDataDesc::setNumElements(size_t numElements)
     _numElements = numElements;
 }
 
-size_t GraphicsDataDesc::getNumElements() const
+size_t GraphicsDataDesc::getElementCount() const
 {
     return _numElements;
 }

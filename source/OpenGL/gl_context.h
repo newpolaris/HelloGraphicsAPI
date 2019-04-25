@@ -48,9 +48,9 @@ namespace el {
     private:
 
         size_t _indexSize;
-        size_t _numIndices;
+        size_t _indexCount;
         size_t _vertexSize;
-        size_t _numVertices;
+        size_t _vertexCount;
         Viewport _viewport;
         GLProgramPtr _program;
         GLVertexBuffers _vertexBuffers;

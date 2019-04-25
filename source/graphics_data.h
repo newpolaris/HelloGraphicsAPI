@@ -16,7 +16,7 @@ namespace el {
         streamsize_t getDataSize() const;
 
         void setNumElements(size_t numElements);
-        size_t getNumElements() const;
+        size_t getElementCount() const;
 
         void setElementSize(size_t elementSize);
         size_t getElementSize() const;

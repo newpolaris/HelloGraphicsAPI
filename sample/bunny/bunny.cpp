@@ -209,7 +209,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-#elif 0 // COMPATIBILITY MODE
+#elif 1 // COMPATIBILITY MODE
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
@@ -383,7 +383,7 @@ int main(int argc, char** argv)
         draws[i].translate[2] = urd(eng) * 20.f - 10.f;
         draws[i].scale = urd(eng) + 0.5f;
         quat_rotate(draws[i].orientation, angle, axis); 
-        draws[i].mesh_index = static_cast<uint32_t>(urd(eng) * geometry.meshes.size());
+        draws[i].meshIndex = static_cast<uint32_t>(urd(eng) * geometry.meshes.size());
     }
 
     GraphicsContextPtr context[2];
@@ -447,20 +447,20 @@ int main(int argc, char** argv)
             // TODO: setPipeline etc;
             context[i]->setViewport(Viewport(0, 0, width, height));
             context[i]->setIndexBuffer(index_buffer);
-            for (uint32_t k = 0; k < draws.size(); k++)
+            for (auto& draw : draws)
             {
-                const auto& mesh = geometry.meshes[draws[i].mesh_index];
+                const auto& mesh = geometry.meshes[draw.meshIndex];
+                const uint32_t vertexOffsetInByte = mesh.vertexOffset * sizeof(Vertex);
+                context[i]->setVertexBuffer("vPosition", vertex_buffer, sizeof(Vertex), offsetof(Vertex, x));
+                context[i]->setVertexBuffer("vNormal", vertex_buffer, sizeof(Vertex), offsetof(Vertex, nx));
+                context[i]->setVertexBuffer("vTexcoord", vertex_buffer, sizeof(Vertex), offsetof(Vertex, tu));
 
-                context[i]->setVertexBuffer("vPosition", vertex_buffer, sizeof(Vertex), offsetof(Vertex, x) + mesh.vertexOffset);
-                context[i]->setVertexBuffer("vNormal", vertex_buffer, sizeof(Vertex), offsetof(Vertex, nx) + mesh.vertexOffset);
-                context[i]->setVertexBuffer("vTexcoord", vertex_buffer, sizeof(Vertex), offsetof(Vertex, tu) + mesh.vertexOffset);
-
-                context[i]->setUniform("uScale", draws[k].scale);
-                context[i]->setUniform("uTranslate", draws[k].translate);
-                context[i]->setUniform("uOrientation", draws[k].orientation);
+                context[i]->setUniform("uScale", draw.scale);
+                context[i]->setUniform("uTranslate", draw.translate);
+                context[i]->setUniform("uOrientation", draw.orientation);
 
                 // Shared bewteen context
-                context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle, mesh.indexCount, mesh.indexOffset);
+                context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle, mesh.indexCount, mesh.indexOffset, mesh.vertexOffset);
             }
 
             profile[i].end();

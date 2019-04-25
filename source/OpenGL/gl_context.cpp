@@ -12,9 +12,9 @@ using namespace el;
 
 GLContext::GLContext() :
     _indexSize(0u),
-    _numIndices(0u),
+    _indexCount(0u),
     _vertexSize(0u),
-    _numVertices(0u)
+    _vertexCount(0u)
 {
 }
 
@@ -93,6 +93,8 @@ void GLContext::setTexture(const std::string& name, const GraphicsTexturePtr& te
 void GLContext::setVertexBuffer(const std::string& name, const GraphicsDataPtr& vertexData, uint32_t stride, uint32_t offset)
 {
     EL_ASSERT(_program);
+    _vertexSize = vertexData->getDesc().getElementSize();
+    _vertexCount = vertexData->getDesc().getElementCount();
     _program->setVertexBuffer(name, vertexData, stride, offset);
 }
 
@@ -100,6 +102,8 @@ void GLContext::setVertexBuffer(uint32_t binding, const GraphicsDataPtr& vertexD
 {
     EL_ASSERT(vertexData);
     EL_ASSERT(_vertexBuffers.size() > binding);
+    _vertexSize = vertexData->getDesc().getElementSize();
+    _vertexCount = vertexData->getDesc().getElementCount();
     _vertexBuffers[binding] = GLVertexBuffer(vertexData, offset);
 }
 
@@ -109,8 +113,8 @@ void GLContext::setIndexBuffer(const GraphicsDataPtr& indexData)
     EL_ASSERT(indexData);
 
     _indexSize = indexData->getDesc().getElementSize();
-    _numIndices = indexData->getDesc().getNumElements();
-    EL_ASSERT(_numIndices >= 0);
+    _indexCount = indexData->getDesc().getElementCount();
+    EL_ASSERT(_indexCount >= 0);
     EL_ASSERT(_indexSize > 0);
     _program->setIndexBuffer(indexData);
 }
@@ -203,7 +207,7 @@ void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount
     bindVertexBuffers(_vertexBuffers);
 
     const GLenum indexType = getIndexType(_indexSize);
-    EL_ASSERT(indexCount + startIndexLocation <= _numIndices); 
+    EL_ASSERT(indexCount + startIndexLocation <= _indexCount); 
 
     GLenum mode = asPrimitiveType(primitive);
     const GLvoid* offset = reinterpret_cast<GLvoid*>(startIndexLocation);
@@ -216,14 +220,14 @@ void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount
     bindVertexBuffers(_vertexBuffers);
 
     const GLenum indexType = getIndexType(_indexSize);
-    EL_ASSERT(indexCount + startIndexLocation <= _numIndices); 
-    EL_ASSERT(baseVertexLocation <= int32_t(_numVertices));
+    EL_ASSERT(indexCount + startIndexLocation <= _indexCount); 
+    EL_ASSERT(baseVertexLocation <= int32_t(_vertexCount));
 
     GLenum mode = asPrimitiveType(primitive);
-    const GLvoid* indices = reinterpret_cast<GLvoid*>(startIndexLocation);
+    const GLvoid* offset = reinterpret_cast<GLvoid*>(startIndexLocation);
 
     // since Core 3.2 or requires ARB_draw_elements_base_vertex
-    GL_CHECK(glDrawElementsBaseVertex(mode, indexCount, GL_UNSIGNED_INT, indices, baseVertexLocation));
+    GL_CHECK(glDrawElementsBaseVertex(mode, indexCount, indexType, offset, baseVertexLocation));
 }
 
 void GLContext::drawInstanced(GraphicsPrimitiveType primitive, uint32_t vertexCountPerInstance, uint32_t instanceCount,

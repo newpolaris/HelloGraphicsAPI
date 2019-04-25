@@ -33,8 +33,8 @@ namespace el {
     struct Mesh
     {
         uint32_t vertexOffset;
-        uint32_t indexOffset;
         uint32_t vertexCount;
+        uint32_t indexOffset;
         uint32_t indexCount;
     };
 
@@ -43,7 +43,7 @@ namespace el {
         vec3 translate;
         float scale;
         quat orientation;
-        uint32_t mesh_index;
+        uint32_t meshIndex;
     };
 
     struct Geometry

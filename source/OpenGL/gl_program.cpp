@@ -10,6 +10,9 @@
 #include <algorithm>
 
 namespace el {
+
+    static const bool g_isQuiet = true;
+
     namespace gl {
         namespace program {
             typedef GLuint Handle;
@@ -225,7 +228,7 @@ void GLProgram::setUniform(const std::string& name, float v0)
     auto it = _activeUniforms.find(name);
     if (it == _activeUniforms.end())
     {
-        EL_TRACE("Can't find uniform '%s'\n", name.c_str());
+        EL_WARN_IF(!g_isQuiet, "Can't find uniform '%s'\n", name.c_str());
         return;
     }
     auto& uniform = it->second;
@@ -237,7 +240,7 @@ void GLProgram::setUniform(const std::string& name, const vec3& v0)
     auto it = _activeUniforms.find(name);
     if (it == _activeUniforms.end())
     {
-        EL_TRACE("Can't find uniform '%s'\n", name.c_str());
+        EL_WARN_IF(!g_isQuiet, "Can't find uniform '%s'\n", name.c_str());
         return;
     }
     auto& uniform = it->second;
@@ -249,7 +252,7 @@ void GLProgram::setUniform(const std::string& name, const vec4& v0)
     auto it = _activeUniforms.find(name);
     if (it == _activeUniforms.end())
     {
-        EL_TRACE("Can't find uniform '%s'\n", name.c_str());
+        EL_WARN_IF(!g_isQuiet, "Can't find uniform '%s'\n", name.c_str());
         return;
     }
     auto& uniform = it->second;
@@ -261,7 +264,7 @@ void GLProgram::setUniform(const std::string& name, const mat4x4& m0)
     auto it = _activeUniforms.find(name);
     if (it == _activeUniforms.end())
     {
-        EL_TRACE("Can't find uniform '%s'\n", name.c_str());
+        EL_WARN_IF(!g_isQuiet, "Can't find uniform '%s'\n", name.c_str());
         return;
     }
     auto& uniform = it->second;
@@ -273,7 +276,7 @@ void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& te
     auto it = _activeUniforms.find(name);
     if (it == _activeUniforms.end())
     {
-        EL_TRACE("Can't find uniform '%s'\n", name.c_str());
+        EL_WARN_IF(!g_isQuiet, "Can't find uniform '%s'\n", name.c_str());
         return;
     }
     auto& uniform = it->second;
@@ -317,7 +320,7 @@ void GLProgram::setVertexBuffer(const std::string& name, const GraphicsDataPtr& 
     auto it = _activeAttributes.find(name);
     if (it == _activeAttributes.end())
     {
-        EL_TRACE("Can't find attributes '%s'\n", name.c_str());
+        EL_WARN_IF(!g_isQuiet, "Can't find attributes '%s'\n", name.c_str());
         return;
     }
 
