@@ -24,6 +24,24 @@ GLContext::~GLContext()
 
 bool GLContext::create()
 {
+    // TODO:
+    glClearDepth(1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearStencil(0);
+
+    glViewport(0, 0, 0, 0);
+
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LEQUAL);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+
+
     // TODO: Better?
 #if 0
     if (GLEW_ARB_vertex_array_object)
@@ -57,6 +75,8 @@ void GLContext::destory()
 
 void GLContext::beginRendering()
 {
+    // TODO:
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLContext::endRendering()
@@ -210,8 +230,8 @@ void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount
     EL_ASSERT(indexCount + startIndexLocation <= _indexCount); 
 
     GLenum mode = asPrimitiveType(primitive);
-    const GLvoid* offset = reinterpret_cast<GLvoid*>(startIndexLocation);
-    GL_CHECK(glDrawElements(mode, indexCount, indexType, offset));
+    const GLvoid* offsetInByte = reinterpret_cast<GLvoid*>(startIndexLocation * _indexSize);
+    GL_CHECK(glDrawElements(mode, indexCount, indexType, offsetInByte));
 }
 
 void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
@@ -224,10 +244,10 @@ void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount
     EL_ASSERT(baseVertexLocation <= int32_t(_vertexCount));
 
     GLenum mode = asPrimitiveType(primitive);
-    const GLvoid* offset = reinterpret_cast<GLvoid*>(startIndexLocation);
+    const GLvoid* offsetInByte = reinterpret_cast<GLvoid*>(startIndexLocation * _indexSize);
 
     // since Core 3.2 or requires ARB_draw_elements_base_vertex
-    GL_CHECK(glDrawElementsBaseVertex(mode, indexCount, indexType, offset, baseVertexLocation));
+    GL_CHECK(glDrawElementsBaseVertex(mode, indexCount, indexType, offsetInByte, baseVertexLocation));
 }
 
 void GLContext::drawInstanced(GraphicsPrimitiveType primitive, uint32_t vertexCountPerInstance, uint32_t instanceCount,

@@ -366,6 +366,8 @@ int main(int argc, char** argv)
     // context[0]->setInputLayout(input_layout);
     // context[0]->setVertexBuffer(0, vertex_buffer);
 
+    const float fNear = 0.1f;
+    const float fFar = 1000.f;
     std::default_random_engine eng {10};
     std::uniform_real_distribution<float> urd(0, 1);
     const uint32_t draw_count = 2000;
@@ -380,7 +382,7 @@ int main(int argc, char** argv)
 
         draws[i].translate[0] = urd(eng) * 20.f - 10.f;
         draws[i].translate[1] = urd(eng) * 20.f - 10.f;
-        draws[i].translate[2] = urd(eng) * 20.f - 10.f;
+        draws[i].translate[2] = urd(eng) * -20.f - fNear;
         draws[i].scale = urd(eng) + 0.5f;
         quat_rotate(draws[i].orientation, angle, axis); 
         draws[i].meshIndex = static_cast<uint32_t>(urd(eng) * geometry.meshes.size());
@@ -441,7 +443,7 @@ int main(int argc, char** argv)
 
             mat4x4 project;
             const float aspect = static_cast<float>(width) / height;
-            mat4x4_perspective(project, radians(70.f), aspect, 0.01f, 1000.f);
+            mat4x4_perspective(project, radians(70.f), aspect, fNear, fFar);
             context[i]->setUniform("uProject", project);
 
             // TODO: setPipeline etc;
