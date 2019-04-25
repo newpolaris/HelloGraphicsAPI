@@ -27,4 +27,9 @@ const GraphicsProgramDesc& MTLProgram::getProgramDesc() const
     return _programDesc;
 }
 
+const GraphicsVertexAttributes& MTLProgram::getVertexAttributes() const
+{
+    return _vertexAttributes;
+}
+
 #endif // #if EL_PLAT_APPLE

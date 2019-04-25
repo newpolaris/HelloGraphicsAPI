@@ -288,13 +288,14 @@ void GLProgram::setUniform(const std::string& name, const GraphicsTexturePtr& te
 
 void GLProgram::setVertexBuffer(const GraphicsDataPtr& buffer)
 {
+#if 0
     auto& bindings = _inputLayout->getDesc().getBindings();
 
     auto glBuffer = std::static_pointer_cast<GLBuffer>(buffer);
     if (glBuffer != nullptr)
         glBuffer->bind();
 
-#if 0
+
     auto& desc = _inputLayout->getDesc();
     auto& bindings = desc.getBindings()[binding];
     for (auto& location : desc.getAttributes()[binding])

@@ -27,7 +27,7 @@ namespace el {
         void setTexture(const std::string& name, const GraphicsTexturePtr& texture) override;
         [[deprecated]]
         void setVertexBuffer(const std::string& name, const GraphicsDataPtr& vertexData, uint32_t stride, uint32_t offset) override;
-        void setVertexBuffer(uint32_t binding, const GraphicsDataPtr& vertexData, uint32_t offset = 0);
+        void setVertexBuffer(uint32_t binding, const GraphicsDataPtr& vertexData, uint32_t offset = 0) override;
         void setIndexBuffer(const GraphicsDataPtr& indexData) override;
         void setUniform(const std::string& name, float v0) override;
         void setUniform(const std::string& name, const vec3& v0) override;

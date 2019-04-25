@@ -31,4 +31,7 @@ target_include_directories("objparser" PRIVATE "${OBJPARSER_DIR}")
 set_target_properties("objparser" PROPERTIES FOLDER "external")
 
 add_subdirectory(meshoptimizer)
+if(APPLE)
+    target_compile_options(meshoptimizer PRIVATE -Wno-comma)
+endif(APPLE)
 set_target_properties(meshoptimizer PROPERTIES FOLDER "external")

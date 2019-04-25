@@ -40,7 +40,8 @@ private:
     bool _isSupportTimerQuery;
 
     GLuint _query[2];
-    float _cpuTime, _gpuTime;
+    float _cpuTime;
+    float _gpuTime;
 
     std::string _name;
     time_point _cpuTimePoint[2];

@@ -187,15 +187,15 @@ void GLContext::setInputLayout(const GraphicsInputLayoutPtr& inputLayout)
                 EL_ASSERT(attribSize == vertexAttrbSize);
 
                 attribProgramLocation = attrib->location;
-                uint32_t binding = inputAttrib.getBinding();
+                // uint32_t binding = inputAttrib.getBinding();
                 break;
             }
         }
         if (attribProgramLocation != GL_INVALID_VALUE)
         {
-            attrib->count;
-            attrib->location;
-            attrib->type;
+            //attrib->count;
+            //attrib->location;
+            //attrib->type;
         }
     }
 

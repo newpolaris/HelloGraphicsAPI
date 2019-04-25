@@ -24,10 +24,12 @@ namespace el {
         void use() const;
 
         const GraphicsProgramDesc& getProgramDesc() const override;
+        const GraphicsVertexAttributes& getVertexAttributes() const override;
 
     private:
 
         GraphicsProgramDesc _programDesc;
+        GraphicsVertexAttributes _vertexAttributes;
     };
 
 } // namespace el {

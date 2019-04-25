@@ -2,11 +2,11 @@
 
 using namespace el;
 
-GLProfileBusyWait::GLProfileBusyWait() : 
-    _cpuTime(0.0), 
-    _gpuTime(0.0),
+GLProfileBusyWait::GLProfileBusyWait() :
+    _fGetQueryObjectui64v(nullptr),
     _isSupportTimerQuery(false),
-    _fGetQueryObjectui64v(nullptr)
+    _cpuTime(0.0), 
+    _gpuTime(0.0)
 {
     _query[0] = 0;
     _query[1] = 0;

@@ -4,25 +4,27 @@
 
 #if EL_PLAT_APPLE
 
-#include "graphics_buffer.h"
+#include <graphics_data.h>
 
 namespace el {
 
-    class MTLBuffer final : public GraphicsBuffer
+    class MTLBuffer final : public GraphicsData
     {
     public:
 
         MTLBuffer();
         ~MTLBuffer();
 
-        bool create(GraphicsBufferDesc desc) override;
+        bool create(GraphicsDataDesc desc) override;
         void destroy();
 
         void bind() const;
+        
+        const GraphicsDataDesc& getDesc() const override;
 
     private:
 
-        GraphicsBufferDesc _desc;
+        GraphicsDataDesc _desc;
     };
 
 } // namespace el {

@@ -7,7 +7,8 @@
 #include "mtl_shader.h"
 #include "mtl_texture.h"
 #include "mtl_buffer.h"
-#include "mtl_device_context.h"
+#include "mtl_context.h"
+#include "mtl_input_layout.h"
 
 using namespace el;
 
@@ -48,7 +49,7 @@ GraphicsTexturePtr MTLDevice::createTexture(GraphicsTextureDesc desc)
 	return nullptr;
 }
 
-GraphicsBufferPtr MTLDevice::createBuffer(GraphicsBufferDesc desc)
+GraphicsDataPtr MTLDevice::createBuffer(GraphicsDataDesc desc)
 {
 	auto buffer = std::make_shared<MTLBuffer>();
     if (!buffer) return nullptr;
@@ -57,9 +58,20 @@ GraphicsBufferPtr MTLDevice::createBuffer(GraphicsBufferDesc desc)
 	return nullptr;
 }
 
-GraphicsDeviceContextPtr MTLDevice::createDeviceContext()
+GraphicsInputLayoutPtr MTLDevice::createInputLayout(GraphicsInputLayoutDesc desc)
 {
-	auto deviceContext = std::make_shared<MTLDeviceContext>();
+    auto inputLayout = std::make_shared<MTLInputLayout>();
+    if (!inputLayout)
+        return nullptr;
+    inputLayout->setDevice(shared_from_this());
+    if (!inputLayout->create(std::move(desc)))
+        return inputLayout;
+    return nullptr;
+}
+
+GraphicsContextPtr MTLDevice::createDeviceContext()
+{
+	auto deviceContext = std::make_shared<MTLContext>();
     if (!deviceContext)
         return nullptr;
     deviceContext->setDevice(shared_from_this());

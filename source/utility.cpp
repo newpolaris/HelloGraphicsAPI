@@ -18,7 +18,7 @@ std::unique_ptr<char[]> el::fileread(const char* filename)
     fclose(file);
     if (count != size)
         return nullptr;
-    return std::move(data);
+    return data;
 }
 
 std::unique_ptr<char[]> el::fstreamread(const char* filename)

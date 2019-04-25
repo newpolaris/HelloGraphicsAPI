@@ -6,5 +6,5 @@ namespace el {
 
     typedef std::shared_ptr<class MTLDevice> MetalDevicePtr;
     typedef std::weak_ptr<class MTLDevice> MetalDeviceWeakPtr;
-    typedef std::shared_ptr<class MTLDeviceContext> MetalDeviceContextPtr;
+    typedef std::shared_ptr<class MTLContext> MetalDeviceContextPtr;
 };

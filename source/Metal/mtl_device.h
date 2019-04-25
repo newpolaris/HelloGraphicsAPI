@@ -18,8 +18,9 @@ namespace el {
 		GraphicsProgramPtr createProgram(GraphicsProgramDesc desc) override;
 		GraphicsShaderPtr createShader(GraphicsShaderDesc desc) override;
 		GraphicsTexturePtr createTexture(GraphicsTextureDesc desc) override;
-		GraphicsBufferPtr createBuffer(GraphicsBufferDesc desc) override;
-        GraphicsDeviceContextPtr createDeviceContext() override;
+		GraphicsDataPtr createBuffer(GraphicsDataDesc desc) override;
+        GraphicsInputLayoutPtr createInputLayout(GraphicsInputLayoutDesc desc) override;
+        GraphicsContextPtr createDeviceContext() override;
 
         mtlpp::Device& getDevice();
         mtlpp::CommandQueue& getCommandQueue();

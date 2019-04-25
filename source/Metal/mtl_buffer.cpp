@@ -14,7 +14,7 @@ MTLBuffer::~MTLBuffer()
 {
 }
 
-bool MTLBuffer::create(GraphicsBufferDesc desc)
+bool MTLBuffer::create(GraphicsDataDesc desc)
 {
     _desc = std::move(desc);
 
@@ -27,6 +27,11 @@ void MTLBuffer::destroy()
 
 void MTLBuffer::bind() const
 {
+}
+
+const GraphicsDataDesc& MTLBuffer::getDesc() const
+{
+    return _desc;
 }
 
 #endif // #if EL_PLAT_APPLE

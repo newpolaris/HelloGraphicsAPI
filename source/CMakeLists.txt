@@ -27,7 +27,7 @@ if(APPLE)
 endif()
 
 if(BUILD_OPENGL)
-	find_package(OpenGL REQUIRED)
+    find_package(OpenGL REQUIRED)
 
     file(GLOB RENDERER_OGL_HEADER "OpenGL/*.h")
     file(GLOB RENDERER_OGL_SOURCE "OpenGL/*.cpp")
@@ -43,12 +43,18 @@ if(BUILD_METAL)
 
     set(RENDERER_MTL ${RENDERER_MTL_HEADER} ${RENDERER_MTL_SOURCE})
 
-    source_group("Metal" FILES ${RENDERER_OGL})
+    source_group("Metal" FILES ${RENDERER_MTL})
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
+        -framework AppKit \
+        -framework Metal \
+        -framework MetalKit \
+        -framework ModelIO")
 endif()
 
 set(RENDERER_LIST ${RENDERER_CORE})
 
-if (BUILD_OPENGL)
+if(BUILD_OPENGL)
     set(RENDERER_LIST ${RENDERER_LIST} ${RENDERER_OGL})
 endif()
 
