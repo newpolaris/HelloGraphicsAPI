@@ -17,42 +17,42 @@ namespace el
     
     const char shadersSrc[] = R"""(
 #include <metal_stdlib>
-    using namespace metal;
+using namespace metal;
     
-    typedef struct
-    {
-        packed_float3 position;
-        packed_float2 texcoord;
-    } vertex_t;
-    
-    typedef struct
-    {
-        float4 clipSpacePosition [[position]];
-        float2 textureCoordinate;
-    } RasterizerData;
-    
-    vertex RasterizerData vertFunc(
-                                   const device vertex_t* vertexArray [[buffer(0)]],
-                                   unsigned int vID[[vertex_id]])
-    {
-        RasterizerData data;
-        data.clipSpacePosition = float4(vertexArray[vID].position, 1.0);
-        data.textureCoordinate = vertexArray[vID].texcoord;
-        return data;
-    }
-    
-    fragment half4 fragFunc(
-                            RasterizerData in [[stage_in]],
-                            texture2d<half> colorTexture [[texture(0)]])
-    {
-        constexpr sampler textureSampler (mag_filter::nearest,
-                                          min_filter::nearest);
-        // Sample the texture to obtain a color
-        const half4 colorSample = colorTexture.sample(textureSampler, in.textureCoordinate);
-        
-        // We return the color of the texture
-        return colorSample;
-    }
+typedef struct
+{
+	packed_float3 position;
+	packed_float2 texcoord;
+} vertex_t;
+
+typedef struct
+{
+	float4 clipSpacePosition [[position]];
+	float2 textureCoordinate;
+} RasterizerData;
+
+vertex RasterizerData vertFunc(
+							   const device vertex_t* vertexArray [[buffer(0)]],
+							   unsigned int vID[[vertex_id]])
+{
+	RasterizerData data;
+	data.clipSpacePosition = float4(vertexArray[vID].position, 1.0);
+	data.textureCoordinate = vertexArray[vID].texcoord;
+	return data;
+}
+
+fragment half4 fragFunc(
+						RasterizerData in [[stage_in]],
+						texture2d<half> colorTexture [[texture(0)]])
+{
+	constexpr sampler textureSampler (mag_filter::nearest,
+									  min_filter::nearest);
+	// Sample the texture to obtain a color
+	const half4 colorSample = colorTexture.sample(textureSampler, in.textureCoordinate);
+	
+	// We return the color of the texture
+	return colorSample;
+}
     )""";
     
     // AAPLVertex improve;
@@ -84,13 +84,6 @@ namespace el
         fragmentShader = g_device->createShader(fragmentDesc);
         
 #if 0
-        ns::Error error;
-        mtlpp::Library library = g_device.NewLibrary(shadersSrc, mtlpp::CompileOptions(), &error);
-        if (!library)
-            EL_TRACE("Failed to created pipeline state, error %s", error.GetLocalizedDescription().GetCStr());
-        
-        mtlpp::Function vertFunc = library.NewFunction("vertFunc");
-        mtlpp::Function fragFunc = library.NewFunction("fragFunc");
         
         
         GraphicsTexturePtr g_texture;
@@ -239,6 +232,7 @@ int main()
     assert(g_texture);
     mtlpp::Region region = { 0, 0, descriptor.GetWidth(), descriptor.GetHeight() };
     g_texture.Replace(region, 0, pixels, 16);
+
     g_vertexBuffer = g_device.NewBuffer(vertexData, sizeof(vertexData), mtlpp::ResourceOptions::CpuCacheModeDefaultCache);
 
     mtlpp::RenderPipelineDescriptor renderPipelineDesc;

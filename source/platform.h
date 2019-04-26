@@ -5,7 +5,7 @@
 #define EL_ARCH_X86_64 0
 #define EL_ARCH_X86 0
 
-#define EL_COMP_GNUC 0
+#define EL_COMP_GCC 0
 #define EL_COMP_CLANG 0
 #define EL_COMP_MSVC 0
 

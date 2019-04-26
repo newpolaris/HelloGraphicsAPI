@@ -4,9 +4,9 @@
 #include <fstream>
 #include <vector>
 
-std::unique_ptr<char[]> el::fileread(const char* filename)
+std::unique_ptr<char[]> el::fileread(const std::string& filename)
 {
-    FILE* file = fopen(filename, "rb");
+    FILE* file = fopen(filename.c_str(), "rb");
     if (file == nullptr)
         return nullptr;
     fseek(file, 0L, SEEK_END);
@@ -21,10 +21,10 @@ std::unique_ptr<char[]> el::fileread(const char* filename)
     return data;
 }
 
-std::unique_ptr<char[]> el::fstreamread(const char* filename)
+std::unique_ptr<char[]> el::fstreamread(const std::string& filename)
 {
     std::ifstream stream;
-    stream.open(filename);
+    stream.open(filename.c_str());
     if (!stream.is_open())
         return nullptr;
     stream.ignore(std::numeric_limits<uint32_t>::max());

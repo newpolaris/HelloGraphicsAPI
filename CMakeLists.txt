@@ -26,7 +26,11 @@ include_directories(${PROJECT_SOURCE_DIR}/external/meshoptimizer/src)
 include_directories(${PROJECT_SOURCE_DIR}/external/objparser)
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-add_definitions(-DRESOURCE_PATH=\"${CMAKE_SOURCE_DIR}/resource/\")
+
+option(BUILD_OPENGL "Legacy OpenGL" ON)
+if(APPLE)
+    option(BUILD_METAL "Apple Metal" ON)
+endif()
 
 add_subdirectory(source)
 add_subdirectory(sample)

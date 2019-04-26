@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 
 namespace el {
 
@@ -13,7 +14,7 @@ namespace el {
         return std::extent< T[N] >::value;
     }
 
-    std::unique_ptr<char[]> fileread(const char* filename);
-    std::unique_ptr<char[]> fstreamread(const char* filename);
+    std::unique_ptr<char[]> fileread(const std::string& filename);
+    std::unique_ptr<char[]> fstreamread(const std::string& filename);
 
 } // namespace el {

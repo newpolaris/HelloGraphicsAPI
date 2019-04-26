@@ -11,6 +11,8 @@
 using namespace el;
 
 GLContext::GLContext() :
+    _isDepthTest(true),
+    _isCullface(true),
     _indexSize(0u),
     _indexCount(0u),
     _vertexSize(0u),
@@ -40,7 +42,6 @@ bool GLContext::create()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glFrontFace(GL_CW);
-
 
     // TODO: Better?
 #if 0
@@ -73,8 +74,35 @@ void GLContext::destory()
     _program.reset();
 }
 
+void GLContext::setDepthTest(bool enable)
+{
+    // TODO:
+    // if (_isDepthTest != enable)
+    {
+        _isDepthTest = enable;
+        if (_isDepthTest)
+            glEnable(GL_DEPTH_TEST);
+        else
+            glDisable(GL_DEPTH_TEST);
+    }
+}
+
+void GLContext::setCullFace(bool isEnable)
+{
+    // TODO:
+    // if (_isCullface != enable)
+    {
+        _isCullface = isEnable;
+        if (_isCullface)
+            glEnable(GL_CULL_FACE);
+        else
+            glDisable(GL_CULL_FACE);
+    }
+}
+
 void GLContext::beginRendering()
 {
+    glClearColor(0.5f, 0.5f, 0.5f, 1.f);
     // TODO:
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

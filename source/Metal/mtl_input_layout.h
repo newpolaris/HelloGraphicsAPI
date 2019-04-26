@@ -25,7 +25,7 @@ namespace el {
 
         GraphicsInputLayoutDesc _desc;
 
-        MetalDeviceWeakPtr _device;
+        MTLDeviceWeakPtr _device;
     };
 
 } // namespace el {

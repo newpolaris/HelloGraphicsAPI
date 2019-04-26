@@ -2365,8 +2365,7 @@ namespace ns
 
     Object::~Object()
     {
-        if (m_ptr)
-            CFRelease(m_ptr);
+        reset();
     }
 
     Object& Object::operator=(const Object& rhs)
@@ -2394,6 +2393,13 @@ namespace ns
     }
 #endif
 
+    void Object::reset(void* ptr)
+    {
+        if (m_ptr)
+            CFRelease(m_ptr);
+        m_ptr = ptr;
+    }
+    
     uint32_t ArrayBase::GetSize() const
     {
         Validate();
@@ -4605,7 +4611,7 @@ namespace mtlpp
                                            slice:slice];
     }
 
-    void Texture::Replace(const Region& region, uint32_t mipmapLevel, uint32_t slice, void* pixelBytes, uint32_t bytesPerRow, uint32_t bytesPerImage)
+    void Texture::Replace(const Region& region, uint32_t mipmapLevel, uint32_t slice, const void* pixelBytes, uint32_t bytesPerRow, uint32_t bytesPerImage)
     {
         Validate();
         [(__bridge id<MTLTexture>)m_ptr replaceRegion:MTLRegionMake3D(region.Origin.X, region.Origin.Y, region.Origin.Z, region.Size.Width, region.Size.Height, region.Size.Depth)
@@ -4625,7 +4631,7 @@ namespace mtlpp
                                      mipmapLevel:mipmapLevel];
     }
 
-    void Texture::Replace(const Region& region, uint32_t mipmapLevel, void* pixelBytes, uint32_t bytesPerRow)
+    void Texture::Replace(const Region& region, uint32_t mipmapLevel, const void* pixelBytes, uint32_t bytesPerRow)
     {
         Validate();
         [(__bridge id<MTLTexture>)m_ptr replaceRegion:MTLRegionMake3D(region.Origin.X, region.Origin.Y, region.Origin.Z, region.Size.Width, region.Size.Height, region.Size.Depth)

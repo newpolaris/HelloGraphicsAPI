@@ -149,50 +149,25 @@ static void APIENTRY gl_debug_callback(GLenum source,
 }
 #endif // EL_CONFIG_DEBUG
 
-class GraphicsApplication
-{
-public:
-};
 
 namespace el {
-
-#if 0
-    struct Vertex
+    
+    const std::string getResourcePath()
     {
-        float x, y, z;
-        float nx, ny, nz;
-        float tu, tv;
-    };
-
-    bool LoadMesh()
-    {
-        ObjFile obj;
-        if (!objParseFile(obj, ""))
-            return false;
-
-        std::vector<Vertex> vertices;
-        Vertex v;
-        vertices[0] = v;;
-    }
-    struct Vertex
-    {
-        vec2 pos;
-        vec3 color;
-    };
-
-    const std::vector<Vertex> vertices = {
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
-    };
-
-    const std::vector<uint16_t> indices = {
-        0, 2, 1, 0, 3, 2
-    };
+#if EL_PLAT_IOS
+        return[NSBundle.mainBundle.resourcePath stringByAppendingString : @"/data / "].UTF8String;
+#elif EL_PLAT_ANDROID
+        return "";
+#else
+        return EL_DEFINE_RESOURCE_PATH;
 #endif
-
-} // namespace el {
+    }
+    
+    const std::string getSamplePath()
+    {
+        return EL_DEFINE_SAMPLE_PATH;
+    }
+}
 
 int main(int argc, char** argv)
 {
@@ -234,6 +209,14 @@ int main(int argc, char** argv)
 
     glfwMakeContextCurrent(windows[0]);
 
+    // Only enable vsync for the first of the windows to be swapped to
+    // avoid waiting out the interval for each window
+    glfwSwapInterval(1);
+
+    // The contexts are created with the same APIs so the function
+    // pointers should be re-usable between them
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    
     // TODO:
     // how to handle glad_glGenFramebuffersEXT?
     // GL_IMPORT_EXT__(true, PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
@@ -243,14 +226,6 @@ int main(int argc, char** argv)
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
-
-    // Only enable vsync for the first of the windows to be swapped to
-    // avoid waiting out the interval for each window
-    glfwSwapInterval(1);
-
-    // The contexts are created with the same APIs so the function
-    // pointers should be re-usable between them
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
 #if EL_CONFIG_DEBUG
     if (glDebugMessageCallback) {
@@ -320,17 +295,17 @@ int main(int argc, char** argv)
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
-        const auto vertex_shader_text = fileread("main.vert");
+        const auto vertex_shader_text = fileread(getSamplePath() + "main.vert");
         EL_ASSERT(vertex_shader_text);
-
+        
         GraphicsShaderDesc vertex_desc;
         vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
         vertex_desc.setShaderCode(vertex_shader_text.get());
-
+        
         vertex_shader = device->createShader(vertex_desc);
         EL_ASSERT(vertex_shader);
-
-        const auto frag_shader_text = fileread("main.frag");
+        
+        const auto frag_shader_text = fileread(getSamplePath() + "main.frag");
         EL_ASSERT(frag_shader_text);
 
         GraphicsShaderDesc fragment_desc;
@@ -349,7 +324,7 @@ int main(int argc, char** argv)
 
         GraphicsDataDesc vertices_buffer_desc;
         vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
-        vertices_buffer_desc.setData((const stream_t*)vertices);
+        vertices_buffer_desc.setStream((const stream_t*)vertices);
         vertices_buffer_desc.setElementSize(sizeof(vec2));
         vertices_buffer_desc.setNumElements(countof(vertices));
 
@@ -357,7 +332,7 @@ int main(int argc, char** argv)
 
         GraphicsDataDesc indices_buffer_desc;
         indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
-        indices_buffer_desc.setData((const char*)indices);
+        indices_buffer_desc.setStream((const char*)indices);
         indices_buffer_desc.setElementSize(sizeof(uint32_t));
         indices_buffer_desc.setNumElements(countof(indices));
 
@@ -366,6 +341,8 @@ int main(int argc, char** argv)
 
     GraphicsContextPtr context[2];
     context[0] = device->createDeviceContext();
+    context[0]->setDepthTest(false);
+    context[0]->setCullFace(false);
     context[0]->setProgram(program); 
     context[0]->setTexture("texture", texture);
     context[0]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
@@ -403,6 +380,8 @@ int main(int argc, char** argv)
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
     context[1] = device->createDeviceContext();
+    context[1]->setDepthTest(false);
+    context[1]->setCullFace(false);
     context[1]->setProgram(program);
     context[1]->setTexture("texture", texture);
     context[1]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
@@ -413,8 +392,8 @@ int main(int argc, char** argv)
 
     context[1]->setUniform("MVP", mvp);
 
-    while (!glfwWindowShouldClose(windows[0]) &&
-        !glfwWindowShouldClose(windows[1]))
+    while (!glfwWindowShouldClose(windows[0])
+        && !glfwWindowShouldClose(windows[1]))
     {
         const vec3 colors[2] =
         {
@@ -429,10 +408,10 @@ int main(int argc, char** argv)
 
             glfwGetFramebufferSize(windows[i], &width, &height);
             glfwMakeContextCurrent(windows[i]);
-
-            profile[i].start();
-
+            
             context[i]->beginRendering();
+            profile[i].start();
+            
             context[i]->setProgram(program);
             context[i]->setViewport(Viewport(0, 0, width, height));
 
@@ -441,11 +420,14 @@ int main(int argc, char** argv)
             context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeFan, 4);
 
             profile[i].end();
+            context[i]->endRendering();
 
             glfwSwapBuffers(windows[i]);
+            
             char profileBuf[256] = {'\0'};
-            sprintf(profileBuf, "%s CPU %.3f, GPU %.3f", profile[i].getName().c_str(),
-                profile[i].getCpuTime(), profile[i].getGpuTime());
+            sprintf(profileBuf, "%s CPU %.3f, GPU %.3f",
+                    profile[i].getName().c_str(),
+                    profile[i].getCpuTime(), profile[i].getGpuTime());
             glfwSetWindowTitle(windows[i], profileBuf);
         }
 

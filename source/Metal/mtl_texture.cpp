@@ -5,9 +5,6 @@
 #include "debug.h"
 #include "mtl_device.h"
 
-// TODO:
-#include <GLFW/glfw3.h>
-
 using namespace el;
 
 MTLTexture::MTLTexture()
@@ -23,14 +20,24 @@ bool MTLTexture::create(GraphicsTextureDesc desc)
     auto device = _device.lock();
     if (!device) return false;
 
+	// TODO:
     auto format = mtlpp::PixelFormat::RGBA8Unorm;
+
     auto textureDesc = mtlpp::TextureDescriptor::Texture2DDescriptor(
         format, desc.getWidth(), desc.getHeight(), false);
+
+	// TODO:
     textureDesc.SetUsage(mtlpp::TextureUsage::RenderTarget);
 
     _texture = device->getDevice().NewTexture(textureDesc);
     if (!_texture)
         return false;
+
+	// TODO:
+	uint32_t bytesPerRow = 16;
+
+    mtlpp::Region region = { 0, 0, textureDesc.GetWidth(), textureDesc.GetHeight() };
+    _texture.Replace(region, 0, desc.getStream(), bytesPerRow);
 
 	_textureDesc = std::move(desc);
 

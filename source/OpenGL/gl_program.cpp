@@ -11,7 +11,7 @@
 
 namespace el {
 
-    static const bool g_isQuiet = true;
+    static const bool g_isQuiet = false;
 
     namespace gl {
         namespace program {

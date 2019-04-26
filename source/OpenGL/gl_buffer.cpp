@@ -37,11 +37,11 @@ bool GLBuffer::create(GraphicsDataDesc desc)
             _usage = GL_DYNAMIC_READ;
     } 
 
-    const streamsize_t dataSize = desc.getDataSize();
+    const streamsize_t dataSize = desc.getStreamSize();
 
     GL_CHECK(glGenBuffers(1, &_bufferID));
     GL_CHECK(glBindBuffer(_target, _bufferID));
-    GL_CHECK(glBufferData(_target, dataSize, desc.getData(), _usage));
+    GL_CHECK(glBufferData(_target, dataSize, desc.getStream(), _usage));
 
     if (GLAD_GL_KHR_debug) // GLEW_KHR_debug
         GL_CHECK(glObjectLabel(GL_BUFFER, _bufferID, -1, "Vertex Array Buffer object"));

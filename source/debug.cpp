@@ -59,7 +59,11 @@ void el::debug_break()
     __debugbreak();
 #elif EL_ARCH_ARM
     __builtin_trap();
-    #eleif
-        __asm int 3;
+#elif EL_ARCH_X86 && (EL_COMP_GCC || EL_COMP_CLANG)
+    // File violates Native Client safety rules.
+    __asm__ ("int $3");
+#else // cross platform implementation
+    int* int3 = (int*)3L;
+    *int3 = 3;
 #endif
 }

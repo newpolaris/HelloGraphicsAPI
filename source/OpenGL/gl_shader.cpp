@@ -67,6 +67,8 @@ GLShader::~GLShader()
 
 bool GLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
 {
+    if (shaderCode == nullptr)
+        return false;
     _stage = stage;
     _id = shader::create(getShaderStage(stage), shaderCode);
     if (_id == 0)

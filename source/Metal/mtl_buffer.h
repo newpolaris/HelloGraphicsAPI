@@ -4,7 +4,10 @@
 
 #if EL_PLAT_APPLE
 
+#include <graphics_types.h>
 #include <graphics_data.h>
+#include "mtl_types.h"
+#include "mtlpp.hpp"
 
 namespace el {
 
@@ -21,10 +24,16 @@ namespace el {
         void bind() const;
         
         const GraphicsDataDesc& getDesc() const override;
+        void setDevice(GraphicsDevicePtr device);
+        GraphicsDevicePtr getDevice();
 
     private:
 
+        mtlpp::Buffer _buffer;
+        
         GraphicsDataDesc _desc;
+
+        MTLDeviceWeakPtr _device;
     };
 
 } // namespace el {

@@ -6,6 +6,7 @@
 
 #include "graphics_types.h"
 #include "graphics_shader.h"
+#include "mtl_types.h"
 #include "mtlpp.hpp"
 
 namespace el {
@@ -22,12 +23,17 @@ namespace el {
         
         const GraphicsShaderDesc& getDesc() const override;
 
+        void setDevice(GraphicsDevicePtr device);
+        GraphicsDevicePtr getDevice();
+
     private:
 
         GraphicsShaderDesc _desc;
         
         mtlpp::Library _library;
         mtlpp::Function _function;
+
+        MTLDeviceWeakPtr _device;
     };
 
 } // namespace el {

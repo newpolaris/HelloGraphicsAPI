@@ -342,7 +342,7 @@ int main(int argc, char** argv)
 
         GraphicsDataDesc vertices_buffer_desc;
         vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
-        vertices_buffer_desc.setData(geometry.getVertexData());
+        vertices_buffer_desc.setStream(geometry.getVertexData());
         vertices_buffer_desc.setElementSize(sizeof(Vertex));
         vertices_buffer_desc.setNumElements(geometry.getVertexCount());
 
@@ -350,7 +350,7 @@ int main(int argc, char** argv)
 
         GraphicsDataDesc indices_buffer_desc;
         indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
-        indices_buffer_desc.setData(geometry.getIndexData());
+        indices_buffer_desc.setStream(geometry.getIndexData());
         indices_buffer_desc.setElementSize(sizeof(uint32_t));
         indices_buffer_desc.setNumElements(geometry.getIndexCount());
 

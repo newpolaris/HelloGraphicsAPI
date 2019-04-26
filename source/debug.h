@@ -35,7 +35,7 @@ namespace el {
 #   else
 #       define EL_ASSERT(_call) (void)( \
                 (!!(_call)) || \
-                (debug_break(), 0) \
+                (el::debug_break(), 0) \
                 )
 #   endif
 #else

@@ -20,12 +20,6 @@ file(GLOB RENDERER_CORE_SOURCE "*.cpp")
 set(RENDERER_CORE ${RENDERER_CORE_HEADER} ${RENDERER_CORE_SOURCE})
 source_group("Common" FILES ${RENDERER_CORE})
 
-option(BUILD_OPENGL "Legacy OpenGL" ON)
-
-if(APPLE)
-    option(BUILD_METAL "Apple Metal" ON)
-endif()
-
 if(BUILD_OPENGL)
     find_package(OpenGL REQUIRED)
 
@@ -42,14 +36,7 @@ if(BUILD_METAL)
     file(GLOB RENDERER_MTL_SOURCE "Metal/*.cpp" "Metal/*.mm")
 
     set(RENDERER_MTL ${RENDERER_MTL_HEADER} ${RENDERER_MTL_SOURCE})
-
     source_group("Metal" FILES ${RENDERER_MTL})
-
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} \
-        -framework AppKit \
-        -framework Metal \
-        -framework MetalKit \
-        -framework ModelIO")
 endif()
 
 set(RENDERER_LIST ${RENDERER_CORE})

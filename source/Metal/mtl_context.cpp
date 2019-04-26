@@ -17,29 +17,11 @@ MTLContext::~MTLContext()
 
 bool MTLContext::create()
 {
-    auto device = _device.lock();
-    if (!device) return false;
-
-    // TODO: need to texture generate ?
-    _commandBuffer = device->getCommandQueue().CommandBuffer();
-    if (!_commandBuffer) return false;
-
     return true;
 }
 
 void MTLContext::destroy()
 {
-}
-
-void MTLContext::finsh(bool waitForCompletion)
-{
-    EL_ASSERT(_commandBuffer);
-
-    _commandBuffer.Commit();
-    if (waitForCompletion)
-    {
-        _commandBuffer.WaitUntilCompleted();
-    }
 }
 
 void MTLContext::setDevice(GraphicsDevicePtr device)
@@ -52,12 +34,90 @@ GraphicsDevicePtr MTLContext::getDevice()
     return _device.lock();
 }
 
+#if 0
+    VkRenderPassBeginInfo pass = { VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO };
+    pass.renderPass = renderpass;
+    pass.framebuffer = framebuffer;
+    pass.renderArea = scissor;
+    pass.clearValueCount = ARRAY_SIZE(clear_values);
+    pass.pClearValues = clear_values;
+
+    vkCmdBeginRenderPass(command_buffer, &pass, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBindPipeline(command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+    vkCmdSetViewport(command_buffer, 0, 1, &viewport);
+    vkCmdSetScissor(command_buffer, 0, 1, &scissor);
+#endif
+#if 0
+- (MTLRenderPassDescriptor *)newRenderPassWithColorAttachmentTexture:(id<MTLTexture>)texture
+{
+    MTLRenderPassDescriptor *renderPass = [MTLRenderPassDescriptor new];
+    
+    renderPass.colorAttachments[0].texture = texture;
+    renderPass.colorAttachments[0].loadAction = MTLLoadActionClear;
+    renderPass.colorAttachments[0].storeAction = MTLStoreActionStore;
+    renderPass.colorAttachments[0].clearColor = MBEClearColor;
+    
+    renderPass.depthAttachment.texture = self.depthTexture;
+    renderPass.depthAttachment.loadAction = MTLLoadActionClear;
+    renderPass.depthAttachment.storeAction = MTLStoreActionStore;
+    renderPass.depthAttachment.clearDepth = 1.0;
+    
+    return renderPass;
+}
+#endif
+
 void MTLContext::beginRendering() 
 {
+    auto device = _device.lock();
+    EL_ASSERT(device);
+    EL_ASSERT(!_commandBuffer);
+    
+    _commandBuffer = device->getCommandQueue().CommandBuffer();
+    EL_ASSERT(!_commandBuffer);
+    
+    // renderCommandEncoder.SetCullMode(mtlpp::CullMode::Back);
+    // renderCommandEncoder.SetCullMode(mtlpp::CullMode::None);
+}
+
+void MTLContext::setRenderPassDescirptor()
+{
+}
+
+void MTLContext::setFramebuffer()
+{
+}
 }
 
 void MTLContext::endRendering() 
 {
+   
+}
+
+void MTLContext::present()
+{
+    // _commandBuffer.Present(win.GetDrawable());
+}
+
+void MTLContext::finsh(bool waitForCompletion)
+{
+    EL_ASSERT(_commandBuffer);
+    
+    _commandBuffer.Commit();
+    if (waitForCompletion)
+    {
+        _commandBuffer.WaitUntilCompleted();
+    }
+    _commandBuffer.reset();
+}
+
+void MTLContext::setDepthTest(bool isEnable)
+{
+    // _isDepthTest = isEnable;
+}
+
+void MTLContext::setCullFace(bool isEnable)
+{
+    // _isCullFace = isEnable;
 }
 
 void MTLContext::setViewport(const Viewport& viewport) 
@@ -106,6 +166,10 @@ void MTLContext::setInputLayout(const GraphicsInputLayoutPtr& inputLayout)
 
 void MTLContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset)
 {
+    auto primitive - // asPrimitive
+    // mtlpp::PrimitiveType::Triangle
+    
+    _renderCommandEncoder.Draw(, vertexStartOffset, vertexCount);
 }
 
 void MTLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation)

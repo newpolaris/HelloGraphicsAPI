@@ -11,17 +11,17 @@ GraphicsDataDesc::GraphicsDataDesc() :
 {
 }
 
-void GraphicsDataDesc::setData(const stream_t* data)
+void GraphicsDataDesc::setStream(const stream_t* data)
 {
     _data = data;
 }
 
-const char* GraphicsDataDesc::getData() const
+const char* GraphicsDataDesc::getStream() const
 {
     return _data;
 }
 
-streamsize_t GraphicsDataDesc::getDataSize() const
+streamsize_t GraphicsDataDesc::getStreamSize() const
 {
     return _elementSize * _numElements;
 }

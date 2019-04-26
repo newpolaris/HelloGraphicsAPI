@@ -10,10 +10,10 @@ namespace el {
 
         GraphicsDataDesc();
 
-        void setData(const stream_t* data);
-        const stream_t* getData() const;
+        void setStream(const stream_t* data);
+        const stream_t* getStream() const;
 
-        streamsize_t getDataSize() const;
+        streamsize_t getStreamSize() const;
 
         void setNumElements(size_t numElements);
         size_t getElementCount() const;

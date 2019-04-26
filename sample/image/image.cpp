@@ -138,56 +138,15 @@ namespace el {
 #elif EL_PLAT_ANDROID
         return "";
 #else
-        return RESOURCE_PATH;
+        return EL_DEFINE_RESOURCE_PATH;
 #endif
     }
-
+    
+    const std::string getSamplePath()
+    {
+        return EL_DEFINE_SAMPLE_PATH;
+    }
 }
-
-namespace el {
-
-#if 0
-    struct Vertex
-    {
-        float x, y, z;
-        float nx, ny, nz;
-        float tu, tv;
-    };
-
-    bool LoadMesh()
-    {
-        ObjFile obj;
-        if (!objParseFile(obj, ""))
-            return false;
-
-        std::vector<Vertex> vertices;
-        Vertex v;
-        vertices[0] = v;;
-    }
-    struct Vertex
-    {
-        vec2 pos;
-        vec3 color;
-    };
-
-    const std::vector<Vertex> vertices = {
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
-        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
-    };
-
-    const std::vector<uint16_t> indices = {
-        0, 2, 1, 0, 3, 2
-    };
-#endif
-
-} // namespace el {
-namespace el {
-
-    void init();
-
-} // namespace el {
 
 int main(int argc, char** argv)
 {
@@ -305,9 +264,9 @@ int main(int argc, char** argv)
     // Create the OpenGL objects inside the first context, created above
     // All objects will be shared with the second context, created below
     {
-        const auto vertex_shader_text = fileread("main.vert");
+        const auto vertex_shader_text = fileread(getSamplePath() + "main.vert");
         EL_ASSERT(vertex_shader_text);
-
+        
         GraphicsShaderDesc vertex_desc;
         vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
         vertex_desc.setShaderCode(vertex_shader_text.get());
@@ -315,7 +274,7 @@ int main(int argc, char** argv)
         vertex_shader = device->createShader(vertex_desc);
         EL_ASSERT(vertex_shader);
 
-        const auto frag_shader_text = fileread("main.frag");
+        const auto frag_shader_text = fileread(getSamplePath() + "main.frag");
         EL_ASSERT(frag_shader_text);
 
         GraphicsShaderDesc fragment_desc;
@@ -334,7 +293,7 @@ int main(int argc, char** argv)
 
         GraphicsDataDesc vertices_buffer_desc;
         vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
-        vertices_buffer_desc.setData((const stream_t*)vertices);
+        vertices_buffer_desc.setStream((const stream_t*)vertices);
         vertices_buffer_desc.setElementSize(sizeof(vec2));
         vertices_buffer_desc.setNumElements(countof(vertices));
 
@@ -342,7 +301,7 @@ int main(int argc, char** argv)
 
         GraphicsDataDesc indices_buffer_desc;
         indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
-        indices_buffer_desc.setData((const char*)indices);
+        indices_buffer_desc.setStream((const char*)indices);
         indices_buffer_desc.setElementSize(sizeof(uint32_t));
         indices_buffer_desc.setNumElements(countof(indices));
 

@@ -22,6 +22,9 @@ namespace el {
         void beginRendering() override;
         void endRendering() override;
 
+        void setDepthTest(bool enable) override;
+        void setCullFace(bool enable) override;
+
         void setViewport(const Viewport& viewport) override;
         void setProgram(const GraphicsProgramPtr& ptr) override;
         void setTexture(const std::string& name, const GraphicsTexturePtr& texture) override;
@@ -46,6 +49,9 @@ namespace el {
                                   uint32_t startIndexLocation, int32_t vaseVertexLocation, uint32_t startInstanceLocation) override;
 
     private:
+
+        bool _isDepthTest;
+        bool _isCullface;
 
         size_t _indexSize;
         size_t _indexCount;

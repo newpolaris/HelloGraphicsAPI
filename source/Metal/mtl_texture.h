@@ -4,8 +4,8 @@
 
 #if EL_PLAT_APPLE
 
-#include "graphics_types.h"
-#include "graphics_texture.h"
+#include <graphics_types.h>
+#include <graphics_texture.h>
 #include "mtl_types.h"
 #include "mtlpp.hpp"
 
@@ -29,8 +29,10 @@ namespace el {
     private:
 
         mtlpp::Texture _texture;
+
         GraphicsTextureDesc _textureDesc;
-        MetalDeviceWeakPtr _device;
+
+        MTLDeviceWeakPtr _device;
     };
 
 } // namespace el {

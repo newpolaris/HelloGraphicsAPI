@@ -1,5 +1,9 @@
 #include "gl_profile.h"
 
+// https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_timer_query.txt
+// https://github.com/google/skia/blob/master/tools/gpu/gl/GLTestContext.cpp
+// https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_disjoint_timer_query.txt
+
 using namespace el;
 
 GLProfileBusyWait::GLProfileBusyWait() :
@@ -21,7 +25,7 @@ void GLProfileBusyWait::start()
     _cpuTimePoint[0] = std::chrono::high_resolution_clock::now();
 
     if (_isSupportTimerQuery)
-        GL_CHECK(glQueryCounter(_query[0], GL_TIMESTAMP));
+        GL_CHECK(glBeginQuery(GL_TIME_ELAPSED, _query[0]));
 }
 
 void GLProfileBusyWait::end()
@@ -33,19 +37,18 @@ void GLProfileBusyWait::end()
 
     if (_isSupportTimerQuery)
     {
-        GL_CHECK(glQueryCounter(_query[1], GL_TIMESTAMP));
+        GL_CHECK(glEndQuery(GL_TIME_ELAPSED));
 
         GLint stopTimerAvailable = 0;
         while (!stopTimerAvailable) {
-            GL_CHECK(glGetQueryObjectiv(_query[1], GL_QUERY_RESULT_AVAILABLE, &stopTimerAvailable));
+            GL_CHECK(glGetQueryObjectiv(_query[0], GL_QUERY_RESULT_AVAILABLE, &stopTimerAvailable));
         }
 
         // get query results
-        GLuint64 startTime = 0, stopTime = 0;
-        GL_CHECK(_fGetQueryObjectui64v(_query[0], GL_QUERY_RESULT, &startTime));
-        GL_CHECK(_fGetQueryObjectui64v(_query[1], GL_QUERY_RESULT, &stopTime));
+        GLuint64 timeElapsed = 0;
+        GL_CHECK(_fGetQueryObjectui64v(_query[0], GL_QUERY_RESULT, &timeElapsed));
 
-        _gpuTime = static_cast<float>((stopTime - startTime) / 1000000.0);
+        _gpuTime = static_cast<float>((timeElapsed) / 1000000.0);
     }
 }
 
@@ -58,6 +61,9 @@ void GLProfileBusyWait::create()
         glBeginQuery != nullptr &&
         glGetQueryObjectiv != nullptr;
 
+    // TODO: add check to glQueryCounter
+    
+    
     if (!isQuerySupport)
         return;
 
@@ -68,6 +74,7 @@ void GLProfileBusyWait::create()
 
     if (_fGetQueryObjectui64v != nullptr)
         _isSupportTimerQuery = true;
+
 }
 
 void GLProfileBusyWait::destroy()

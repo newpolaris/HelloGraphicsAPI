@@ -107,7 +107,9 @@ namespace ns
         inline const void* GetPtr() const { return m_ptr; }
 
         inline operator bool() const { return m_ptr != nullptr; }
-
+        
+        void reset(void* ptr = nullptr);
+        
     protected:
         Object();
         Object(const Handle& handle);
@@ -122,6 +124,7 @@ namespace ns
         Object& operator=(Object&& rhs);
 #endif
 
+        
         inline void Validate() const
         {
 #if MTLPP_CONFIG_VALIDATE
@@ -718,9 +721,9 @@ namespace mtlpp
         bool         IsFrameBufferOnly() const;
 
         void GetBytes(void* pixelBytes, uint32_t bytesPerRow, uint32_t bytesPerImage, const Region& fromRegion, uint32_t mipmapLevel, uint32_t slice);
-        void Replace(const Region& region, uint32_t mipmapLevel, uint32_t slice, void* pixelBytes, uint32_t bytesPerRow, uint32_t bytesPerImage);
+        void Replace(const Region& region, uint32_t mipmapLevel, uint32_t slice, const void* pixelBytes, uint32_t bytesPerRow, uint32_t bytesPerImage);
         void GetBytes(void* pixelBytes, uint32_t bytesPerRow, const Region& fromRegion, uint32_t mipmapLevel);
-        void Replace(const Region& region, uint32_t mipmapLevel, void* pixelBytes, uint32_t bytesPerRow);
+        void Replace(const Region& region, uint32_t mipmapLevel, const void* pixelBytes, uint32_t bytesPerRow);
         Texture NewTextureView(PixelFormat pixelFormat);
         Texture NewTextureView(PixelFormat pixelFormat, TextureType textureType, const ns::Range& mipmapLevelRange, const ns::Range& sliceRange);
     }

@@ -15,6 +15,8 @@ namespace el {
 
         virtual void beginRendering() = 0;
         virtual void endRendering() = 0;
+        virtual void setDepthTest(bool isEnable) = 0;
+        virtual void setCullFace(bool isEnable) = 0;
         virtual void setViewport(const Viewport& viewport) = 0;
         virtual void setProgram(const GraphicsProgramPtr& program) = 0;
         virtual void setTexture(const std::string& name, const GraphicsTexturePtr& texture) = 0;

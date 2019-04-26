@@ -1,10 +1,14 @@
 #include "graphics_types.h"
+#include "mtlpp.hpp"
 
 namespace el {
 
-	class MTLDeviceDesc;
+    class MTLDeviceDesc;
 
-    typedef std::shared_ptr<class MTLDevice> MetalDevicePtr;
-    typedef std::weak_ptr<class MTLDevice> MetalDeviceWeakPtr;
-    typedef std::shared_ptr<class MTLContext> MetalDeviceContextPtr;
+    typedef std::shared_ptr<class MTLDevice> MTLDevicePtr;
+    typedef std::shared_ptr<class MTLContext> MTLDeviceContextPtr;
+
+    typedef std::weak_ptr<class MTLDevice> MTLDeviceWeakPtr;
+
+    mtlpp::PixelFormat asPixelForamt(GraphicsPixelFormat format);
 };
