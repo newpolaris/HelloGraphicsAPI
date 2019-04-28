@@ -1,6 +1,7 @@
 # Function for building single sample
 function(buildSample SAMPLE_NAME)
     set(SAMPLE_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
+    set(COMMON_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/common)
     message(STATUS "Generating project file for example in ${SAMPLE_FOLDER}")
 
     project(${SAMPLE_NAME})
@@ -18,6 +19,8 @@ function(buildSample SAMPLE_NAME)
 
     target_compile_definitions(${SAMPLE_NAME} PRIVATE -DEL_DEFINE_SAMPLE_PATH=\"${SAMPLE_FOLDER}/\")
     target_compile_definitions(${SAMPLE_NAME} PRIVATE -DEL_DEFINE_RESOURCE_PATH=\"${CMAKE_SOURCE_DIR}/resource/\")
+
+    target_include_directories(${SAMPLE_NAME} PRIVATE "${COMMON_FOLDER}")
 
     target_link_libraries(${SAMPLE_NAME} PRIVATE "lib3d")
     target_link_libraries(${SAMPLE_NAME} PRIVATE "objparser")

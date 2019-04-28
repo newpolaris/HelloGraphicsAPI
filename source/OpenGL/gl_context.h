@@ -19,6 +19,8 @@ namespace el {
         bool create();
         void destory();
 
+        void startDebugControl();
+        
         void beginRendering() override;
         void endRendering() override;
 
@@ -43,12 +45,12 @@ namespace el {
         void draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset) override;
         void drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation) override;
         void drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation) override;
-        void drawInstanced(GraphicsPrimitiveType primitive, uint32_t vertexCountPerInstance, uint32_t instanceCount,
-		                   uint32_t startVertexLocation, uint32_t startInstanceLocation) override;
-        void drawIndexedInstanced(GraphicsPrimitiveType primitive, uint32_t indexCountPerInstance, uint32_t instanceCount,
-                                  uint32_t startIndexLocation, int32_t vaseVertexLocation, uint32_t startInstanceLocation) override;
+        void drawInstanced(GraphicsPrimitiveType primitive, uint32_t vertexCountPerInstance, uint32_t instanceCount, uint32_t startVertexLocation, uint32_t startInstanceLocation) override;
+        void drawIndexedInstanced(GraphicsPrimitiveType primitive, uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation, int32_t vaseVertexLocation, uint32_t startInstanceLocation) override;
 
     private:
+
+        static void APIENTRY debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 
         bool _isDepthTest;
         bool _isCullface;

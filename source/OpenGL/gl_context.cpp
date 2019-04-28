@@ -8,7 +8,38 @@
 #include "gl_program.h"
 #include "gl_input_layout.h"
 
+#include <sstream>
+#include <GLFW/glfw3.h>
+
 using namespace el;
+
+bool isInitGLExtension = false;
+bool initGLExtension()
+{
+	if (isInitGLExtension)
+		return true;
+
+    // The contexts are created with the same APIs so the function
+    // pointers should be re-usable between them
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+    // TODO:
+    // how to handle glad_glGenFramebuffersEXT?
+    // GL_IMPORT_EXT__(true, PFNGLBINDFRAMEBUFFERPROC, glBindFramebuffer);
+    if (glGenFramebuffers == 0)
+    {
+        EL_TRACE("Require GL_ARB_framebuffer_object");
+        return false;
+    }
+
+    // Only enable vsync for the first of the windows to be swapped to
+    // avoid waiting out the interval for each window
+    glfwSwapInterval(1);
+
+    isInitGLExtension = true;
+
+    return true;
+}
 
 GLContext::GLContext() :
     _isDepthTest(true),
@@ -26,6 +57,9 @@ GLContext::~GLContext()
 
 bool GLContext::create()
 {
+    if (!initGLExtension())
+        return false;
+
     // TODO:
     glClearDepth(1.0f);
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -74,6 +108,26 @@ void GLContext::destory()
     _program.reset();
 }
 
+void GLContext::startDebugControl()
+{
+#if EL_CONFIG_DEBUG
+    if (glDebugMessageCallback) {
+        GL_CHECK(glEnable(GL_DEBUG_OUTPUT));
+        GL_CHECK(glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS));
+        GL_CHECK(glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE));
+        GL_CHECK(glDebugMessageCallback(debugCallback, nullptr));
+    }
+
+    std::printf("%s\n%s\n%s\n%s\n",
+        glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine
+        glGetString(GL_VERSION),   // e.g. 3.2 INTEL-8.0.61
+        glGetString(GL_VENDOR),    // e.g. NVIDIA Corporation
+        glGetString(GL_SHADING_LANGUAGE_VERSION)  // e.g. 4.60 NVIDIA or 1.50 NVIDIA via Cg compiler
+    );
+#endif
+}
+
+
 void GLContext::setDepthTest(bool enable)
 {
     // TODO:
@@ -102,6 +156,7 @@ void GLContext::setCullFace(bool isEnable)
 
 void GLContext::beginRendering()
 {
+    // TODO:
     glClearColor(0.5f, 0.5f, 0.5f, 1.f);
     // TODO:
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -286,6 +341,77 @@ void GLContext::drawInstanced(GraphicsPrimitiveType primitive, uint32_t vertexCo
 void GLContext::drawIndexedInstanced(GraphicsPrimitiveType primitive, uint32_t indexCountPerInstance, uint32_t instanceCount,
                                      uint32_t startIndexLocation, int32_t vaseVertexLocation, uint32_t startInstanceLocation)
 {
+}
+
+void APIENTRY GLContext::debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity,
+                                              GLsizei length, const GLchar* message, const void* userParam)
+{
+    // ignore these non-significant error codes
+    if (id == 131169 || id == 131185 || id == 131218 || id == 131204 || id == 131184)
+        return;
+
+    std::stringstream output;
+    output << "---------- OPENGL CALLBACK -----------" << std::endl;
+    output << "SOURCE: ";
+    switch (source) {
+    case GL_DEBUG_SOURCE_API:
+        output << "WINDOW_SYSTEM";
+        break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER:
+        output << "SHADER_COMPILER";
+        break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY:
+        output << "THIRD_PARTY";
+        break;
+    case GL_DEBUG_SOURCE_APPLICATION:
+        output << "APPLICATION";
+        break;
+    case GL_DEBUG_SOURCE_OTHER:
+        output << "OTHER";
+        break;
+    }
+    output << std::endl;
+
+    output << "TYPE: ";
+    switch (type) {
+    case GL_DEBUG_TYPE_ERROR:
+        output << "ERROR";
+        break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
+        output << "DEPRECATED_BEHAVIOR";
+        break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
+        output << "UNDEFINED_BEHAVIOR";
+        break;
+    case GL_DEBUG_TYPE_PORTABILITY:
+        output << "PORTABILITY";
+        break;
+    case GL_DEBUG_TYPE_PERFORMANCE:
+        output << "PERFORMANCE";
+        break;
+    case GL_DEBUG_TYPE_OTHER:
+        output << "OTHER";
+        break;
+    }
+    output << std::endl;
+
+    output << "SEVERITY : ";
+    switch (severity) {
+    case GL_DEBUG_SEVERITY_LOW:
+        output << "LOW";
+        break;
+    case GL_DEBUG_SEVERITY_MEDIUM:
+        output << "MEDIUM";
+        break;
+    case GL_DEBUG_SEVERITY_HIGH:
+        output << "HIGH";
+        break;
+    }
+    output << std::endl;
+    output << message << std::endl;
+
+    EL_TRACE("\n%s", output.str().c_str());
+    el::debug_break();
 }
 
 #endif // #if EL_BUILD_OPENGL
