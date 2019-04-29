@@ -1,6 +1,6 @@
 #include <graphics_window.h>
 #include <debug.h>
-
+ 
 using namespace el;
 
 GraphicsWindowPtr el::createWindow(const GraphicsWindowDesc& desc)
