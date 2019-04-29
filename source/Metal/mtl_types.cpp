@@ -1,8 +1,10 @@
 #include "mtl_types.h"
+#include <debug.h>
 
 using namespace el;
+using namespace mtlpp;
 
-mtlpp::PixelFormat el::asPixelForamt(GraphicsPixelFormat format)
+mtlpp::PixelFormat el::asPixelFormat(GraphicsPixelFormat format)
 {
     switch (format)
 {
@@ -256,4 +258,20 @@ mtlpp::PixelFormat el::asPixelForamt(GraphicsPixelFormat format)
         EL_ASSERT(false);
         return mtlpp::PixelFormat::Invalid;
     }
+}
+
+mtlpp::TextureUsage el::asTextureUsage(GraphicsTextureUsageFlags flags)
+{
+    uint32_t usage = 0;
+
+    if (flags & GraphicsTextureUsageFlagBitStorageBit)
+        usage |= TextureUsage::ShaderWrite;
+    if (flags & GraphicsTextureUsageFlagBitColorAttachmentBit)
+        usage |= TextureUsage::RenderTarget;
+    if (flags & GraphicsTextureUsageFlagBitDepthStencilAttachmentBit)
+        usage |= TextureUsage::RenderTarget;
+    if (flags & GraphicsTextureUsageFlagBitSampledBit)
+        usage |= TextureUsage::ShaderRead;
+
+    return mtlpp::TextureUsage(usage);
 }

@@ -1,6 +1,6 @@
 #include "mtl_context.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 #include "debug.h"
 #include "mtl_device.h"
@@ -79,23 +79,9 @@ void MTLContext::beginRendering()
     // renderCommandEncoder.SetCullMode(mtlpp::CullMode::None);
 }
 
-void MTLContext::setRenderPassDescirptor()
-{
-}
-
-void MTLContext::setFramebuffer()
-{
-}
-}
-
 void MTLContext::endRendering() 
 {
    
-}
-
-void MTLContext::present()
-{
-    // _commandBuffer.Present(win.GetDrawable());
 }
 
 void MTLContext::finsh(bool waitForCompletion)
@@ -166,10 +152,6 @@ void MTLContext::setInputLayout(const GraphicsInputLayoutPtr& inputLayout)
 
 void MTLContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset)
 {
-    auto primitive - // asPrimitive
-    // mtlpp::PrimitiveType::Triangle
-    
-    _renderCommandEncoder.Draw(, vertexStartOffset, vertexCount);
 }
 
 void MTLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation)
@@ -189,4 +171,4 @@ void MTLContext::drawIndexedInstanced(GraphicsPrimitiveType primitive, uint32_t 
 {
 }
 
-#endif // EL_PLAT_APPLE
+#endif // EL_BUILD_METAL

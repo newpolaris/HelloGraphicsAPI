@@ -51,6 +51,13 @@ endif()
 
 add_library(${LIB_NAME} ${RENDERER_LIST})
 
+if(BUILD_OPENGL)
+    target_compile_definitions(${LIB_NAME} PRIVATE -DEL_BUILD_OPENGL=1)
+endif()
+if(BUILD_METAL)
+    target_compile_definitions(${LIB_NAME} PRIVATE -DEL_BUILD_METAL=1)
+endif()
+
 target_link_libraries(${LIB_NAME} PRIVATE glfw)
 target_link_libraries(${LIB_NAME} PRIVATE glad)
 target_link_libraries(${LIB_NAME} PRIVATE stb)

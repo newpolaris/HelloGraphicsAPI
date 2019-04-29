@@ -37,7 +37,7 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 
     const GLint levels = desc.getLevels();
 
-    // unsupport multi-level images
+    // TODO: support multi level images
     EL_ASSERT(levels == 1);
     const GLint level = 0;
 

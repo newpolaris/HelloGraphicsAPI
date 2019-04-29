@@ -56,7 +56,10 @@ namespace el {
         GraphicsWindow();
         virtual ~GraphicsWindow();
 
-        virtual bool run() = 0;
+        virtual void makeContextCurrent() = 0;
+
+        virtual uint32_t getWidth() const = 0;
+        virtual uint32_t getHeight() const = 0 ;
     };
 
     class GraphicsWindowGLFW final : public GraphicsWindow
@@ -69,16 +72,26 @@ namespace el {
         bool setup(const GraphicsWindowDesc& desc);
         void close(); 
 
-        bool run() override;
+        void makeContextCurrent() override;
+
+        void setWidth(uint32_t width);
+        uint32_t getWidth() const override;
+
+        void setHeight(uint32_t height);
+        uint32_t getHeight() const override;
 
     // private:
 
         static void errorCallback(int error, const char* description);
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+        static void sizeCallback(GLFWwindow* window, int width, int height);
 
         bool setupGLFW();
         bool setupWindow();
         
+        uint32_t _width;
+        uint32_t _height;
+
         GLFWwindow* _window;
         GraphicsWindowDesc _windowDesc;
     };

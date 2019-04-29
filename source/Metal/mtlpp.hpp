@@ -646,7 +646,7 @@ namespace mtlpp
     }
     MTLPP_AVAILABLE(10_11, 8_0);
 
-    enum class TextureUsage
+    enum TextureUsage : uint32_t
     {
         Unknown         = 0x0000,
         ShaderRead      = 0x0001,

@@ -10,5 +10,6 @@ namespace el {
 
     typedef std::weak_ptr<class MTLDevice> MTLDeviceWeakPtr;
 
-    mtlpp::PixelFormat asPixelForamt(GraphicsPixelFormat format);
+    mtlpp::PixelFormat asPixelFormat(GraphicsPixelFormat format);
+    mtlpp::TextureUsage asTextureUsage(GraphicsTextureUsageFlags usage);
 };

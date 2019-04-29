@@ -67,6 +67,8 @@ namespace el {
     GLFWwindow* _get(const GraphicsWindowPtr& ptr)
     {
         auto glfw = std::static_pointer_cast<GraphicsWindowGLFW>(ptr);
+        if (glfw == nullptr)
+            return nullptr;
         return glfw->_window;
     }
 
@@ -90,13 +92,13 @@ int bunny_run()
     if (!windows[0]) 
         return false;
 
-    glfwMakeContextCurrent(_get(windows[0]));
+    windows[0]->makeContextCurrent();
 
     GraphicsDeviceDesc deviceDesc;
     deviceDesc.setType(window_desc[0].getDeviceType());
 
     GraphicsDevicePtr device = createDevice(deviceDesc);
-    context[0] = device->createDeviceContext();
+    context[0] = device->createContext();
 
     GraphicsShaderPtr vertex_shader;
     GraphicsShaderPtr fragment_shader;
@@ -222,7 +224,7 @@ int bunny_run()
         glfwSetWindowPos(_get(windows[1]), xpos + width + left + right, ypos);
     }
 
-    glfwMakeContextCurrent(_get(windows[1]));
+    windows[1]->makeContextCurrent();
 
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
@@ -235,10 +237,10 @@ int bunny_run()
         int i;
         for (i = 0; i < 1; i++)
         {
-            int width, height;
+            windows[i]->makeContextCurrent();
 
-            glfwGetFramebufferSize(_get(windows[i]), &width, &height);
-            glfwMakeContextCurrent(_get(windows[i]));
+            auto width = windows[i]->getWidth();
+            auto height = windows[i]->getHeight();
 
             profile[i].start();
 

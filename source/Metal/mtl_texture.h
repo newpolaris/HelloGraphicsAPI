@@ -2,7 +2,7 @@
 
 #include "predefine.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 #include <graphics_types.h>
 #include <graphics_texture.h>
@@ -18,10 +18,10 @@ namespace el {
         MTLTexture();
         ~MTLTexture();
 
-        bool create(GraphicsTextureDesc desc);
+        bool create(const GraphicsTextureDesc& desc);
         void destroy();
 
-        void setDevice(GraphicsDevicePtr device);
+        void setDevice(const GraphicsDevicePtr& device);
         GraphicsDevicePtr getDevice();
 
         const GraphicsTextureDesc& getTextureDesc() const override;
@@ -29,12 +29,10 @@ namespace el {
     private:
 
         mtlpp::Texture _texture;
-
-        GraphicsTextureDesc _textureDesc;
-
         MTLDeviceWeakPtr _device;
+        GraphicsTextureDesc _textureDesc;
     };
 
 } // namespace el {
 
-#endif // EL_PLAT_APPLE
+#endif // EL_BUILD_METAL
