@@ -62,6 +62,9 @@ namespace el {
         void setPixelAlignment(GraphicsPixelAlignment align);
         GraphicsPixelAlignment getPixelAlignment() const;
 
+        void setTextureUsage(GraphicsTextureUsageFlags usage);
+        GraphicsTextureUsageFlags getTextureUsage() const;
+
 	private:
 
 		uint32_t _width;
@@ -81,6 +84,7 @@ namespace el {
 		GraphicsTextureDim _dim;
         GraphicsPixelFormat _pixelFormat;
         GraphicsPixelAlignment _pixelAlignment;
+        GraphicsTextureUsageFlags _textureUsage;
 	};
 
     class GraphicsTexture

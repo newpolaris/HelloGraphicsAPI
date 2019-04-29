@@ -1,22 +1,22 @@
 #pragma once
-
+    
 #include "predefine.h"
 
 #if EL_BUILD_METAL
 
 #include "graphics_types.h"
-#include "graphics_shader.h"
+#include "graphics_pipeline.h"
 #include "mtl_types.h"
 #include "mtlpp.hpp"
 
 namespace el {
     
-    class MTLShader final : public GraphicsShader
+    class MTLPipeline final : public GraphicsPipeline
     {
     public:
 
-        MTLShader();
-        ~MTLShader();
+        MTLPipeline();
+        ~MTLPipeline();
 
         bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
         void destroy();

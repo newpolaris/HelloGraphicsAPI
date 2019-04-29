@@ -183,7 +183,7 @@ namespace el {
         GraphicsSamplerMipmapModeLinear = 2,
     };
 
-    // From vulkan sepc.
+    // From vulkan spec.
     enum class GraphicsBorderColor {
         GraphicsBorderColorFloatTransparentBlack = 0,
         GraphicsBorderColorIntTransparentBlack = 1,
@@ -193,6 +193,21 @@ namespace el {
         GraphicsBorderColorIntOpaqueWhite = 5,
     };
 
+    // From vulkan spec.
+    enum GraphicsTextureUsageFlagBits {
+        GraphicsTextureUsageFlagBitTransferSrcBit = 0x00000001,
+        GraphicsTextureUsageFlagBitTransferDstBit = 0x00000002,
+        GraphicsTextureUsageFlagBitSampledBit = 0x00000004,
+        GraphicsTextureUsageFlagBitStorageBit = 0x00000008,
+        GraphicsTextureUsageFlagBitColorAttachmentBit = 0x00000010,
+        GraphicsTextureUsageFlagBitDepthStencilAttachmentBit = 0x00000020,
+        GraphicsTextureUsageFlagBitTransientAttachmentBit = 0x00000040,
+        GraphicsTextureUsageFlagBitInputAttachmentBit = 0x00000080,
+    };
+
+    typedef uint32_t GraphicsTextureUsageFlags;
+
+    // TODO: Replace with vulkan spec.
     // From MTLPixelFormat
     enum class GraphicsPixelFormat
     {
@@ -409,5 +424,6 @@ namespace el {
     };
 
     uint32_t asVertexFormatSize(VertexFormat format);
+    uint32_t asTexelSize(GraphicsPixelFormat format);
 
 } // namespace el

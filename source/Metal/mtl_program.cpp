@@ -1,6 +1,6 @@
 #include "mtl_program.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 using namespace el;
 
@@ -12,8 +12,10 @@ MTLProgram::~MTLProgram()
 {
 }
 
-bool MTLProgram::create(GraphicsProgramDesc desc)
+bool MTLProgram::create(const GraphicsProgramDesc& desc)
 {
+    mtlpp::Device device;
+
     _programDesc = std::move(desc);
     return true;
 }
@@ -32,4 +34,4 @@ const GraphicsVertexAttributes& MTLProgram::getVertexAttributes() const
     return _vertexAttributes;
 }
 
-#endif // #if EL_PLAT_APPLE
+#endif // #if EL_BUILD_METAL

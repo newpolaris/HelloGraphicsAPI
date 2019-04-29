@@ -2,7 +2,7 @@
 
 #include "predefine.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 #include <graphics_types.h>
 #include <graphics_data.h>
@@ -38,4 +38,4 @@ namespace el {
 
 } // namespace el {
 
-#endif // EL_PLAT_APPLE
+#endif // EL_BUILD_METAL

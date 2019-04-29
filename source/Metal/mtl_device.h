@@ -2,7 +2,7 @@
 
 #include "predefine.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 #include "graphics_device.h"
 #include "mtlpp.hpp"
@@ -20,7 +20,7 @@ namespace el {
 		GraphicsTexturePtr createTexture(GraphicsTextureDesc desc) override;
 		GraphicsDataPtr createBuffer(GraphicsDataDesc desc) override;
         GraphicsInputLayoutPtr createInputLayout(GraphicsInputLayoutDesc desc) override;
-        GraphicsContextPtr createDeviceContext() override;
+        GraphicsContextPtr createContext() override;
 
         mtlpp::Device& getDevice();
         mtlpp::CommandQueue& getCommandQueue();
@@ -33,4 +33,4 @@ namespace el {
 
 } // namespace el {
 
-#endif // EL_PLAT_APPLE
+#endif // EL_BUILD_METAL

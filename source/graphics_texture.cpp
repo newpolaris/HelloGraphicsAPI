@@ -18,7 +18,8 @@ GraphicsTextureDesc::GraphicsTextureDesc() :
 	_streamSize(0),
 	_dim(GraphicsTextureDim2D),
 	_pixelFormat(GraphicsPixelFormat::GraphicsPixelFormatInvalid),
-    _pixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment4)
+    _pixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment4),
+    _textureUsage(0)
 {
 }
 
@@ -181,6 +182,16 @@ void GraphicsTextureDesc::setPixelAlignment(GraphicsPixelAlignment align)
 GraphicsPixelAlignment GraphicsTextureDesc::getPixelAlignment() const
 {
     return _pixelAlignment;
+}
+
+void GraphicsTextureDesc::setTextureUsage(GraphicsTextureUsageFlags usage)
+{
+    _textureUsage = usage;
+}
+
+GraphicsTextureUsageFlags GraphicsTextureDesc::getTextureUsage() const
+{
+    return _textureUsage;
 }
 
 GraphicsTexture::GraphicsTexture()

@@ -1,9 +1,10 @@
 #include "mtl_texture.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 #include "debug.h"
 #include "mtl_device.h"
+#include "mtl_types.h"
 
 using namespace el;
 
@@ -15,30 +16,36 @@ MTLTexture::~MTLTexture()
 {
 }
 
-bool MTLTexture::create(GraphicsTextureDesc desc)
+bool MTLTexture::create(const GraphicsTextureDesc& desc)
 {
     auto device = _device.lock();
-    if (!device) return false;
+    if (!device)
+        return false;
 
-	// TODO:
-    auto format = mtlpp::PixelFormat::RGBA8Unorm;
+    if (desc.getHeight() == 0 || desc.getWidth() == 0)
+        return false;
 
+    auto format = asPixelFormat(desc.getPixelFormat());
     auto textureDesc = mtlpp::TextureDescriptor::Texture2DDescriptor(
         format, desc.getWidth(), desc.getHeight(), false);
 
-	// TODO:
-    textureDesc.SetUsage(mtlpp::TextureUsage::RenderTarget);
+    textureDesc.SetUsage(asTextureUsage(desc.getTextureUsage()));
 
     _texture = device->getDevice().NewTexture(textureDesc);
     if (!_texture)
         return false;
 
-	// TODO:
-	uint32_t bytesPerRow = 16;
+    // calc. bytesPerRow with alignment fixing
+    const int alignment = (int)desc.getPixelAlignment();
+    uint32_t bytesPerRow = desc.getWidth() * asTexelSize(desc.getPixelFormat());
+    bytesPerRow = ((bytesPerRow + alignment - 1) / alignment) * alignment;
+
+    if (desc.getStreamSize() > 0) {
+        EL_ASSERT(bytesPerRow == desc.getStreamSize() / desc.getHeight());
+    }
 
     mtlpp::Region region = { 0, 0, textureDesc.GetWidth(), textureDesc.GetHeight() };
     _texture.Replace(region, 0, desc.getStream(), bytesPerRow);
-
 	_textureDesc = std::move(desc);
 
 	return true;
@@ -46,11 +53,12 @@ bool MTLTexture::create(GraphicsTextureDesc desc)
 
 void MTLTexture::destroy()
 {
+    _texture.reset();
 }
 
-void MTLTexture::setDevice(GraphicsDevicePtr device)
+void MTLTexture::setDevice(const GraphicsDevicePtr& device)
 {
-    _device = std::static_pointer_cast<MTLDevice>(std::move(device));
+    _device = std::static_pointer_cast<MTLDevice>(device);
 }
 
 GraphicsDevicePtr MTLTexture::getDevice()
@@ -63,4 +71,4 @@ const GraphicsTextureDesc& MTLTexture::getTextureDesc() const
 	return _textureDesc;
 }
 
-#endif // EL_PLAT_APPLE
+#endif // EL_BUILD_METAL

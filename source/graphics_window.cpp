@@ -102,13 +102,34 @@ bool GraphicsWindowGLFW::setup(const GraphicsWindowDesc& desc)
 
 void GraphicsWindowGLFW::close()
 {
+    glfwSetWindowUserPointer(_window, nullptr);
     glfwDestroyWindow(_window);
     _window = nullptr;
 }
 
-bool GraphicsWindowGLFW::run()
+void GraphicsWindowGLFW::setWidth(uint32_t width)
 {
-    return true;
+    _width = width;
+}
+
+uint32_t GraphicsWindowGLFW::getWidth() const
+{
+    return _width;
+}
+
+void GraphicsWindowGLFW::setHeight(uint32_t height)
+{
+    _height = height;
+}
+
+uint32_t GraphicsWindowGLFW::getHeight() const
+{
+    return _height;
+}
+
+void GraphicsWindowGLFW::makeContextCurrent()
+{
+    glfwMakeContextCurrent(_window);
 }
 
 bool GraphicsWindowGLFW::setupGLFW()
@@ -153,12 +174,22 @@ bool GraphicsWindowGLFW::setupGLFW()
 
 bool GraphicsWindowGLFW::setupWindow()
 {
+    int width = (int)_windowDesc.getWidth();
+    int height = (int)_windowDesc.getHeight();
+    const char* title = _windowDesc.getWindowTitle().c_str();
+
     GLFWwindow* sharedWindowContext = nullptr;
-    _window = glfwCreateWindow(1024, 768, "First", NULL, sharedWindowContext);
+    _window = glfwCreateWindow(width, height, title, NULL, sharedWindowContext);
     if (!_window)
         return false;
 
+    glfwSetWindowUserPointer(_window, this);
     glfwSetKeyCallback(_window, keyCallback);
+    glfwSetWindowSizeCallback(_window, sizeCallback);
+
+    glfwGetWindowSize(_window, &width, &height);
+    _width = uint32_t(width);
+    _height = uint32_t(height);
 
     return true;
 }
@@ -172,4 +203,12 @@ void GraphicsWindowGLFW::keyCallback(GLFWwindow* window, int key, int scancode, 
 {
     if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+void GraphicsWindowGLFW::sizeCallback(GLFWwindow* window, int width, int height)
+{
+    auto glfw = static_cast<GraphicsWindowGLFW*>(glfwGetWindowUserPointer(window));
+    EL_ASSERT(glfw);
+    glfw->setWidth(uint32_t(width));
+    glfw->setHeight(uint32_t(width));
 }

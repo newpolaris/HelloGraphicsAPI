@@ -1,6 +1,6 @@
 #include "mtl_device.h"
 
-#if EL_PLAT_APPLE 
+#if EL_BUILD_METAL 
 
 #include "debug.h"
 #include "mtl_program.h"
@@ -69,7 +69,7 @@ GraphicsInputLayoutPtr MTLDevice::createInputLayout(GraphicsInputLayoutDesc desc
     return nullptr;
 }
 
-GraphicsContextPtr MTLDevice::createDeviceContext()
+GraphicsContextPtr MTLDevice::createContext()
 {
 	auto deviceContext = std::make_shared<MTLContext>();
     if (!deviceContext)
@@ -90,4 +90,4 @@ mtlpp::CommandQueue& MTLDevice::getCommandQueue()
     return _commandQueue;
 }
 
-#endif // EL_PLAT_APPLE
+#endif // EL_BUILD_METAL
