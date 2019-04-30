@@ -1140,7 +1140,7 @@ namespace mtlpp
     }
     MTLPP_AVAILABLE(10_11, 8_0);
 
-    enum class PipelineOption
+    enum PipelineOption : uint32_t
     {
         None           = 0,
         ArgumentInfo   = 1 << 0,

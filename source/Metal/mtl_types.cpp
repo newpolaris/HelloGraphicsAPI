@@ -275,3 +275,126 @@ mtlpp::TextureUsage el::asTextureUsage(GraphicsTextureUsageFlags flags)
 
     return mtlpp::TextureUsage(usage);
 }
+
+mtlpp::SamplerMinMagFilter el::asSamplerMinMagFilter(GraphicsFilter filter)
+{
+    switch (filter)
+    {
+    case GraphicsFilterNearest:
+        return SamplerMinMagFilter::Nearest;
+    case GraphicsFilterLinear:
+        return SamplerMinMagFilter::Linear;
+    default:
+        EL_ASSERT(false);
+        return SamplerMinMagFilter(0);
+    }
+}
+
+mtlpp::SamplerMipFilter el::asSamplerMipFilter(GraphicsSamplerMipmapMode mode)
+{
+    switch (mode)
+    {
+    case GraphicsSamplerMipmapModeNone:
+        return SamplerMipFilter::NotMipmapped;
+    case GraphicsSamplerMipmapModeNearest:
+        return SamplerMipFilter::Nearest;
+    case GraphicsSamplerMipmapModeLinear:
+        return SamplerMipFilter::Linear;
+    default:
+        EL_ASSERT(false);
+        return SamplerMipFilter(0);
+    }
+}
+
+mtlpp::SamplerAddressMode el::asSamplerAddressMode(GraphicsSamplerAddressMode mode)
+{
+    switch (mode)
+    {
+    case GraphicsSamplerAddressModeRepeat:
+        return SamplerAddressMode::Repeat;
+    case GraphicsSamplerAddressModeMirroredReapt:
+        return SamplerAddressMode::MirrorRepeat;
+    case GraphicsSamplerAddressModeClampToEdge:
+        return SamplerAddressMode::ClampToEdge;
+    case GraphicsSamplerAddressModeClampToBorder:
+        return SamplerAddressMode::ClampToBorderColor;
+    case GraphicsSamplerAddressModeMirrorClampToEdge:
+        return SamplerAddressMode::MirrorClampToEdge;
+    default:
+        EL_ASSERT(false);
+        return SamplerAddressMode(0);
+    }
+}
+
+mtlpp::SamplerBorderColor el::asSamplerBorderColor(GraphicsBorderColor color)
+{
+    switch (color)
+    {
+    case GraphicsBorderColorFloatTransparentBlack:
+        return SamplerBorderColor::TransparentBlack;  // {0,0,0,0}
+    case GraphicsBorderColorFloatOpaqueBlack:
+        return SamplerBorderColor::OpaqueBlack;       // {0,0,0,1}
+    case GraphicsBorderColorFloatOpaqueWhite:
+        return SamplerBorderColor::OpaqueWhite;       // {1,1,1,1}
+
+    case GraphicsBorderColorIntTransparentBlack:
+    case GraphicsBorderColorIntOpaqueBlack:
+    case GraphicsBorderColorIntOpaqueWhite:
+    default:
+        EL_ASSERT(false);
+        return SamplerBorderColor(0);
+    }
+}
+
+mtlpp::CompareFunction el::asCompareFunction(GraphicsCompareOp func)
+{
+    switch (func)
+    {
+    case GraphicsCompareOp::GraphicsCompareOpNever:
+        return CompareFunction::Never;
+    case GraphicsCompareOp::GraphicsCompareOpLess:
+        return CompareFunction::Less;
+    case GraphicsCompareOp::GraphicsCompareOpEqual:
+        return CompareFunction::Equal;
+    case GraphicsCompareOp::GraphicsCompareOpLessOrEqual:
+        return CompareFunction::LessEqual;
+    case GraphicsCompareOp::GraphicsCompareOpGreater:
+        return CompareFunction::Greater;
+    case GraphicsCompareOp::GraphicsCompareOpNotEqual:
+        return CompareFunction::NotEqual;
+    case GraphicsCompareOp::GraphicsCompareOpGreaterOrEqual:
+        return CompareFunction::GreaterEqual;
+    case GraphicsCompareOp::GraphicsCompareOpAlways:
+        return CompareFunction::Always;
+    default:
+        EL_ASSERT(false);
+        return CompareFunction(0);
+    }
+}
+
+
+mtlpp::StencilOperation el::asStencilOperation(GraphicsStencilOp func)
+{
+    switch (func)
+    {
+    case GraphicsStencilOp::GraphicsStencilOpKeep:
+        return StencilOperation::Keep;
+    case GraphicsStencilOp::GraphicsStencilOpZero:
+        return StencilOperation::Zero;
+    case GraphicsStencilOp::GraphicsStencilOpReplace:
+        return StencilOperation::Replace;
+    case GraphicsStencilOp::GraphicsStencilOpIncrementAndClamp:
+        return StencilOperation::IncrementClamp;
+    case GraphicsStencilOp::GraphicsStencilOpDecrementAndClamp:
+        return StencilOperation::DecrementClamp;
+    case GraphicsStencilOp::GraphicsStencilOpInvert:
+        return StencilOperation::Invert;
+    case GraphicsStencilOp::GraphicsStencilOpIncrementAndWrap:
+        return StencilOperation::IncrementWrap;
+    case GraphicsStencilOp::GraphicsStencilOpDecrementAndWrap:
+        return StencilOperation::DecrementWrap;
+    default:
+        EL_ASSERT(false);
+        return StencilOperation(0);
+    }
+}

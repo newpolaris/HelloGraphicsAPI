@@ -12,4 +12,12 @@ namespace el {
 
     mtlpp::PixelFormat asPixelFormat(GraphicsPixelFormat format);
     mtlpp::TextureUsage asTextureUsage(GraphicsTextureUsageFlags usage);
+    mtlpp::SamplerMinMagFilter asSamplerMinMagFilter(GraphicsFilter filter);;
+
+    mtlpp::SamplerMipFilter asSamplerMipFilter(GraphicsSamplerMipmapMode mode);
+    mtlpp::SamplerAddressMode asSamplerAddressMode(GraphicsSamplerAddressMode mode);
+    mtlpp::SamplerBorderColor asSamplerBorderColor(GraphicsBorderColor color);
+    mtlpp::CompareFunction asCompareFunction(GraphicsCompareOp func);
+    mtlpp::StencilOperation asStencilOperation(GraphicsStencilOp func);
+
 };

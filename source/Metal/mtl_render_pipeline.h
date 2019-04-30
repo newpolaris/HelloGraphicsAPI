@@ -11,28 +11,25 @@
 
 namespace el {
     
-    class MTLPipeline final : public GraphicsPipeline
+    class MTLRenderPipeline final : public GraphicsPipeline
     {
     public:
 
-        MTLPipeline();
-        ~MTLPipeline();
+        MTLRenderPipeline();
+        ~MTLRenderPipeline();
 
-        bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
+        bool create(const GraphicsPipelineDesc& desc);
         void destroy();
         
-        const GraphicsShaderDesc& getDesc() const override;
+        const GraphicsPipelineDesc& getDesc() const override;
 
         void setDevice(GraphicsDevicePtr device);
         GraphicsDevicePtr getDevice();
 
     private:
 
-        GraphicsShaderDesc _desc;
-        
-        mtlpp::Library _library;
-        mtlpp::Function _function;
-
+        mtlpp::RenderPipelineState _pipelineState;
+        GraphicsPipelineDesc _pipelineDesc;
         MTLDeviceWeakPtr _device;
     };
 

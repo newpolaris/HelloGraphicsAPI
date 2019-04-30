@@ -96,14 +96,14 @@ void MTLContext::finsh(bool waitForCompletion)
     _commandBuffer.reset();
 }
 
-void MTLContext::setDepthTest(bool isEnable)
+void MTLContext::setDepthTestEnable(bool enable)
 {
-    // _isDepthTest = isEnable;
+    // _depthTestEnable = enable;
 }
 
-void MTLContext::setCullFace(bool isEnable)
+void MTLContext::setCullFaceEnable(bool enable)
 {
-    // _isCullFace = isEnable;
+    // _cullFaceEnable = enable;
 }
 
 void MTLContext::setViewport(const Viewport& viewport) 

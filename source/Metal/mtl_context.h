@@ -27,8 +27,8 @@ namespace el {
         void endRendering() override;
         void finsh(bool waitForCompletion = false);
         
-        void setDepthTest(bool isEnable) override;
-        void setCullFace(bool isEnable) override;
+        void setDepthTestEnable(bool enable) override;
+        void setCullFaceEnable(bool enable) override;
         
         void setViewport(const Viewport& viewport) override;
         void setProgram(const GraphicsProgramPtr& program) override;

@@ -1,4 +1,4 @@
-#include "mtl_reder_pipeline.h"
+#include "mtl_render_pipeline.h"
 
 #if EL_BUILD_METAL
 
@@ -17,16 +17,49 @@ MTLRenderPipeline::~MTLRenderPipeline()
 {
 }
 
+enum class PrimitiveTopologyClass
+{
+    Unspecified = 0,
+    Point = 1,
+    Line = 2,
+    Triangle = 3,
+};
+
 bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
 {
-    ns::Error error = nullptr;
+    ns::Error error;
+
+    mtlpp::Device device;
+
+    RenderPipelineDescriptor descriptor;
+    // descriptor.SetVertexDescriptor(VertexDescriptor());
+        void SetVertexDescriptor(const VertexDescriptor& vertexDescriptor);
+        void SetVertexFunction(const Function& vertexFunction);
+        void SetFragmentFunction(const Function& fragmentFunction);
+        void SetRasterizationEnabled(bool rasterizationEnabled);
+        void SetDepthAttachmentPixelFormat(PixelFormat depthAttachmentPixelFormat);
+        void SetStencilAttachmentPixelFormat(PixelFormat stencilAttachmentPixelFormat);
+        void SetLabel(const ns::String& label);
+
+    // TODO:
+    // void SetInputPrimitiveTopology(PrimitiveTopologyClass inputPrimitiveTopology) MTLPP_AVAILABLE_MAC(10_11);
+    // void SetSampleCount(uint32_t sampleCount);
+    // void SetAlphaToCoverageEnabled(bool alphaToCoverageEnabled);
+    // void SetAlphaToOneEnabled(bool alphaToOneEnabled);
+
+    RenderPipelineReflection reflection;
+    PipelineOption pipelineOptions = PipelineOption(PipelineOption::ArgumentInfo | PipelineOption::BufferTypeInfo);
+    _pipelineState = device.NewRenderPipelineState(descriptor, pipelineOptions, &reflection, &error);
+    if (!_pipelineState)
+        return false;
 
 #if 0
-    mltpp::device device;
-    device.
-        MTLRenderPipelineReflection* reflectionObj;
-    MTLPipelineOption option = MTLPipelineOptionBufferTypeInfo | MTLPipelineOptionArgumentInfo;
-    id <MTLRenderPipelineState> pso = [device newRenderPipelineStateWithDescriptor : pipelineStateDescriptor options : option reflection : &reflectionObj error : &error];
+    const auto vertexArgs = reflection.GetVertexArguments();
+    for (uint32_t i = 0; i < vertexArgs.GetSize(); i++)
+    {
+        vertexArgs[i].GetBufferDataType
+    }
+    reflection.GetFragmentArguments();
 
     for (MTLArgument *arg in reflectionObj.vertexArguments)
     {
@@ -41,6 +74,26 @@ bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
         }
     }
 #endif
+    return true;
+}
+
+void MTLRenderPipeline::destroy()
+{
+    _pipelineState.reset();
+}
+
+const GraphicsPipelineDesc& MTLRenderPipeline::getDesc() const
+{
+    return _pipelineDesc;
+}
+
+void MTLRenderPipeline::setDevice(GraphicsDevicePtr device)
+{
+}
+
+GraphicsDevicePtr MTLRenderPipeline::getDevice()
+{
+    return GraphicsDevicePtr();
 }
 
 #endif // EL_BUILD_METAL

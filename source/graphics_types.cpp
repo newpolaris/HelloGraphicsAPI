@@ -80,3 +80,4 @@ uint32_t el::asTexelSize(GraphicsPixelFormat format)
         EL_ASSERT(false);
         return 0;
     };
+}

@@ -73,7 +73,7 @@ void GraphicsTextureDesc::setAddressModeU(GraphicsSamplerAddressMode mode)
     _addressModeU = mode;
 }
 
-GraphicsSamplerAddressMode GraphicsTextureDesc::getAddresModeV() const
+GraphicsSamplerAddressMode GraphicsTextureDesc::getAddressModeV() const
 {
     return _addressModeV;
 }
@@ -83,7 +83,7 @@ void GraphicsTextureDesc::setAddressModeV(GraphicsSamplerAddressMode mode)
     _addressModeV = mode;
 }
 
-GraphicsSamplerAddressMode GraphicsTextureDesc::getAddresModeW() const
+GraphicsSamplerAddressMode GraphicsTextureDesc::getAddressModeW() const
 {
     return _addressModeW;
 }

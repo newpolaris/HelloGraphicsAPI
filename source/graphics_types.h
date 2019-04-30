@@ -1,6 +1,5 @@
 #pragma once
 
-#include "predefine.h"
 #include <memory>
 #include <vector>
 #include <cstdint>
@@ -53,9 +52,12 @@ namespace el {
     class GraphicsShaderDesc;
     class GraphicsTextureDesc;
     class GraphicsDataDesc;
+    class GraphicsSamplerDesc;
     class GraphicsInputLayoutDesc;
     class GraphicsInputBinding;
     class GraphicsInputAttribute;
+    class GraphicsDepthStencilDesc;
+    class GraphicsStencilOpState;
 
     typedef std::shared_ptr<class GraphicsDevice> GraphicsDevicePtr;
     typedef std::shared_ptr<class GraphicsContext> GraphicsContextPtr;
@@ -65,6 +67,8 @@ namespace el {
     typedef std::shared_ptr<class GraphicsData> GraphicsDataPtr;
     typedef std::shared_ptr<class GraphicsInputLayout> GraphicsInputLayoutPtr;
     typedef std::shared_ptr<class GraphicsVertexAttribute> GraphicsVertexAttributePtr;
+    typedef std::shared_ptr<class GraphicsSampler> GraphicsSamplerPtr;
+    typedef std::shared_ptr<class GraphicsDepthStencil> GraphicsDepthStencilPtr;
 
     typedef std::weak_ptr<GraphicsDevice> GraphicsDeviceWeakPtr;
 
@@ -184,7 +188,7 @@ namespace el {
     };
 
     // From vulkan spec.
-    enum class GraphicsBorderColor {
+    enum GraphicsBorderColor {
         GraphicsBorderColorFloatTransparentBlack = 0,
         GraphicsBorderColorIntTransparentBlack = 1,
         GraphicsBorderColorFloatOpaqueBlack = 2,
@@ -421,6 +425,33 @@ namespace el {
     {
         GraphicsInputRateVertex = 0,
         GraphicsInputRateInstance = 1
+    };
+
+    enum class GraphicsCompareOp : uint32_t
+    {
+        GraphicsCompareOpNever = 0,
+        GraphicsCompareOpLess = 1,
+        GraphicsCompareOpEqual = 2,
+        GraphicsCompareOpLessOrEqual = 3,
+        GraphicsCompareOpGreater = 4,
+        GraphicsCompareOpNotEqual = 5,
+        GraphicsCompareOpGreaterOrEqual = 6,
+        GraphicsCompareOpAlways = 7,
+        GraphicsCompareOpMaxEnum = 0x7FFFFFFF
+    };
+
+    // From vulkan sepc.
+    enum class GraphicsStencilOp : uint32_t
+    {
+        GraphicsStencilOpKeep = 0,
+        GraphicsStencilOpZero = 1,
+        GraphicsStencilOpReplace = 2,
+        GraphicsStencilOpIncrementAndClamp = 3,
+        GraphicsStencilOpDecrementAndClamp = 4,
+        GraphicsStencilOpInvert = 5,
+        GraphicsStencilOpIncrementAndWrap = 6,
+        GraphicsStencilOpDecrementAndWrap = 7,
+        GraphicsStencilOpMaxEnum = 0x7FFFFFFF
     };
 
     uint32_t asVertexFormatSize(VertexFormat format);

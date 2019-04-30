@@ -26,8 +26,8 @@ namespace el {
 
     private:
 
-        GraphicsProgramDesc _programDesc;
         GraphicsVertexAttributes _vertexAttributes;
+        GraphicsProgramDesc _programDesc;
     };
 
 } // namespace el {

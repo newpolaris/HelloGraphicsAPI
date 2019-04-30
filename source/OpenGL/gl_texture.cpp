@@ -83,8 +83,8 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 #endif
 
     auto wrapS = asSamplerAddressMode(desc.getAddressModeU());
-    auto wrapT = asSamplerAddressMode(desc.getAddresModeV());
-    auto wrapR = asSamplerAddressMode(desc.getAddresModeW());
+    auto wrapT = asSamplerAddressMode(desc.getAddressModeV());
+    auto wrapR = asSamplerAddressMode(desc.getAddressModeW());
 
     if (wrapS != defaultWrap)
         GL_CHECK(glTexParameteri(_target, GL_TEXTURE_WRAP_S, wrapS));

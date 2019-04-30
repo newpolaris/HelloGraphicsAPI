@@ -11,8 +11,10 @@ MTLInputLayout::~MTLInputLayout()
 {
 }
 
-bool MTLInputLayout::create(GraphicsInputLayoutDesc desc)
+bool MTLInputLayout::create(const GraphicsInputLayoutDesc& desc)
 {
+    // mtlpp::VertexBufferLayoutDescriptor
+
     _desc = std::move(desc);
 
     return true;

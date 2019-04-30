@@ -29,10 +29,10 @@ namespace el {
         GraphicsSamplerAddressMode getAddressModeU() const;
         void setAddressModeU(GraphicsSamplerAddressMode wrap);
 
-        GraphicsSamplerAddressMode getAddresModeV() const;
+        GraphicsSamplerAddressMode getAddressModeV() const;
         void setAddressModeV(GraphicsSamplerAddressMode wrap);
 
-        GraphicsSamplerAddressMode getAddresModeW() const;
+        GraphicsSamplerAddressMode getAddressModeW() const;
         void setAddressModeW(GraphicsSamplerAddressMode wrap);
 
         GraphicsFilter getMinFilter() const;
