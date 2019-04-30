@@ -36,12 +36,12 @@ namespace el {
         uint32_t height;
     };
 
-    inline bool operator==(const Viewport& v1, const Viewport& v2) noexcept
+    inline bool operator==(const Viewport& v1, const Viewport& v2)
     {
         return v1.x == v2.x && v1.y == v2.y && v1.width == v2.width && v1.height == v2.height;
     }
 
-    inline bool operator!=(const Viewport& v1, const Viewport& v2) noexcept
+    inline bool operator!=(const Viewport& v1, const Viewport& v2)
     {
         return !(v1 == v2);
     }

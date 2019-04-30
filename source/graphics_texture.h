@@ -98,8 +98,8 @@ namespace el {
 
     private:
 
-        GraphicsTexture(const GraphicsTexture&) = delete;
-        GraphicsTexture& operator=(const GraphicsTexture&) = delete;
+        GraphicsTexture(const GraphicsTexture&);
+        GraphicsTexture& operator=(const GraphicsTexture&);
     };
 
 } // namespace el {

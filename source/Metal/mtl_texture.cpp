@@ -44,7 +44,7 @@ bool MTLTexture::create(const GraphicsTextureDesc& desc)
         EL_ASSERT(bytesPerRow == desc.getStreamSize() / desc.getHeight());
     }
 
-    mtlpp::Region region = { 0, 0, textureDesc.GetWidth(), textureDesc.GetHeight() };
+    auto region = mtlpp::Region( 0, 0, textureDesc.GetWidth(), textureDesc.GetHeight() );
     _texture.Replace(region, 0, desc.getStream(), bytesPerRow);
 	_textureDesc = std::move(desc);
 

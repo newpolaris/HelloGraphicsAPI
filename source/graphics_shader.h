@@ -37,8 +37,8 @@ namespace el {
 
     private:
 
-        GraphicsShader(const GraphicsShader&) = delete;
-        GraphicsShader& operator=(const GraphicsShader&) = delete;
+        GraphicsShader(const GraphicsShader&);
+        GraphicsShader& operator=(const GraphicsShader&);
     };
 
 } // namespace el {

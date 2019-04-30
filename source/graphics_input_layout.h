@@ -90,6 +90,9 @@ namespace el {
 
     private:
 
+        GraphicsInputLayout(const GraphicsInputLayout&);
+        GraphicsInputLayout& operator=(const GraphicsShader&);
+
         GraphicsInputLayoutDesc _desc;
     };
 

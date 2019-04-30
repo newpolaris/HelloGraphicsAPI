@@ -108,13 +108,13 @@ int bunny_run()
     GraphicsDataPtr index_buffer;
     GraphicsInputLayoutPtr input_layout;
 
-    std::vector<std::string> objfiles = {
-        "kitten.obj",
-        "rabbit.obj",
-        "wolf.obj",
+    std::string objfiles[] = {
+		"kitten.obj",
+		"rabbit.obj",
+		"wolf.obj",
     };
     Geometry geometry;
-    for (uint32_t i = 0; i < objfiles.size(); i++)
+    for (uint32_t i = 0; i < _countof(objfiles); i++)
         EL_ASSERT(LoadMesh(&geometry, el::getResourcePath() + objfiles[i]));
 
     // Create the OpenGL objects inside the first context, created above
@@ -175,7 +175,7 @@ int bunny_run()
 
     const float fNear = 0.1f;
     const float fFar = 1000.f;
-    std::default_random_engine eng {10};
+    std::default_random_engine eng(10);
     std::uniform_real_distribution<float> urd(0, 1);
     const uint32_t draw_count = 2000;
     std::vector<MeshDraw> draws(draw_count);

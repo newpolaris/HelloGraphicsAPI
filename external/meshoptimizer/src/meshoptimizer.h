@@ -703,11 +703,16 @@ public:
 
 	typedef StorageT<void> Storage;
 
+#pragma warning(push)
+#pragma warning(disable: 4351)
+
 	meshopt_Allocator()
 		: blocks()
 		, count(0)
 	{
 	}
+
+#pragma warning(pop)
 
 	~meshopt_Allocator()
 	{

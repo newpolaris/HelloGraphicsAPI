@@ -33,8 +33,8 @@ namespace el {
 		GraphicsProgram();
 		virtual ~GraphicsProgram();
 
-		GraphicsProgram(const GraphicsProgram&) = delete;
-		GraphicsProgram& operator=(const GraphicsProgram&) = delete;
+		GraphicsProgram(const GraphicsProgram&);
+		GraphicsProgram& operator=(const GraphicsProgram&);
 
 		virtual const GraphicsProgramDesc& getProgramDesc() const = 0;
         virtual const GraphicsVertexAttributes& getVertexAttributes() const = 0;

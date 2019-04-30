@@ -2,6 +2,7 @@
 
 #include <graphics_types.h>
 #include <linmath.h>
+#include "debug.h"
 
 namespace el {
 
@@ -19,7 +20,6 @@ namespace el {
         virtual void setViewport(const Viewport& viewport) = 0;
         virtual void setProgram(const GraphicsProgramPtr& program) = 0;
         virtual void setTexture(const std::string& name, const GraphicsTexturePtr& texture) = 0;
-        [[deprecated]]
         virtual void setVertexBuffer(const std::string& name, const GraphicsDataPtr& vertexData, uint32_t stride, uint32_t offset) = 0;
         virtual void setVertexBuffer(uint32_t binding, const GraphicsDataPtr& vertexData, uint32_t offset = 0) = 0;
         virtual void setIndexBuffer(const GraphicsDataPtr& indexData) = 0;
@@ -39,8 +39,8 @@ namespace el {
 
     private:
 
-        GraphicsContext(const GraphicsContext&) = delete;
-        GraphicsContext& operator=(const GraphicsContext&) = delete;
+        GraphicsContext(const GraphicsContext&);
+        GraphicsContext& operator=(const GraphicsContext&);
     };
 
 } // namespace el {

@@ -87,7 +87,7 @@ GLuint GLShader::getID() const
     return _id;
 }
 
-const GraphicsShaderDesc& GLShader::getDesc() const noexcept
+const GraphicsShaderDesc& GLShader::getDesc() const
 {
     return _shaderDesc;
 }

@@ -132,7 +132,7 @@ namespace ns
 #endif
         }
 
-        const void* m_ptr = nullptr;
+        const void* m_ptr;
     };
 
     struct Range
