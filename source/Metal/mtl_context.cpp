@@ -150,6 +150,14 @@ void MTLContext::setInputLayout(const GraphicsInputLayoutPtr& inputLayout)
 {
 }
 
+enum class PrimitiveTopologyClass
+{
+    Unspecified = 0,
+    Point = 1,
+    Line = 2,
+    Triangle = 3,
+};
+
 void MTLContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset)
 {
 }

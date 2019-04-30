@@ -17,14 +17,6 @@ MTLRenderPipeline::~MTLRenderPipeline()
 {
 }
 
-enum class PrimitiveTopologyClass
-{
-    Unspecified = 0,
-    Point = 1,
-    Line = 2,
-    Triangle = 3,
-};
-
 bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
 {
     ns::Error error;
@@ -39,7 +31,6 @@ bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
         void SetRasterizationEnabled(bool rasterizationEnabled);
         void SetDepthAttachmentPixelFormat(PixelFormat depthAttachmentPixelFormat);
         void SetStencilAttachmentPixelFormat(PixelFormat stencilAttachmentPixelFormat);
-        void SetLabel(const ns::String& label);
 
     // TODO:
     // void SetInputPrimitiveTopology(PrimitiveTopologyClass inputPrimitiveTopology) MTLPP_AVAILABLE_MAC(10_11);
