@@ -49,12 +49,12 @@ GraphicsInputRate GraphicsInputBinding::getInputRate() const
 GraphicsInputAttribute::GraphicsInputAttribute() :
     _binding(0u),
     _location(0u),
-    _format(VertexFormat::Invalid),
+    _format(GraphicsVertexFormat::Invalid),
     _offset(0u)
 {
 }
 
-GraphicsInputAttribute::GraphicsInputAttribute(uint32_t binding, std::string name, uint32_t location, VertexFormat format, uint32_t offset) :
+GraphicsInputAttribute::GraphicsInputAttribute(uint32_t binding, std::string name, uint32_t location, GraphicsVertexFormat format, uint32_t offset) :
     _binding(binding),
     _name(std::move(name)),
     _location(location),
@@ -93,12 +93,12 @@ const std::string& GraphicsInputAttribute::getName() const
     return _name;
 }
 
-void GraphicsInputAttribute::setFormat(VertexFormat format)
+void GraphicsInputAttribute::setFormat(GraphicsVertexFormat format)
 {
     _format = format;
 }
 
-VertexFormat el::GraphicsInputAttribute::getFormat() const
+GraphicsVertexFormat el::GraphicsInputAttribute::getFormat() const
 {
     return _format;
 }

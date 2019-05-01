@@ -31,37 +31,37 @@ void GraphicsWindowDesc::setWindowType(GraphicsWindowType type)
     _windowType = type;
 }
 
-GraphicsWindowType el::GraphicsWindowDesc::getWindowType() const
+GraphicsWindowType GraphicsWindowDesc::getWindowType() const
 {
     return _windowType;
 }
 
-void el::GraphicsWindowDesc::setWindowTitle(const std::string& title)
+void GraphicsWindowDesc::setWindowTitle(const std::string& title)
 {
     _windowTitle = title;
 }
 
-const std::string& el::GraphicsWindowDesc::getWindowTitle() const
+const std::string& GraphicsWindowDesc::getWindowTitle() const
 {
     return _windowTitle;
 }
 
-void el::GraphicsWindowDesc::setWidth(uint32_t width)
+void GraphicsWindowDesc::setWidth(uint32_t width)
 {
     _width = width;
 }
 
-uint32_t el::GraphicsWindowDesc::getWidth() const
+uint32_t GraphicsWindowDesc::getWidth() const
 {
     return _width;
 }
 
-void el::GraphicsWindowDesc::setHeight(uint32_t height)
+void GraphicsWindowDesc::setHeight(uint32_t height)
 {
     _height = height;
 }
 
-uint32_t el::GraphicsWindowDesc::getHeight() const
+uint32_t GraphicsWindowDesc::getHeight() const
 {
     return _height;
 }

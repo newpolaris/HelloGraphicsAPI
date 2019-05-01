@@ -3,14 +3,14 @@
 
 using namespace el;
 
-uint32_t el::asVertexFormatSize(VertexFormat format)
+uint32_t el::asVertexFormatSize(GraphicsVertexFormat format)
 {
     switch (format) 
     {
-    case VertexFormat::Float:               return 4;
-    case VertexFormat::Float2:              return 4*2;
-    case VertexFormat::Float3:              return 4*3;
-    case VertexFormat::Float4:              return 4*4;
+    case GraphicsVertexFormat::Float:               return 4;
+    case GraphicsVertexFormat::Float2:              return 4*2;
+    case GraphicsVertexFormat::Float3:              return 4*3;
+    case GraphicsVertexFormat::Float4:              return 4*4;
     default:
         EL_ASSERT(false);
         return 0;

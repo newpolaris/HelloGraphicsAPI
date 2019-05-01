@@ -32,7 +32,7 @@ namespace el {
     public:
 
         GraphicsInputAttribute();
-        GraphicsInputAttribute(uint32_t binding, std::string name, uint32_t location, VertexFormat format, uint32_t offset);
+        GraphicsInputAttribute(uint32_t binding, std::string name, uint32_t location, GraphicsVertexFormat format, uint32_t offset);
 
         void setBinding(uint32_t binding);
         uint32_t getBinding() const;
@@ -43,8 +43,8 @@ namespace el {
         void setName(std::string name);
         const std::string& getName() const;
 
-        void setFormat(VertexFormat format);
-        VertexFormat getFormat() const;
+        void setFormat(GraphicsVertexFormat format);
+        GraphicsVertexFormat getFormat() const;
 
         void setOffset(uint32_t offset);
         uint32_t getOffset() const;
@@ -54,7 +54,7 @@ namespace el {
         uint32_t _binding;
         std::string _name;
         uint32_t _location;
-        VertexFormat _format;
+        GraphicsVertexFormat _format;
         uint32_t _offset;
     };
 

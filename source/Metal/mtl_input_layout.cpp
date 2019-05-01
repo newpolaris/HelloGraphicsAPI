@@ -13,7 +13,23 @@ MTLInputLayout::~MTLInputLayout()
 
 bool MTLInputLayout::create(const GraphicsInputLayoutDesc& desc)
 {
-    // mtlpp::VertexBufferLayoutDescriptor
+    auto& layout = _inputLayout.GetLayouts();
+    for (uint32_t i = 0; desc.getBindings().size(); i++)
+    {
+        auto& source = desc.getBindings();
+        layout[i].SetStepFunction(asVertexStepFunction(source[i].getInputRate()));
+        layout[i].SetStepRate(1);
+        layout[i].SetStride(source[i].getStride());
+    }
+
+    auto& attributes = _inputLayout.GetAttributes();
+    for (uint32_t i = 0; desc.getAttributes().size(); i++)
+    {
+        auto& source = desc.getAttributes();
+        attributes[i].SetBufferIndex(source[i].getBinding());
+        attributes[i].SetFormat(asVertexFormat(source[i].getFormat()));
+        attributes[i].SetOffset(source[i].getOffset());
+    }
 
     _desc = std::move(desc);
 
@@ -22,6 +38,7 @@ bool MTLInputLayout::create(const GraphicsInputLayoutDesc& desc)
 
 void MTLInputLayout::destory()
 {
+    _inputLayout.reset();
 }
 
 void MTLInputLayout::setDevice(GraphicsDevicePtr device)

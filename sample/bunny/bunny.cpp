@@ -95,7 +95,7 @@ int bunny_run()
     windows[0]->makeContextCurrent();
 
     GraphicsDeviceDesc deviceDesc;
-    deviceDesc.setType(window_desc[0].getDeviceType());
+    deviceDesc.setType(GraphicsDeviceTypeOpenGL);
 
     GraphicsDevicePtr device = createDevice(deviceDesc);
     context[0] = device->createContext();

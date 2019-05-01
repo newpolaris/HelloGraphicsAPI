@@ -19,5 +19,6 @@ namespace el {
     mtlpp::SamplerBorderColor asSamplerBorderColor(GraphicsBorderColor color);
     mtlpp::CompareFunction asCompareFunction(GraphicsCompareOp func);
     mtlpp::StencilOperation asStencilOperation(GraphicsStencilOp func);
-
+    mtlpp::VertexFormat asVertexFormat(GraphicsVertexFormat format);
+    mtlpp::VertexStepFunction asVertexStepFunction(GraphicsInputRate func);
 };

@@ -24,11 +24,12 @@ bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
     mtlpp::Device device;
 
     RenderPipelineDescriptor descriptor;
-    // descriptor.SetVertexDescriptor(VertexDescriptor());
-        void SetVertexDescriptor(const VertexDescriptor& vertexDescriptor);
-        void SetVertexFunction(const Function& vertexFunction);
-        void SetFragmentFunction(const Function& fragmentFunction);
-        void SetRasterizationEnabled(bool rasterizationEnabled);
+    // descriptor.SetVertexDescriptor(desc.getInputLayout());
+
+    // void SetVertexFunction(desc.getVertexShader());
+    // void SetFragmentFunction(const Function& fragmentFunction);
+    // bool rasterizationEnabled = fragmentShader != nullptr;
+    void SetRasterizationEnabled(bool rasterizationEnabled);
         void SetDepthAttachmentPixelFormat(PixelFormat depthAttachmentPixelFormat);
         void SetStencilAttachmentPixelFormat(PixelFormat stencilAttachmentPixelFormat);
 
@@ -44,14 +45,14 @@ bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
     if (!_pipelineState)
         return false;
 
-#if 0
     const auto vertexArgs = reflection.GetVertexArguments();
     for (uint32_t i = 0; i < vertexArgs.GetSize(); i++)
     {
-        vertexArgs[i].GetBufferDataType
+        // vertexArgs[i].GetBufferDataType
     }
     reflection.GetFragmentArguments();
 
+#if 0
     for (MTLArgument *arg in reflectionObj.vertexArguments)
     {
         NSLog(@"Found arg: %@\n", arg.name);
@@ -65,6 +66,7 @@ bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
         }
     }
 #endif
+
     return true;
 }
 

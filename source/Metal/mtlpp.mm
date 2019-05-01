@@ -2395,6 +2395,7 @@ namespace ns
 
     void Object::reset(void* ptr)
     {
+        Validate();
         if (m_ptr)
             CFRelease(m_ptr);
         m_ptr = ptr;

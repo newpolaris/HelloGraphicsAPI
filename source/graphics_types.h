@@ -359,9 +359,9 @@ namespace el {
         GraphicsPrimitiveTypeFan = 5,
     };
 
-    // TODO: merge with vulkan format
-    // from apple format;
-    enum class VertexFormat
+    // TODO:
+    // from apple spec.
+    enum class GraphicsVertexFormat
     {
         Invalid = 0,
 
@@ -454,7 +454,7 @@ namespace el {
         GraphicsStencilOpMaxEnum = 0x7FFFFFFF
     };
 
-    uint32_t asVertexFormatSize(VertexFormat format);
+    uint32_t asVertexFormatSize(GraphicsVertexFormat format);
     uint32_t asTexelSize(GraphicsPixelFormat format);
 
 } // namespace el

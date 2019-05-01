@@ -152,11 +152,6 @@ int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
 
-    glfwSetErrorCallback(error_callback);
-
-    if (!glfwInit())
-        exit(EXIT_FAILURE);
-
 #ifdef GLFW_INCLUDE_ES3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
@@ -375,6 +370,9 @@ int main(int argc, char** argv)
             glfwMakeContextCurrent(windows[i]);
 
             profile[i].start();
+
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_CULL_FACE);
 
             context[i]->beginRendering();
             context[i]->setProgram(program);

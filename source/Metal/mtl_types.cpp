@@ -398,3 +398,117 @@ mtlpp::StencilOperation el::asStencilOperation(GraphicsStencilOp func)
         return StencilOperation(0);
     }
 }
+
+mtlpp::VertexFormat el::asVertexFormat(GraphicsVertexFormat format)
+{
+    switch (format)
+    {
+    case GraphicsVertexFormat::UChar2:
+        return VertexFormat::UChar2;
+    case GraphicsVertexFormat::UChar3:
+        return VertexFormat::UChar3;
+    case GraphicsVertexFormat::UChar4:
+        return VertexFormat::UChar4;
+    case GraphicsVertexFormat::Char2:
+        return VertexFormat::Char2;
+    case GraphicsVertexFormat::Char3:
+        return VertexFormat::Char3;
+    case GraphicsVertexFormat::Char4:
+        return VertexFormat::Char4;
+    case GraphicsVertexFormat::UChar2Normalized:
+        return VertexFormat::UChar2Normalized;
+    case GraphicsVertexFormat::UChar3Normalized:
+        return VertexFormat::UChar3Normalized;
+    case GraphicsVertexFormat::UChar4Normalized:
+        return VertexFormat::UChar4Normalized;
+    case GraphicsVertexFormat::Char2Normalized:
+        return VertexFormat::Char2Normalized;
+    case GraphicsVertexFormat::Char3Normalized:
+        return VertexFormat::Char3Normalized;
+    case GraphicsVertexFormat::Char4Normalized:
+        return VertexFormat::Char4Normalized;
+    case GraphicsVertexFormat::UShort2:
+        return VertexFormat::UShort2;
+    case GraphicsVertexFormat::UShort3:
+        return VertexFormat::UShort3;
+    case GraphicsVertexFormat::UShort4:
+        return VertexFormat::UShort4;
+
+    case GraphicsVertexFormat::Short2:
+        return VertexFormat::Short2;
+    case GraphicsVertexFormat::Short3:
+        return VertexFormat::Short3;
+    case GraphicsVertexFormat::Short4:
+        return VertexFormat::Short4;
+
+    case GraphicsVertexFormat::UShort2Normalized:
+        return VertexFormat::UShort2Normalized;
+    case GraphicsVertexFormat::UShort3Normalized:
+        return VertexFormat::UShort3Normalized;
+    case GraphicsVertexFormat::UShort4Normalized:
+        return VertexFormat::UShort4Normalized;
+
+    case GraphicsVertexFormat::Short2Normalized:
+        return VertexFormat::Short2Normalized;
+    case GraphicsVertexFormat::Short3Normalized:
+        return VertexFormat::Short3Normalized;
+    case GraphicsVertexFormat::Short4Normalized:
+        return VertexFormat::Short4Normalized;
+
+    case GraphicsVertexFormat::Half2:
+        return VertexFormat::Half2;
+    case GraphicsVertexFormat::Half3:
+        return VertexFormat::Half3;
+    case GraphicsVertexFormat::Half4:
+        return VertexFormat::Half4;
+
+    case GraphicsVertexFormat::Float:
+        return VertexFormat::Float;
+    case GraphicsVertexFormat::Float2:
+        return VertexFormat::Float2;
+    case GraphicsVertexFormat::Float3:
+        return VertexFormat::Float3;
+    case GraphicsVertexFormat::Float4:
+        return VertexFormat::Float4;
+
+    case GraphicsVertexFormat::Int:
+        return VertexFormat::Int;
+    case GraphicsVertexFormat::Int2:
+        return VertexFormat::Int2;
+    case GraphicsVertexFormat::Int3:
+        return VertexFormat::Int3;
+    case GraphicsVertexFormat::Int4:
+        return VertexFormat::Int4;
+
+    case GraphicsVertexFormat::UInt:
+        return VertexFormat::UInt;
+    case GraphicsVertexFormat::UInt2:
+        return VertexFormat::UInt2;
+    case GraphicsVertexFormat::UInt3:
+        return VertexFormat::UInt3;
+    case GraphicsVertexFormat::UInt4:
+        return VertexFormat::UInt4;
+
+    case GraphicsVertexFormat::Int1010102Normalized:
+        return VertexFormat::Int1010102Normalized;
+    case GraphicsVertexFormat::UInt1010102Normalized:
+        return VertexFormat::UInt1010102Normalized;
+    default:
+        EL_ASSERT(false);
+        return VertexFormat(0);
+    }
+}
+
+mtlpp::VertexStepFunction el::asVertexStepFunction(GraphicsInputRate func)
+{
+    switch (func)
+    {
+    case GraphicsInputRateVertex:
+        return VertexStepFunction::PerVertex;
+    case GraphicsInputRateInstance:
+        return VertexStepFunction::PerInstance;
+    default:
+        EL_ASSERT("false");
+        return VertexStepFunction(0);
+    }
+}

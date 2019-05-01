@@ -27,8 +27,8 @@ namespace el {
 
     private:
 
+        mtlpp::VertexDescriptor _inputLayout;
         GraphicsInputLayoutDesc _desc;
-
         MTLDeviceWeakPtr _device;
     };
 

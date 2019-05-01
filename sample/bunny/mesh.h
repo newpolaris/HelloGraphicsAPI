@@ -16,9 +16,9 @@ namespace el {
         static GraphicsInputAttributes getAttributeDescription()
         {
             GraphicsInputAttributes attrib(3);
-            attrib[0] = GraphicsInputAttribute(0, "vPosition", 0, VertexFormat::Float3, offsetof(Vertex, x));
-            attrib[1] = GraphicsInputAttribute(0, "vNormal", 1, VertexFormat::Float3, offsetof(Vertex, nx));
-            attrib[2] = GraphicsInputAttribute(0, "vTexcoord", 2, VertexFormat::Float2, offsetof(Vertex, tu));
+            attrib[0] = GraphicsInputAttribute(0, "vPosition", 0, GraphicsVertexFormat::Float3, offsetof(Vertex, x));
+            attrib[1] = GraphicsInputAttribute(0, "vNormal", 1, GraphicsVertexFormat::Float3, offsetof(Vertex, nx));
+            attrib[2] = GraphicsInputAttribute(0, "vTexcoord", 2, GraphicsVertexFormat::Float2, offsetof(Vertex, tu));
             return attrib;
         }
 
