@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <cstdio>
 #include <iostream>
 #include <debug.h>
 #include <platform.h>
@@ -20,59 +19,83 @@
 #define WGL_CONTEXT_FLAGS_ARB 0x2094
 #define WGL_CONTEXT_PROFILE_MASK_ARB 0x9126
 
-typedef HGLRC (WINAPI * WGLCREATECONTEXT_T)(HDC);
-typedef BOOL (WINAPI * WGLDELETECONTEXT_T)(HGLRC);
-typedef PROC (WINAPI * WGLGETPROCADDRESS_T)(LPCSTR);
-typedef HDC (WINAPI * WGLGETCURRENTDC_T)(void);
-typedef BOOL (WINAPI * WGLMAKECURRENT_T)(HDC, HGLRC);
-typedef BOOL (WINAPI * WGLSHARELISTS_T)(HGLRC, HGLRC);
-typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC, HGLRC, const int*);
-
-struct WglLibrary
+namespace el
 {
-    bool Load();
+    typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC)(int);
+    typedef BOOL (WINAPI * PFNWGLGETPIXELFORMATATTRIBIVARBPROC)(HDC,int,int,UINT,const int*,int*);
+    typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC)(void);
+    typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGARBPROC)(HDC);
+    typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC)(HDC,HGLRC,const int*);
 
-    HINSTANCE _instance;
-    WGLCREATECONTEXT_T CreateContext;
-    WGLDELETECONTEXT_T DeleteContext;
-    WGLGETPROCADDRESS_T GetProcAddress;
-    WGLGETCURRENTDC_T GetCurrentDC;
-    WGLMAKECURRENT_T MakeCurrent;
-    WGLSHARELISTS_T ShareLists;
-};
+    typedef HGLRC (WINAPI * PFN_wglCreateContext)(HDC);
+    typedef BOOL (WINAPI * PFN_wglDeleteContext)(HGLRC);
+    typedef PROC (WINAPI * PFN_wglGetProcAddress)(LPCSTR);
+    typedef HDC (WINAPI * PFN_wglGetCurrentDC)(void);
+    typedef HGLRC (WINAPI * PFN_wglGetCurrentContext)(void);
+    typedef BOOL (WINAPI * PFN_wglMakeCurrent)(HDC,HGLRC);
+    typedef BOOL (WINAPI * PFN_wglShareLists)(HGLRC,HGLRC);
 
-bool WglLibrary::Load()
+    extern PFN_wglGetProcAddress wglGetProcAddress;
+	extern PFN_wglMakeCurrent wglMakeCurrent;
+	extern PFN_wglCreateContext wglCreateContext;
+	extern PFN_wglDeleteContext wglDeleteContext;
+    extern PFN_wglGetCurrentDC wglGetCurrentDC;
+    extern PFN_wglGetCurrentContext wglGetCurrentContext;
+    extern PFN_wglShareLists wglShareLists;
+}
+
+namespace el
 {
-    _instance = LoadLibraryA("opengl32.dll");
-    if (!_instance)
+    PFN_wglGetProcAddress wglGetProcAddress;
+    PFN_wglMakeCurrent wglMakeCurrent;
+    PFN_wglCreateContext wglCreateContext;
+    PFN_wglDeleteContext wglDeleteContext;
+    PFN_wglGetCurrentDC wglGetCurrentDC;
+    PFN_wglGetCurrentContext wglGetCurrentContext;
+    PFN_wglShareLists wglShareLists;
+
+    bool initGLExtention();
+}
+
+#include <atomic>
+
+bool el::initGLExtention()
+{
+    static thread_local std::atomic_bool isInitGLExtention(false);
+    if (isInitGLExtention)
+        return true;
+
+    HINSTANCE instance;
+    instance = LoadLibraryA("opengl32.dll");
+    if (!instance)
     {
         EL_TRACE("WGL: Failed to load opengl32.dll");
         return false;
     }
 
-    CreateContext = (WGLCREATECONTEXT_T)
-        ::GetProcAddress(_instance, "wglCreateContext");
-    DeleteContext = (WGLDELETECONTEXT_T)
-        ::GetProcAddress(_instance, "wglDeleteContext");
-    GetProcAddress = (WGLGETPROCADDRESS_T)
-        ::GetProcAddress(_instance, "wglGetProcAddress");
-    GetCurrentDC = (WGLGETCURRENTDC_T)
-        ::GetProcAddress(_instance, "wglGetCurrentDC");
-    MakeCurrent = (WGLMAKECURRENT_T)
-        ::GetProcAddress(_instance, "wglMakeCurrent");
-    ShareLists = (WGLSHARELISTS_T)
-        ::GetProcAddress(_instance, "wglShareLists");
+    wglGetProcAddress = (PFN_wglGetProcAddress)
+        GetProcAddress(instance, "wglGetProcAddress");
+    wglMakeCurrent = (PFN_wglMakeCurrent)
+        GetProcAddress(instance, "wglMakeCurrent");
+    wglCreateContext = (PFN_wglCreateContext)
+        GetProcAddress(instance, "wglCreateContext");
+    wglDeleteContext = (PFN_wglDeleteContext)
+        GetProcAddress(instance, "wglDeleteContext");
+    wglGetCurrentDC = (PFN_wglGetCurrentDC)
+        GetProcAddress(instance, "wglGetCurrentDC");
+    wglGetCurrentContext = (PFN_wglGetCurrentContext)
+        GetProcAddress(instance, "wglGetCurrentContext");
+    wglShareLists = (PFN_wglShareLists)
+        GetProcAddress(instance, "wglShareLists");
 
+    isInitGLExtention = true;
     return true;
 }
 
-WglLibrary instance; 
+#include <mutex>
 
-#define wglCreateContext    instance.CreateContext
-#define wglMakeCurrent      instance.MakeCurrent 
-#define wglDeleteContext    instance.DeleteContext
-#define wglGetProcAddress   instance.GetProcAddress
-
+namespace el
+{
 struct PlatformDriver
 {
     HDC _hdc = 0;
@@ -80,7 +103,7 @@ struct PlatformDriver
 
     bool createDriver(void* window)
     {
-        EL_ASSERT(instance.Load());
+        EL_ASSERT(el::initGLExtention());
 
         PIXELFORMATDESCRIPTOR pfd = {
             sizeof(PIXELFORMATDESCRIPTOR),
@@ -133,7 +156,8 @@ struct PlatformDriver
             if (!wglMakeCurrent(_hdc, _context))
                 return false;
         }
-        gladLoadGL();
+        static std::once_flag flag; 
+        std::call_once(flag, gladLoadGL);
 
         return true;
     }
@@ -143,16 +167,44 @@ struct PlatformDriver
         SwapBuffers(_hdc);
     }
 };
+}
 
 #endif // EL_PLAT_WINDOWS
 
-bool TestApp()
+#include <condition_variable>
+#include <mutex>
+
+namespace el
 {
-    if (!glfwInit())
-        return false;
+    class Event {
+    public:
 
+        void set()
+        {
+            std::lock_guard<std::mutex> guard(_mutex);
+            _flag = true;
+            _condition.notify_one();
+        }
+
+        void wait()
+        {
+            std::unique_lock<std::mutex> guard(_mutex);
+            _condition.wait(guard, [this]{ return _flag;});
+            _flag = false;
+        }
+
+    private:
+
+        bool _flag = false;
+        std::condition_variable _condition;
+        std::mutex _mutex;
+    };
+
+}
+
+bool TestWindow(el::Event* ev)
+{
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
     GLFWwindow* window = glfwCreateWindow(1024, 768, "Window Sample", nullptr, nullptr);
 
     void* windowHandle = nullptr;
@@ -161,10 +213,9 @@ bool TestApp()
     windowHandle = glfwGetWin32Window(window);
 #endif
 
-    PlatformDriver driver;
+    el::PlatformDriver driver;
     EL_ASSERT(driver.createDriver(windowHandle));
-
-    std::printf("%s\n%s\n%s\n%s\n",
+    EL_TRACE("%s\n%s\n%s\n%s\n",
         glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine
         glGetString(GL_VERSION),   // e.g. 3.2 INTEL-8.0.61
         glGetString(GL_VENDOR),    // e.g. NVIDIA Corporation
@@ -181,6 +232,29 @@ bool TestApp()
     glfwDestroyWindow(window);
     return true;
 }
+
+void waits(el::Event* ev)
+{
+    ev->wait();
+    TestWindow(nullptr);
+}
+
+bool TestApp()
+{
+    if (!glfwInit())
+        return false;
+
+    el::Event ev;
+    std::thread t(waits, &ev);
+    std::chrono::seconds duration(2);
+    std::this_thread::sleep_for(duration);
+    ev.set();
+    TestWindow(nullptr);
+    t.join();
+
+    return true;
+}
+
 
 int main()
 {
