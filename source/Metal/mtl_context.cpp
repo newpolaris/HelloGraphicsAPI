@@ -4,6 +4,7 @@
 
 #include "debug.h"
 #include "mtl_device.h"
+#include "mtlpp.hpp"
 
 using namespace el;
 
@@ -79,23 +80,9 @@ void MTLContext::beginRendering()
     // renderCommandEncoder.SetCullMode(mtlpp::CullMode::None);
 }
 
-void MTLContext::setRenderPassDescirptor()
-{
-}
-
-void MTLContext::setFramebuffer()
-{
-}
-}
-
 void MTLContext::endRendering() 
 {
    
-}
-
-void MTLContext::present()
-{
-    // _commandBuffer.Present(win.GetDrawable());
 }
 
 void MTLContext::finsh(bool waitForCompletion)
@@ -164,12 +151,25 @@ void MTLContext::setInputLayout(const GraphicsInputLayoutPtr& inputLayout)
 {
 }
 
+using namespace mtlpp;
+
+PrimitiveType getPrimitiveType(GraphicsPrimitiveType type)
+{
+    switch (type)
+    {
+    case GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle:
+        return PrimitiveType::Triangle;
+    default:
+        EL_ASSERT(false);
+        return PrimitiveType(0);
+    }
+}
+
 void MTLContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset)
 {
-    auto primitive - // asPrimitive
-    // mtlpp::PrimitiveType::Triangle
-    
-    _renderCommandEncoder.Draw(, vertexStartOffset, vertexCount);
+    const mtlpp::RenderPassDescriptor renderPassDescriptor;
+    auto renderCommandEncoder = _commandBuffer.RenderCommandEncoder(renderPassDescriptor);
+    renderCommandEncoder.Draw(getPrimitiveType(primitive), vertexStartOffset, vertexCount);
 }
 
 void MTLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount, uint32_t startIndexLocation)
