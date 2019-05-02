@@ -12,7 +12,7 @@ class GLProfileBusyWait final
 {
 public:
 
-    using time_point = std::chrono::high_resolution_clock::time_point;
+    typedef std::chrono::high_resolution_clock::time_point time_point;
 
     GLProfileBusyWait();
     ~GLProfileBusyWait();

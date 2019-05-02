@@ -49,8 +49,8 @@ namespace el {
 
     private:
 
-        GraphicsData(const GraphicsData&) = delete;
-        GraphicsData& operator=(const GraphicsData&) = delete;
+        GraphicsData(const GraphicsData&);
+        GraphicsData& operator=(const GraphicsData&);
     };
 
 } // namespace el {

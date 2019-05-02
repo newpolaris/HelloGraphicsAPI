@@ -28,9 +28,9 @@ include_directories(${PROJECT_SOURCE_DIR}/external/objparser)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 option(BUILD_OPENGL "Legacy OpenGL" ON)
-if(APPLE)
+# if(APPLE)
     option(BUILD_METAL "Apple Metal" ON)
-endif()
+# endif()
 
 add_subdirectory(source)
 add_subdirectory(sample)

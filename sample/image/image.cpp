@@ -152,16 +152,11 @@ int main(int argc, char** argv)
 {
     GLFWwindow* windows[2];
 
-    glfwSetErrorCallback(error_callback);
-
-    if (!glfwInit())
-        exit(EXIT_FAILURE);
-
 #ifdef GLFW_INCLUDE_ES3
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-#elif 0 // COMPATIBILITY MODE
+#elif 1 // COMPATIBILITY MODE
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
@@ -309,7 +304,7 @@ int main(int argc, char** argv)
     }
 
     GraphicsContextPtr context[2];
-    context[0] = device->createDeviceContext();
+    context[0] = device->createContext();
     context[0]->setProgram(program); 
     context[0]->setTexture("texture", texture);
     context[0]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
@@ -346,7 +341,7 @@ int main(int argc, char** argv)
 
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
-    context[1] = device->createDeviceContext();
+    context[1] = device->createContext();
     context[1]->setProgram(program);
     context[1]->setTexture("texture", texture);
     context[1]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
@@ -375,6 +370,9 @@ int main(int argc, char** argv)
             glfwMakeContextCurrent(windows[i]);
 
             profile[i].start();
+
+            glDisable(GL_DEPTH_TEST);
+            glDisable(GL_CULL_FACE);
 
             context[i]->beginRendering();
             context[i]->setProgram(program);

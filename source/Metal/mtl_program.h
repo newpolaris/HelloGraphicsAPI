@@ -2,7 +2,7 @@
 
 #include "predefine.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 #include "graphics_types.h"
 #include "graphics_program.h"
@@ -18,20 +18,18 @@ namespace el {
         MTLProgram();
         ~MTLProgram();
 
-        bool create(GraphicsProgramDesc desc);
+        bool create(const GraphicsProgramDesc& desc);
         void destory();
-
-        void use() const;
 
         const GraphicsProgramDesc& getProgramDesc() const override;
         const GraphicsVertexAttributes& getVertexAttributes() const override;
 
     private:
 
-        GraphicsProgramDesc _programDesc;
         GraphicsVertexAttributes _vertexAttributes;
+        GraphicsProgramDesc _programDesc;
     };
 
 } // namespace el {
 
-#endif // EL_PLAT_APPLE
+#endif // EL_BUILD_METAL

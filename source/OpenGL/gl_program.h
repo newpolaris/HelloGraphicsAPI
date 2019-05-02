@@ -61,14 +61,10 @@ namespace el {
         void setUniform(const std::string& name, const GraphicsTexturePtr& texture);
 
         void setVertexBuffer(const GraphicsDataPtr& buffer);
-        [[deprecated]]
         void setVertexBuffer(const std::string& name, const GraphicsDataPtr& buffer, uint32_t stride, uint32_t offset);
-        [[deprecated]]
         void setVertexBuffer(GLint location, GLint size, GLenum type, GLsizei stride, const void *pointer);
-        [[deprecated]]
         void setVertexBuffer(GLint location, const GraphicsDataPtr& buffer, GLint size, GLenum type, GLsizei stride, GLsizei offset);
         void setIndexBuffer(const GraphicsDataPtr& buffer);
-        [[deprecated]]
         void setTexture(GLint location, const GraphicsTexturePtr& texture, GLenum unit);
         void setInputLayout(const GraphicsInputLayoutPtr& layout);
 

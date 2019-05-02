@@ -70,7 +70,7 @@ GraphicsInputLayoutPtr GLDevice::createInputLayout(GraphicsInputLayoutDesc desc)
     return nullptr;
 }
 
-GraphicsContextPtr GLDevice::createDeviceContext()
+GraphicsContextPtr GLDevice::createContext()
 {
     auto context = std::make_shared<GLContext>();
     if (context == nullptr)

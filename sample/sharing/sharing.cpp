@@ -340,9 +340,9 @@ int main(int argc, char** argv)
     }
 
     GraphicsContextPtr context[2];
-    context[0] = device->createDeviceContext();
-    context[0]->setDepthTest(false);
-    context[0]->setCullFace(false);
+    context[0] = device->createContext();
+    context[0]->setDepthTestEnable(false);
+    context[0]->setCullFaceEnable(false);
     context[0]->setProgram(program); 
     context[0]->setTexture("texture", texture);
     context[0]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);
@@ -379,9 +379,9 @@ int main(int argc, char** argv)
 
     // While objects are shared, the global context state is not and will
     // need to be set up for each context
-    context[1] = device->createDeviceContext();
-    context[1]->setDepthTest(false);
-    context[1]->setCullFace(false);
+    context[1] = device->createContext();
+    context[1]->setDepthTestEnable(false);
+    context[1]->setCullFaceEnable(false);
     context[1]->setProgram(program);
     context[1]->setTexture("texture", texture);
     context[1]->setVertexBuffer("vPos", vertex_buffer, sizeof(vertices[0]), 0);

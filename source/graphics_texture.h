@@ -29,10 +29,10 @@ namespace el {
         GraphicsSamplerAddressMode getAddressModeU() const;
         void setAddressModeU(GraphicsSamplerAddressMode wrap);
 
-        GraphicsSamplerAddressMode getAddresModeV() const;
+        GraphicsSamplerAddressMode getAddressModeV() const;
         void setAddressModeV(GraphicsSamplerAddressMode wrap);
 
-        GraphicsSamplerAddressMode getAddresModeW() const;
+        GraphicsSamplerAddressMode getAddressModeW() const;
         void setAddressModeW(GraphicsSamplerAddressMode wrap);
 
         GraphicsFilter getMinFilter() const;
@@ -62,6 +62,9 @@ namespace el {
         void setPixelAlignment(GraphicsPixelAlignment align);
         GraphicsPixelAlignment getPixelAlignment() const;
 
+        void setTextureUsage(GraphicsTextureUsageFlags usage);
+        GraphicsTextureUsageFlags getTextureUsage() const;
+
 	private:
 
 		uint32_t _width;
@@ -81,6 +84,7 @@ namespace el {
 		GraphicsTextureDim _dim;
         GraphicsPixelFormat _pixelFormat;
         GraphicsPixelAlignment _pixelAlignment;
+        GraphicsTextureUsageFlags _textureUsage;
 	};
 
     class GraphicsTexture
@@ -94,8 +98,8 @@ namespace el {
 
     private:
 
-        GraphicsTexture(const GraphicsTexture&) = delete;
-        GraphicsTexture& operator=(const GraphicsTexture&) = delete;
+        GraphicsTexture(const GraphicsTexture&);
+        GraphicsTexture& operator=(const GraphicsTexture&);
     };
 
 } // namespace el {

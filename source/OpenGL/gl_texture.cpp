@@ -37,7 +37,7 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 
     const GLint levels = desc.getLevels();
 
-    // unsupport multi-level images
+    // TODO: support multi level images
     EL_ASSERT(levels == 1);
     const GLint level = 0;
 
@@ -83,8 +83,8 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 #endif
 
     auto wrapS = asSamplerAddressMode(desc.getAddressModeU());
-    auto wrapT = asSamplerAddressMode(desc.getAddresModeV());
-    auto wrapR = asSamplerAddressMode(desc.getAddresModeW());
+    auto wrapT = asSamplerAddressMode(desc.getAddressModeV());
+    auto wrapR = asSamplerAddressMode(desc.getAddressModeW());
 
     if (wrapS != defaultWrap)
         GL_CHECK(glTexParameteri(_target, GL_TEXTURE_WRAP_S, wrapS));

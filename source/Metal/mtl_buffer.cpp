@@ -1,6 +1,6 @@
 #include "mtl_buffer.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 #include "debug.h"
 #include "mtl_device.h"
@@ -61,4 +61,4 @@ GraphicsDevicePtr MTLBuffer::getDevice()
     return _device.lock();
 }
 
-#endif // #if EL_PLAT_APPLE
+#endif // #if EL_BUILD_METAL

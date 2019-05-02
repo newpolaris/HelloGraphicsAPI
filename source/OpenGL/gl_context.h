@@ -24,13 +24,12 @@ namespace el {
         void beginRendering() override;
         void endRendering() override;
 
-        void setDepthTest(bool enable) override;
-        void setCullFace(bool enable) override;
+        void setDepthTestEnable(bool enable) override;
+        void setCullFaceEnable(bool enable) override;
 
         void setViewport(const Viewport& viewport) override;
         void setProgram(const GraphicsProgramPtr& ptr) override;
         void setTexture(const std::string& name, const GraphicsTexturePtr& texture) override;
-        [[deprecated]]
         void setVertexBuffer(const std::string& name, const GraphicsDataPtr& vertexData, uint32_t stride, uint32_t offset) override;
         void setVertexBuffer(uint32_t binding, const GraphicsDataPtr& vertexData, uint32_t offset = 0) override;
         void setIndexBuffer(const GraphicsDataPtr& indexData) override;

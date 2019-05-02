@@ -128,7 +128,7 @@ void GLContext::startDebugControl()
 }
 
 
-void GLContext::setDepthTest(bool enable)
+void GLContext::setDepthTestEnable(bool enable)
 {
     // TODO:
     // if (_isDepthTest != enable)
@@ -141,12 +141,12 @@ void GLContext::setDepthTest(bool enable)
     }
 }
 
-void GLContext::setCullFace(bool isEnable)
+void GLContext::setCullFaceEnable(bool enable)
 {
     // TODO:
     // if (_isCullface != enable)
     {
-        _isCullface = isEnable;
+        _isCullface = enable;
         if (_isCullface)
             glEnable(GL_CULL_FACE);
         else
@@ -157,9 +157,9 @@ void GLContext::setCullFace(bool isEnable)
 void GLContext::beginRendering()
 {
     // TODO:
-    glClearColor(0.5f, 0.5f, 0.5f, 1.f);
+    // glClearColor(0.5f, 0.5f, 0.5f, 1.f);
     // TODO:
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLContext::endRendering()

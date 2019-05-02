@@ -19,7 +19,7 @@ namespace el {
 
         GLuint getID() const;
 
-        virtual const GraphicsShaderDesc& getDesc() const noexcept;
+        virtual const GraphicsShaderDesc& getDesc() const;
 
     private:
 

@@ -5,7 +5,7 @@
 #include "mtl_device.h"
 #include "graphics_types.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 using namespace el;
 
@@ -58,4 +58,4 @@ GraphicsDevicePtr MTLShader::getDevice()
     return _device.lock();
 }
 
-#endif // #if EL_PLAT_APPLE
+#endif // #if EL_BUILD_METAL

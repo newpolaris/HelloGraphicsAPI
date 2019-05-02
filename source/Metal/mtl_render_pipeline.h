@@ -1,38 +1,35 @@
 #pragma once
-
+    
 #include "predefine.h"
 
 #if EL_BUILD_METAL
 
 #include "graphics_types.h"
-#include "graphics_shader.h"
+#include "graphics_pipeline.h"
 #include "mtl_types.h"
 #include "mtlpp.hpp"
 
 namespace el {
     
-    class MTLShader final : public GraphicsShader
+    class MTLRenderPipeline final : public GraphicsPipeline
     {
     public:
 
-        MTLShader();
-        ~MTLShader();
+        MTLRenderPipeline();
+        ~MTLRenderPipeline();
 
-        bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
+        bool create(const GraphicsPipelineDesc& desc);
         void destroy();
         
-        const GraphicsShaderDesc& getDesc() const override;
+        const GraphicsPipelineDesc& getDesc() const override;
 
         void setDevice(GraphicsDevicePtr device);
         GraphicsDevicePtr getDevice();
 
     private:
 
-        GraphicsShaderDesc _desc;
-        
-        mtlpp::Library _library;
-        mtlpp::Function _function;
-
+        mtlpp::RenderPipelineState _pipelineState;
+        GraphicsPipelineDesc _pipelineDesc;
         MTLDeviceWeakPtr _device;
     };
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "predefine.h"
 #include <memory>
 #include <vector>
 #include <cstdint>
@@ -37,12 +36,12 @@ namespace el {
         uint32_t height;
     };
 
-    inline bool operator==(const Viewport& v1, const Viewport& v2) noexcept
+    inline bool operator==(const Viewport& v1, const Viewport& v2)
     {
         return v1.x == v2.x && v1.y == v2.y && v1.width == v2.width && v1.height == v2.height;
     }
 
-    inline bool operator!=(const Viewport& v1, const Viewport& v2) noexcept
+    inline bool operator!=(const Viewport& v1, const Viewport& v2)
     {
         return !(v1 == v2);
     }
@@ -53,9 +52,12 @@ namespace el {
     class GraphicsShaderDesc;
     class GraphicsTextureDesc;
     class GraphicsDataDesc;
+    class GraphicsSamplerDesc;
     class GraphicsInputLayoutDesc;
     class GraphicsInputBinding;
     class GraphicsInputAttribute;
+    class GraphicsDepthStencilDesc;
+    class GraphicsStencilOpState;
 
     typedef std::shared_ptr<class GraphicsDevice> GraphicsDevicePtr;
     typedef std::shared_ptr<class GraphicsContext> GraphicsContextPtr;
@@ -65,6 +67,8 @@ namespace el {
     typedef std::shared_ptr<class GraphicsData> GraphicsDataPtr;
     typedef std::shared_ptr<class GraphicsInputLayout> GraphicsInputLayoutPtr;
     typedef std::shared_ptr<class GraphicsVertexAttribute> GraphicsVertexAttributePtr;
+    typedef std::shared_ptr<class GraphicsSampler> GraphicsSamplerPtr;
+    typedef std::shared_ptr<class GraphicsDepthStencil> GraphicsDepthStencilPtr;
 
     typedef std::weak_ptr<GraphicsDevice> GraphicsDeviceWeakPtr;
 
@@ -183,8 +187,8 @@ namespace el {
         GraphicsSamplerMipmapModeLinear = 2,
     };
 
-    // From vulkan sepc.
-    enum class GraphicsBorderColor {
+    // From vulkan spec.
+    enum GraphicsBorderColor {
         GraphicsBorderColorFloatTransparentBlack = 0,
         GraphicsBorderColorIntTransparentBlack = 1,
         GraphicsBorderColorFloatOpaqueBlack = 2,
@@ -193,6 +197,21 @@ namespace el {
         GraphicsBorderColorIntOpaqueWhite = 5,
     };
 
+    // From vulkan spec.
+    enum GraphicsTextureUsageFlagBits {
+        GraphicsTextureUsageFlagBitTransferSrcBit = 0x00000001,
+        GraphicsTextureUsageFlagBitTransferDstBit = 0x00000002,
+        GraphicsTextureUsageFlagBitSampledBit = 0x00000004,
+        GraphicsTextureUsageFlagBitStorageBit = 0x00000008,
+        GraphicsTextureUsageFlagBitColorAttachmentBit = 0x00000010,
+        GraphicsTextureUsageFlagBitDepthStencilAttachmentBit = 0x00000020,
+        GraphicsTextureUsageFlagBitTransientAttachmentBit = 0x00000040,
+        GraphicsTextureUsageFlagBitInputAttachmentBit = 0x00000080,
+    };
+
+    typedef uint32_t GraphicsTextureUsageFlags;
+
+    // TODO: Replace with vulkan spec.
     // From MTLPixelFormat
     enum class GraphicsPixelFormat
     {
@@ -340,9 +359,9 @@ namespace el {
         GraphicsPrimitiveTypeFan = 5,
     };
 
-    // TODO: merge with vulkan format
-    // from apple format;
-    enum class VertexFormat
+    // TODO:
+    // from apple spec.
+    enum class GraphicsVertexFormat
     {
         Invalid = 0,
 
@@ -408,6 +427,34 @@ namespace el {
         GraphicsInputRateInstance = 1
     };
 
-    uint32_t asVertexFormatSize(VertexFormat format);
+    enum class GraphicsCompareOp : uint32_t
+    {
+        GraphicsCompareOpNever = 0,
+        GraphicsCompareOpLess = 1,
+        GraphicsCompareOpEqual = 2,
+        GraphicsCompareOpLessOrEqual = 3,
+        GraphicsCompareOpGreater = 4,
+        GraphicsCompareOpNotEqual = 5,
+        GraphicsCompareOpGreaterOrEqual = 6,
+        GraphicsCompareOpAlways = 7,
+        GraphicsCompareOpMaxEnum = 0x7FFFFFFF
+    };
+
+    // From vulkan sepc.
+    enum class GraphicsStencilOp : uint32_t
+    {
+        GraphicsStencilOpKeep = 0,
+        GraphicsStencilOpZero = 1,
+        GraphicsStencilOpReplace = 2,
+        GraphicsStencilOpIncrementAndClamp = 3,
+        GraphicsStencilOpDecrementAndClamp = 4,
+        GraphicsStencilOpInvert = 5,
+        GraphicsStencilOpIncrementAndWrap = 6,
+        GraphicsStencilOpDecrementAndWrap = 7,
+        GraphicsStencilOpMaxEnum = 0x7FFFFFFF
+    };
+
+    uint32_t asVertexFormatSize(GraphicsVertexFormat format);
+    uint32_t asTexelSize(GraphicsPixelFormat format);
 
 } // namespace el

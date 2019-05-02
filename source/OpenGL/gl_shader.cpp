@@ -1,4 +1,5 @@
 #include "gl_shader.h"
+
 #include "gl_types.h"
 #include "gl.h"
 #include "predefine.h"
@@ -86,7 +87,7 @@ GLuint GLShader::getID() const
     return _id;
 }
 
-const GraphicsShaderDesc& GLShader::getDesc() const noexcept
+const GraphicsShaderDesc& GLShader::getDesc() const
 {
     return _shaderDesc;
 }

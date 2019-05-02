@@ -18,7 +18,8 @@ GraphicsTextureDesc::GraphicsTextureDesc() :
 	_streamSize(0),
 	_dim(GraphicsTextureDim2D),
 	_pixelFormat(GraphicsPixelFormat::GraphicsPixelFormatInvalid),
-    _pixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment4)
+    _pixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment4),
+    _textureUsage(0)
 {
 }
 
@@ -72,7 +73,7 @@ void GraphicsTextureDesc::setAddressModeU(GraphicsSamplerAddressMode mode)
     _addressModeU = mode;
 }
 
-GraphicsSamplerAddressMode GraphicsTextureDesc::getAddresModeV() const
+GraphicsSamplerAddressMode GraphicsTextureDesc::getAddressModeV() const
 {
     return _addressModeV;
 }
@@ -82,7 +83,7 @@ void GraphicsTextureDesc::setAddressModeV(GraphicsSamplerAddressMode mode)
     _addressModeV = mode;
 }
 
-GraphicsSamplerAddressMode GraphicsTextureDesc::getAddresModeW() const
+GraphicsSamplerAddressMode GraphicsTextureDesc::getAddressModeW() const
 {
     return _addressModeW;
 }
@@ -181,6 +182,16 @@ void GraphicsTextureDesc::setPixelAlignment(GraphicsPixelAlignment align)
 GraphicsPixelAlignment GraphicsTextureDesc::getPixelAlignment() const
 {
     return _pixelAlignment;
+}
+
+void GraphicsTextureDesc::setTextureUsage(GraphicsTextureUsageFlags usage)
+{
+    _textureUsage = usage;
+}
+
+GraphicsTextureUsageFlags GraphicsTextureDesc::getTextureUsage() const
+{
+    return _textureUsage;
 }
 
 GraphicsTexture::GraphicsTexture()

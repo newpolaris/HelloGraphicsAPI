@@ -1,6 +1,6 @@
 #include "mtl_context.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 #include "debug.h"
 #include "mtl_device.h"
@@ -97,14 +97,14 @@ void MTLContext::finsh(bool waitForCompletion)
     _commandBuffer.reset();
 }
 
-void MTLContext::setDepthTest(bool isEnable)
+void MTLContext::setDepthTestEnable(bool enable)
 {
-    // _isDepthTest = isEnable;
+    // _depthTestEnable = enable;
 }
 
-void MTLContext::setCullFace(bool isEnable)
+void MTLContext::setCullFaceEnable(bool enable)
 {
-    // _isCullFace = isEnable;
+    // _cullFaceEnable = enable;
 }
 
 void MTLContext::setViewport(const Viewport& viewport) 
@@ -151,17 +151,25 @@ void MTLContext::setInputLayout(const GraphicsInputLayoutPtr& inputLayout)
 {
 }
 
+enum class PrimitiveTopologyClass
+{
+    Unspecified = 0,
+    Point = 1,
+    Line = 2,
+    Triangle = 3,
+};
+
 using namespace mtlpp;
 
 PrimitiveType getPrimitiveType(GraphicsPrimitiveType type)
 {
     switch (type)
     {
-    case GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle:
-        return PrimitiveType::Triangle;
-    default:
-        EL_ASSERT(false);
-        return PrimitiveType(0);
+        case GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle:
+            return PrimitiveType::Triangle;
+        default:
+            EL_ASSERT(false);
+            return PrimitiveType(0);
     }
 }
 
@@ -189,4 +197,4 @@ void MTLContext::drawIndexedInstanced(GraphicsPrimitiveType primitive, uint32_t 
 {
 }
 
-#endif // EL_PLAT_APPLE
+#endif // EL_BUILD_METAL

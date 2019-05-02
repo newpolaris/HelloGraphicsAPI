@@ -53,6 +53,8 @@ namespace el {
 #       else
 #           define EL_DEPRECATED(x) __declspec(deprecated(x))
 #       endif // _MSC_VER > 1900
+#   else
+#			define EL_DEPRECATED(x)
 #   endif
 #elif defined(__clang__)
 #   define EL_DEPRECATED(x) __attribute__((deprecated(x)))
@@ -63,5 +65,5 @@ namespace el {
 #       define EL_DEPRECATED(x) __attribute__((deprecated))
 #   endif
 #else
-#   define EL_DPRECATED(x) (void)(x)
+#   define EL_DEPRECATED(x)
 #endif

@@ -1,6 +1,6 @@
 #include <graphics_window.h>
 #include <debug.h>
-
+ 
 using namespace el;
 
 GraphicsWindowPtr el::createWindow(const GraphicsWindowDesc& desc)
@@ -31,37 +31,37 @@ void GraphicsWindowDesc::setWindowType(GraphicsWindowType type)
     _windowType = type;
 }
 
-GraphicsWindowType el::GraphicsWindowDesc::getWindowType() const
+GraphicsWindowType GraphicsWindowDesc::getWindowType() const
 {
     return _windowType;
 }
 
-void el::GraphicsWindowDesc::setWindowTitle(const std::string& title)
+void GraphicsWindowDesc::setWindowTitle(const std::string& title)
 {
     _windowTitle = title;
 }
 
-const std::string& el::GraphicsWindowDesc::getWindowTitle() const
+const std::string& GraphicsWindowDesc::getWindowTitle() const
 {
     return _windowTitle;
 }
 
-void el::GraphicsWindowDesc::setWidth(uint32_t width)
+void GraphicsWindowDesc::setWidth(uint32_t width)
 {
     _width = width;
 }
 
-uint32_t el::GraphicsWindowDesc::getWidth() const
+uint32_t GraphicsWindowDesc::getWidth() const
 {
     return _width;
 }
 
-void el::GraphicsWindowDesc::setHeight(uint32_t height)
+void GraphicsWindowDesc::setHeight(uint32_t height)
 {
     _height = height;
 }
 
-uint32_t el::GraphicsWindowDesc::getHeight() const
+uint32_t GraphicsWindowDesc::getHeight() const
 {
     return _height;
 }
@@ -102,13 +102,34 @@ bool GraphicsWindowGLFW::setup(const GraphicsWindowDesc& desc)
 
 void GraphicsWindowGLFW::close()
 {
+    glfwSetWindowUserPointer(_window, nullptr);
     glfwDestroyWindow(_window);
     _window = nullptr;
 }
 
-bool GraphicsWindowGLFW::run()
+void GraphicsWindowGLFW::setWidth(uint32_t width)
 {
-    return true;
+    _width = width;
+}
+
+uint32_t GraphicsWindowGLFW::getWidth() const
+{
+    return _width;
+}
+
+void GraphicsWindowGLFW::setHeight(uint32_t height)
+{
+    _height = height;
+}
+
+uint32_t GraphicsWindowGLFW::getHeight() const
+{
+    return _height;
+}
+
+void GraphicsWindowGLFW::makeContextCurrent()
+{
+    glfwMakeContextCurrent(_window);
 }
 
 bool GraphicsWindowGLFW::setupGLFW()
@@ -153,12 +174,22 @@ bool GraphicsWindowGLFW::setupGLFW()
 
 bool GraphicsWindowGLFW::setupWindow()
 {
+    int width = (int)_windowDesc.getWidth();
+    int height = (int)_windowDesc.getHeight();
+    const char* title = _windowDesc.getWindowTitle().c_str();
+
     GLFWwindow* sharedWindowContext = nullptr;
-    _window = glfwCreateWindow(1024, 768, "First", NULL, sharedWindowContext);
+    _window = glfwCreateWindow(width, height, title, NULL, sharedWindowContext);
     if (!_window)
         return false;
 
+    glfwSetWindowUserPointer(_window, this);
     glfwSetKeyCallback(_window, keyCallback);
+    glfwSetWindowSizeCallback(_window, sizeCallback);
+
+    glfwGetWindowSize(_window, &width, &height);
+    _width = uint32_t(width);
+    _height = uint32_t(height);
 
     return true;
 }
@@ -172,4 +203,12 @@ void GraphicsWindowGLFW::keyCallback(GLFWwindow* window, int key, int scancode, 
 {
     if (action == GLFW_PRESS && key == GLFW_KEY_ESCAPE)
         glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+void GraphicsWindowGLFW::sizeCallback(GLFWwindow* window, int width, int height)
+{
+    auto glfw = static_cast<GraphicsWindowGLFW*>(glfwGetWindowUserPointer(window));
+    EL_ASSERT(glfw);
+    glfw->setWidth(uint32_t(width));
+    glfw->setHeight(uint32_t(width));
 }

@@ -132,7 +132,7 @@ namespace ns
 #endif
         }
 
-        const void* m_ptr = nullptr;
+        const void* m_ptr;
     };
 
     struct Range
@@ -646,7 +646,7 @@ namespace mtlpp
     }
     MTLPP_AVAILABLE(10_11, 8_0);
 
-    enum class TextureUsage
+    enum TextureUsage : uint32_t
     {
         Unknown         = 0x0000,
         ShaderRead      = 0x0001,
@@ -1140,7 +1140,7 @@ namespace mtlpp
     }
     MTLPP_AVAILABLE(10_11, 8_0);
 
-    enum class PipelineOption
+    enum PipelineOption : uint32_t
     {
         None           = 0,
         ArgumentInfo   = 1 << 0,

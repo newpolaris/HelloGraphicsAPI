@@ -2,7 +2,7 @@
 
 #include "predefine.h"
 
-#if EL_PLAT_APPLE
+#if EL_BUILD_METAL
 
 #include "mtlpp.hpp"
 #include "mtl_types.h"
@@ -27,8 +27,8 @@ namespace el {
         void endRendering() override;
         void finsh(bool waitForCompletion = false);
         
-        void setDepthTest(bool isEnable) override;
-        void setCullFace(bool isEnable) override;
+        void setDepthTestEnable(bool enable) override;
+        void setCullFaceEnable(bool enable) override;
         
         void setViewport(const Viewport& viewport) override;
         void setProgram(const GraphicsProgramPtr& program) override;
@@ -59,4 +59,4 @@ namespace el {
 
 } // namespace el {
 
-#endif // EL_PLAT_APPLE
+#endif // EL_BUILD_METAL
