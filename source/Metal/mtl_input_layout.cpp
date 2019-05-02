@@ -13,7 +13,7 @@ MTLInputLayout::~MTLInputLayout()
 
 bool MTLInputLayout::create(const GraphicsInputLayoutDesc& desc)
 {
-    auto& layout = _inputLayout.GetLayouts();
+    auto layout = _inputLayout.GetLayouts();
     for (uint32_t i = 0; desc.getBindings().size(); i++)
     {
         auto& source = desc.getBindings();
@@ -22,7 +22,7 @@ bool MTLInputLayout::create(const GraphicsInputLayoutDesc& desc)
         layout[i].SetStride(source[i].getStride());
     }
 
-    auto& attributes = _inputLayout.GetAttributes();
+    auto attributes = _inputLayout.GetAttributes();
     for (uint32_t i = 0; desc.getAttributes().size(); i++)
     {
         auto& source = desc.getAttributes();
