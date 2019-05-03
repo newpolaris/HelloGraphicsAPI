@@ -1,7 +1,5 @@
-#include "../mtlpp.hpp"
+#include <Metal/mtlpp.hpp>
 #include "window.hpp"
-
-#if 0
 
 mtlpp::Device              g_device;
 mtlpp::CommandQueue        g_commandQueue;
@@ -52,6 +50,7 @@ int main()
         -1.0f, -1.0f, 0.0f,
          1.0f, -1.0f, 0.0f,
     };
+
     g_device = mtlpp::Device::CreateSystemDefaultDevice();
     g_commandQueue = g_device.NewCommandQueue();
 
@@ -72,5 +71,3 @@ int main()
 
     return 0;
 }
-
-#endif

@@ -1,10 +1,11 @@
 #pragma once
 
-#include "../mtlpp.hpp"
+#include <Metal/mtlpp.hpp>
 
 class Window
 {
 public:
+
     Window(const mtlpp::Device& device, void (*render)(const Window&), int32_t width, int32_t height);
 
     uint32_t GetWidth() const;
@@ -15,6 +16,7 @@ public:
     static void Run();
 
 private:
+
     class MtlView : public ns::Object
     {
     public:
