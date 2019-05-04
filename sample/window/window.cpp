@@ -62,11 +62,45 @@ namespace el
         _hdc = ::GetDC(_hwnd);
         if (!_hdc)
             return false;
+
+        PIXELFORMATDESCRIPTOR pfd = {
+            sizeof(PIXELFORMATDESCRIPTOR),
+            1,
+            PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    // Flags
+            PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
+            32,                   // Colordepth of the framebuffer.
+            8, 16, 8, 8, 8, 0,
+            8,
+            24,
+            0,
+            0, 0, 0, 0,
+            24,                   // Number of bits for the depthbuffer
+            0,                    // Number of bits for the stencilbuffer
+            0,                    // Number of Aux buffers in the framebuffer.
+            PFD_MAIN_PLANE,
+            0,
+            0, 0, 0
+        };
+
+        // GFLW's default format
+        PIXELFORMATDESCRIPTOR pfd2; 
+        DescribePixelFormat(_hdc, 12, sizeof(PIXELFORMATDESCRIPTOR), &pfd2);
+
+        int pixelFormat = ChoosePixelFormat(_hdc, &pfd2);
+        if (!pixelFormat)
+            return false;
+        if (!DescribePixelFormat(_hdc, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd2))
+            return false;
+        if (!SetPixelFormat(_hdc, pixelFormat, &pfd2))
+            return false;
+
         return true;
     }
 
     void PlatformSwapchain::close()
     {
+        wglMakeCurrent(NULL, NULL);
+        _context = NULL;
         if (_hdc) {
             ReleaseDC(_hwnd, _hdc);
             _hdc = NULL;
@@ -128,9 +162,10 @@ namespace el
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
 
-        _window = glfwCreateWindow(128, 128, "Hiddden", nullptr, nullptr);
+        _window = glfwCreateWindow(1, 1, "Hiddden", nullptr, nullptr);
         _hwnd = glfwGetWin32Window(_window);
         _hdc = ::GetDC(_hwnd);
         _context = glfwGetWGLContext(_window);
@@ -164,30 +199,32 @@ int main()
 
     PlatformWGL platform;
     auto device = platform.createDevice(GraphicsDeviceTypeOpenGL);
+    EL_ASSERT(device);
 
     glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     GLFWwindow* window = glfwCreateWindow(1280, 1024, "Window", nullptr, nullptr);
     if (!window)
         return -1;
 
     HWND nativeWindow = glfwGetWin32Window(window);
     auto swapchain = platform.createSwapchain(nativeWindow);
-
-    swapchain->activate();
+    EL_ASSERT(swapchain);
 
     DWORD error = GetLastError();
 
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.5f, 0.5f, 0.5f, 1.f);
+        EL_ASSERT(swapchain->activate());
+
+        glClearColor(0.0f, 0.0f, 0.5f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         swapchain->swapbuffer();
+        swapchain->deactivate();
 
         glfwPollEvents();
     }
-    swapchain->deactivate();
 
     return 0;
 }
