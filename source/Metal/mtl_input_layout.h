@@ -1,10 +1,11 @@
-#pragma once
+#ifndef __MTL_INPUT_LAYOUT_H__
+#define __MTL_INPUT_LAYOUT_H__
 
-#include "predefine.h"
+#include <el_predefine.h>
 
 #if EL_BUILD_METAL
 
-#include "mtl_types.h"
+#include <Metal/mtl_types.h>
 #include <graphics_types.h>
 #include <graphics_input_layout.h>
 
@@ -35,3 +36,5 @@ namespace el {
 } // namespace el {
 
 #endif // EL_BUILD_METAL
+
+#endif // __MTL_INPUT_LAYOUT_H__

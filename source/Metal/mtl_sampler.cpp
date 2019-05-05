@@ -1,7 +1,9 @@
-#include "mtl_sampler.h"
+#include <Metal/mtl_sampler.h>
 
-#include <debug.h>
-#include "mtl_types.h"
+#if EL_BUILD_METAL
+
+#include <el_debug.h>
+#include <Metal/mtl_types.h>
 
 using namespace el;
 using namespace mtlpp;
@@ -62,3 +64,5 @@ const GraphicsSamplerDesc& MTLSampler::getSamplerDesc() const
 {
     return _samplerDesc;
 }
+
+#endif // EL_BUILD_METAL

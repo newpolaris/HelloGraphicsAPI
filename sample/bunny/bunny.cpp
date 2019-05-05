@@ -1,6 +1,6 @@
-#include "predefine.h"
-#include "debug.h"
-#include <OpenGL/gl.h>
+#include <el_predefine.h>
+#include <el_debug.h>
+#include <OpenGL/gl_headers.h>
 
 #include <GLFW/glfw3.h>
 
@@ -30,9 +30,8 @@
 #include <cmath>
 #include <random>
 
-#include <utility.h>
-#include <image.h>
-// #include <common.h>
+#include <el_utility.h>
+#include <el_image.h>
 #include <memory>
 
 #include "mesh.h"

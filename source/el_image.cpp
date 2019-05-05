@@ -1,4 +1,4 @@
-#include <image.h>
+#include <el_image.h>
 #include <stb/stb_image.h>
 
 using namespace el;

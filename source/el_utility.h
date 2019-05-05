@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __EL_UTILITY_H__
+#define __EL_UTILITY_H__
 
 #include <memory>
 #include <string>
@@ -18,3 +19,5 @@ namespace el {
     std::unique_ptr<char[]> fstreamread(const std::string& filename);
 
 } // namespace el {
+
+#endif // __EL_UTILITY_H__

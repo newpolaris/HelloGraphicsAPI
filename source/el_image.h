@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __EL_IMAGE_H__
+#define __EL_IMAGE_H__
 
 #include <graphics_types.h>
 
@@ -19,3 +20,5 @@ namespace el {
         GraphicsPixelFormat format;
     };
 }
+
+#endif // __EL_IMAGE_H__

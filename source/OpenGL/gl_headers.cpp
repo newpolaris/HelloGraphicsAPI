@@ -1,6 +1,7 @@
-#include "gl.h"
+#include <OpenGL/gl_headers.h>
+
 #include <string>
-#include "debug.h"
+#include <el_debug.h>
 
 namespace el {
     bool gl::error_handler(const char* file, int line) 

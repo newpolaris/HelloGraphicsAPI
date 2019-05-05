@@ -1,4 +1,4 @@
-#include "gl_profile.h"
+#include <OpenGL/gl_profile.h>
 
 // https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_timer_query.txt
 // https://github.com/google/skia/blob/master/tools/gpu/gl/GLTestContext.cpp

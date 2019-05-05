@@ -1,13 +1,16 @@
-#pragma once
+#ifndef __GL_TYPES_H__
+#define __GL_TYPES_H__
 
-#include "gl.h"
-#include "graphics_types.h"
-#include "debug.h"
+#include <OpenGL/gl_headers.h>
+#include <graphics_types.h>
+#include <el_debug.h>
 
 namespace el {
+
     typedef std::shared_ptr<class GLBuffer> GLBufferPtr;
     typedef std::shared_ptr<class GLProgram> GLProgramPtr;
     typedef std::vector<class GLVertexBuffer> GLVertexBuffers;
+
 }
 
 namespace el {
@@ -41,3 +44,5 @@ namespace el {
     GLenum asSamplerMinFilter(GraphicsFilter filter, GraphicsSamplerMipmapMode mode);
     GLenum asSamplerMagFilter(GraphicsFilter filter);
 }
+
+#endif // __GL_TYPES_H__

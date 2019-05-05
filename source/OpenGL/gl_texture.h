@@ -1,7 +1,10 @@
-#include "graphics_types.h"
-#include "graphics_texture.h"
-#include "gl.h"
-#include "gl_types.h"
+#ifndef __GL_TEXTURE_H__
+#define __GL_TEXTURE_H__
+
+#include <graphics_types.h>
+#include <graphics_texture.h>
+#include <OpenGL/gl_headers.h>
+#include <OpenGL/gl_types.h>
 
 namespace el
 {
@@ -31,3 +34,4 @@ namespace el
     };
 } // namespace el
 
+#endif // __GL_TEXTURE_H__

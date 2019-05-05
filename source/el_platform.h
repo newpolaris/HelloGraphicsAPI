@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __EL_PLATFORM_H__
+#define __EL_PLATFORM_H__
 
 #define EL_ARCH_ARM 0
 #define EL_ARCH_X86_32 0
@@ -91,3 +92,5 @@
 #   undef EL_PLAT_APPLE
 #   define EL_PLAT_APPLE 1
 #endif
+
+#endif // __EL_PLATFORM_H__

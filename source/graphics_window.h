@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __GRAPHICS_WINDOW_H__
+#define __GRAPHICS_WINDOW_H__
 
 #include <GLFW/glfw3.h>
 #include <graphics_types.h>
@@ -98,3 +99,4 @@ namespace el {
 
 } // namespace el;
 
+#endif // __GRAPHICS_WINDOW_H__

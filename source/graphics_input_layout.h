@@ -1,6 +1,7 @@
-#pragma once
+#ifndef __GRAPHICS_INPUT_LAYOUT_H__
+#define __GRAPHICS_INPUT_LAYOUT_H__
 
-#include "graphics_types.h"
+#include <graphics_types.h>
 
 namespace el {
 
@@ -97,3 +98,5 @@ namespace el {
     };
 
 } // namespace el {
+
+#endif // __GRAPHICS_INPUT_LAYOUT_H__

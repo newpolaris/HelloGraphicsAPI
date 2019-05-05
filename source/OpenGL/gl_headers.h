@@ -1,6 +1,8 @@
-#pragma once
+#ifndef __GL_HEADERS_H__
+#define __GL_HEADERS_H__
 
-#include "predefine.h"
+#include <el_predefine.h>
+#include <el_platform.h>
 
 #if EL_PLAT_IOS
 #include <OpenGLES/ES2/gl.h>
@@ -119,3 +121,5 @@ namespace gl {
 	void UniformMatrix4fv(GLint location, GLsizei count, const GLfloat* value);
 } // namespace gl {
 } // namespace el {
+
+#endif // __GL_HEADERS_H__

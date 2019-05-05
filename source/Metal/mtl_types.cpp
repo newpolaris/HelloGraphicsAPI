@@ -1,5 +1,5 @@
-#include "mtl_types.h"
-#include <debug.h>
+#include <Metal/mtl_types.h>
+#include <el_debug.h>
 
 using namespace el;
 using namespace mtlpp;

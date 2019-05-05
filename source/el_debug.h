@@ -1,6 +1,7 @@
-#pragma once
+#ifndef __EL_DEBUG_H__
+#define __EL_DEBUG_H__
 
-#include "predefine.h"
+#include <el_predefine.h>
 
 #include <cassert>
 
@@ -67,3 +68,5 @@ namespace el {
 #else
 #   define EL_DEPRECATED(x)
 #endif
+
+#endif // __EL_DEBUG_H__

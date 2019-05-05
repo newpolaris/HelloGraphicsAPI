@@ -2,9 +2,9 @@
  * Copyright 2016-2017 Nikolay Aleksiev. All rights reserved.
  * License: https://github.com/naleksiev/mtlpp/blob/master/LICENSE
  */
-#include "mtlpp.hpp"
+#include <Metal/mtlpp.hpp>
 
-#include <platform.h>
+#include <el_platform.h>
 
 #if EL_PLAT_APPLE
 

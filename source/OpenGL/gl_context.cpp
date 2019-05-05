@@ -1,12 +1,12 @@
-#include "gl_context.h"
+#include <OpenGL/gl_context.h>
 #if EL_BUILD_OPENGL
 
-#include "graphics_data.h"
-#include "gl.h"
-#include "gl_types.h"
-#include "gl_buffer.h"
-#include "gl_program.h"
-#include "gl_input_layout.h"
+#include <graphics_data.h>
+#include <OpenGL/gl_headers.h>
+#include <OpenGL/gl_types.h>
+#include <OpenGL/gl_buffer.h>
+#include <OpenGL/gl_program.h>
+#include <OpenGL/gl_input_layout.h>
 
 #include <sstream>
 #include <GLFW/glfw3.h>

@@ -1,13 +1,14 @@
-#pragma once
+#ifndef __MTL_RENDER_PIPELINE_H__
+#define __MTL_RENDER_PIPELINE_H__
     
-#include "predefine.h"
+#include <el_predefine.h>
 
 #if EL_BUILD_METAL
 
-#include "graphics_types.h"
-#include "graphics_pipeline.h"
-#include "mtl_types.h"
-#include "mtlpp.hpp"
+#include <graphics_types.h>
+#include <graphics_pipeline.h>
+#include <Metal/mtl_types.h>
+#include <Metal/mtlpp.hpp>
 
 namespace el {
     
@@ -36,3 +37,5 @@ namespace el {
 } // namespace el {
 
 #endif // EL_BUILD_METAL
+
+#endif // __MTL_RENDER_PIPELINE_H__

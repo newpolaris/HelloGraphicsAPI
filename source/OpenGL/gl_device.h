@@ -1,6 +1,7 @@
-#pragma once
+#ifndef __GL_DEVICE_H__
+#define __GL_DEVICE_H__
 
-#include "graphics_device.h"
+#include <graphics_device.h>
 
 namespace el {
 
@@ -19,3 +20,5 @@ namespace el {
 	};
 
 } // namespace el {
+
+#endif // __GL_DEVICE_H__

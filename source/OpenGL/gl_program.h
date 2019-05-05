@@ -1,8 +1,9 @@
-#pragma once
+#ifndef __GL_PROGRAM_H__
+#define __GL_PROGRAM_H__
 
-#include "graphics_types.h"
-#include "graphics_program.h"
-#include "gl_types.h"
+#include <graphics_types.h>
+#include <graphics_program.h>
+#include <OpenGL/gl_types.h>
 #include <linmath.h>
 #include <string>
 #include <map>
@@ -96,3 +97,5 @@ namespace el {
     };
 
 } // namespace el {
+
+#endif // __GL_PROGRAM_H__

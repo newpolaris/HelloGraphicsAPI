@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __GRAPHICS_TYPES_H__
+#define __GRAPHICS_TYPES_H__
 
 #include <memory>
 #include <vector>
@@ -458,3 +459,5 @@ namespace el {
     uint32_t asTexelSize(GraphicsPixelFormat format);
 
 } // namespace el
+
+#endif // __GRAPHICS_TYPES_H__

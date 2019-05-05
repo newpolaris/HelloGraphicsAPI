@@ -1,11 +1,12 @@
-#pragma once
+#ifndef __GL_CONTEXT_H__
+#define __GL_CONTEXT_H__
 
-#include "predefine.h"
+#include <el_predefine.h>
 
 #if EL_BUILD_OPENGL
 
 #include <graphics_context.h>
-#include "gl_types.h"
+#include <OpenGL/gl_types.h>
 
 namespace el {
 
@@ -67,3 +68,4 @@ namespace el {
 } // namespace el {
 
 #endif // #if EL_BUILD_OPENGL
+#endif // __GL_CONTEXT_H__

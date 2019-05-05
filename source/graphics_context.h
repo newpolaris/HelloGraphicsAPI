@@ -1,8 +1,9 @@
-#pragma once
+#ifndef __GRAPHICS_CONTEXT_H__
+#define __GRAPHICS_CONTEXT_H__
 
 #include <graphics_types.h>
 #include <linmath.h>
-#include "debug.h"
+#include <el_debug.h>
 
 namespace el {
 
@@ -44,3 +45,5 @@ namespace el {
     };
 
 } // namespace el {
+
+#endif // __GRAPHICS_CONTEXT_H__

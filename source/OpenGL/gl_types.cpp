@@ -1,5 +1,5 @@
-#include "gl_types.h"
-#include "debug.h"
+#include <OpenGL/gl_types.h>
+#include <el_debug.h>
 
 bool el::isSamplerType(GLenum type)
 {

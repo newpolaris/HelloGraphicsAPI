@@ -1,5 +1,5 @@
 #include <graphics_window.h>
-#include <debug.h>
+#include <el_debug.h>
  
 using namespace el;
 

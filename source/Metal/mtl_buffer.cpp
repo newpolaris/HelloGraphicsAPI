@@ -1,9 +1,9 @@
-#include "mtl_buffer.h"
+#include <Metal/mtl_buffer.h>
 
 #if EL_BUILD_METAL
 
-#include "debug.h"
-#include "mtl_device.h"
+#include <el_debug.h>
+#include <Metal/mtl_device.h>
 
 using namespace el;
 

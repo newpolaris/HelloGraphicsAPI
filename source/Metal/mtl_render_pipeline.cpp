@@ -1,10 +1,10 @@
-#include "mtl_render_pipeline.h"
+#include <Metal/mtl_render_pipeline.h>
 
 #if EL_BUILD_METAL
 
-#include "debug.h"
-#include "mtl_device.h"
-#include "mtl_types.h"
+#include <el_debug.h>
+#include <Metal/mtl_device.h>
+#include <Metal/mtl_types.h>
 
 using namespace el;
 using namespace mtlpp;

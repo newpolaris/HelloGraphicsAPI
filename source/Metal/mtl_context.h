@@ -1,12 +1,13 @@
-#pragma once
+#ifndef __MTL_CONTEXT_H__
+#define __MTL_CONTEXT_H__
 
-#include "predefine.h"
+#include <el_predefine.h>
 
 #if EL_BUILD_METAL
 
-#include "mtlpp.hpp"
-#include "mtl_types.h"
-#include "graphics_context.h"
+#include <Metal/mtlpp.hpp>
+#include <Metal/mtl_types.h>
+#include <graphics_context.h>
 
 namespace el {
 
@@ -60,3 +61,5 @@ namespace el {
 } // namespace el {
 
 #endif // EL_BUILD_METAL
+
+#endif // __MTL_CONTEXT_H__

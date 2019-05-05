@@ -1,6 +1,7 @@
-#pragma once
+#ifndef __GRAPHICS_PROGRAM_H__
+#define __GRAPHICS_PROGRAM_H__
 
-#include "graphics_types.h"
+#include <graphics_types.h>
 
 namespace el {
 
@@ -41,3 +42,5 @@ namespace el {
 	};
 
 } // namespace el {
+
+#endif // __GRAPHICS_PROGRAM_H__

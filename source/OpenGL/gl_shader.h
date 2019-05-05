@@ -1,9 +1,9 @@
-#pragma once
+#ifndef __GL_SHADER_H__
+#define __GL_SHADER_H__
 
-#include "predefine.h"
-#include "gl.h"
-#include "graphics_types.h"
-#include "graphics_shader.h"
+#include <graphics_types.h>
+#include <graphics_shader.h>
+#include <OpenGL/gl_headers.h>
 
 namespace el {
 
@@ -29,3 +29,5 @@ namespace el {
     };
 
 } // namespace el {
+
+#endif // __GL_SHADER_H__

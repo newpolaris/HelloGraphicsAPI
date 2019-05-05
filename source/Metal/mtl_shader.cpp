@@ -1,11 +1,11 @@
-#include "mtl_shader.h"
-
-#include "debug.h"
-#include "mtlpp.hpp"
-#include "mtl_device.h"
-#include "graphics_types.h"
+#include <Metal/mtl_shader.h>
 
 #if EL_BUILD_METAL
+
+#include <el_debug.h>
+#include <Metal/mtlpp.hpp>
+#include <Metal/mtl_device.h>
+#include <graphics_types.h>
 
 using namespace el;
 

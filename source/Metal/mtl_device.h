@@ -1,11 +1,12 @@
-#pragma once
+#ifndef __MTL_DEVICE_H__
+#define __MTL_DEVICE_H__
 
-#include "predefine.h"
+#include <el_predefine.h>
 
 #if EL_BUILD_METAL
 
-#include "graphics_device.h"
-#include "mtlpp.hpp"
+#include <graphics_device.h>
+#include <Metal/mtlpp.hpp>
 
 namespace el {
 
@@ -34,3 +35,5 @@ namespace el {
 } // namespace el {
 
 #endif // EL_BUILD_METAL
+
+#endif // __MTL_DEVICE_H__

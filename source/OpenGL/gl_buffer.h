@@ -1,8 +1,10 @@
-#pragma once
+#ifndef __GL_BUFFER_H__
+#define __GL_BUFFER_H__
 
-#include "graphics_data.h"
-#include "gl.h"
-#include "gl_types.h"
+#include <graphics_data.h>
+#include <graphics_types.h>
+#include <OpenGL/gl_types.h>
+#include <OpenGL/gl_headers.h>
 
 namespace el {
 
@@ -47,3 +49,5 @@ namespace el {
 
 
 } // namespace el {
+
+#endif // __GL_BUFFER_H__

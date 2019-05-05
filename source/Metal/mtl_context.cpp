@@ -1,10 +1,10 @@
-#include "mtl_context.h"
+#include <Metal/mtl_context.h>
 
 #if EL_BUILD_METAL
 
-#include "debug.h"
-#include "mtl_device.h"
-#include "mtlpp.hpp"
+#include <el_debug.h>
+#include <Metal/mtl_device.h>
+#include <Metal/mtlpp.hpp>
 
 using namespace el;
 

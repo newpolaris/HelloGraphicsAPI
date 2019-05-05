@@ -1,5 +1,8 @@
-#include "graphics_types.h"
-#include "mtlpp.hpp"
+#ifndef __MTL_TYPES_H__
+#define __MTL_TYPES_H__
+
+#include <graphics_types.h>
+#include <Metal/mtlpp.hpp>
 
 namespace el {
 
@@ -22,3 +25,5 @@ namespace el {
     mtlpp::VertexFormat asVertexFormat(GraphicsVertexFormat format);
     mtlpp::VertexStepFunction asVertexStepFunction(GraphicsInputRate func);
 };
+
+#endif // __MTL_TYPES_H__

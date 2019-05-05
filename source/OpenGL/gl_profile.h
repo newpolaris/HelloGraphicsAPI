@@ -1,10 +1,11 @@
-#pragma once
+#ifndef __GL_PROGFILE_H__
+#define __GL_PROGFILE_H__
 
 #include <string>
 #include <chrono>
 #include <graphics_device.h>
 
-#include "gl.h"
+#include <OpenGL/gl_headers.h>
 
 namespace el {
 
@@ -50,3 +51,5 @@ private:
 };
 
 } // namespace el {
+
+#endif // __GL_PROGFILE_H__
