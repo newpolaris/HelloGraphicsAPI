@@ -1,9 +1,9 @@
-#include <Metal/mtl_context.h>
+#include  "mtl_context.h"
 
 #if EL_BUILD_METAL
 
 #include <el_debug.h>
-#include <Metal/mtl_device.h>
+#include "mtl_device.h"
 #include <mtlpp.hpp>
 
 using namespace el;

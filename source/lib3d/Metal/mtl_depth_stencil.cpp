@@ -1,8 +1,8 @@
-#include <Metal/mtl_depth_stencil.h>
+#include "mtl_depth_stencil.h"
 
 #if EL_BUILD_METAL
 
-#include <Metal/mtl_types.h>
+#include "mtl_types.h"
 #include <el_debug.h>
 
 using namespace el;

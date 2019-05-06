@@ -1,4 +1,4 @@
-#include <Metal/mtl_shader.h>
+#include "mtl_shader.h"
 
 #if EL_BUILD_METAL
 

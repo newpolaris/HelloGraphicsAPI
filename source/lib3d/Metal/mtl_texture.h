@@ -7,7 +7,7 @@
 
 #include <graphics_types.h>
 #include <graphics_texture.h>
-#include <Metal/mtl_types.h>
+#include "mtl_types.h"
 #include <mtlpp.hpp>
 
 namespace el {

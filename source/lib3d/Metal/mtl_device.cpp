@@ -1,10 +1,10 @@
-#include <Metal/mtl_device.h>
+#include "mtl_device.h"
 
 #if EL_BUILD_METAL 
 
 #include <el_debug.h>
 #include <Metal/mtl_program.h>
-#include <Metal/mtl_shader.h>
+#include "mtl_shader.h"
 #include <Metal/mtl_texture.h>
 #include <Metal/mtl_buffer.h>
 #include <Metal/mtl_context.h>

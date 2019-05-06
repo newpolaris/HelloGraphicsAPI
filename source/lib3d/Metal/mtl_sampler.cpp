@@ -1,4 +1,4 @@
-#include <Metal/mtl_sampler.h>
+#include "mtl_sampler.h"
 
 #if EL_BUILD_METAL
 

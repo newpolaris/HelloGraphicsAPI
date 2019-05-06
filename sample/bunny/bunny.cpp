@@ -113,7 +113,7 @@ int bunny_run()
 		"wolf.obj",
     };
     Geometry geometry;
-    for (uint32_t i = 0; i < _countof(objfiles); i++)
+    for (uint32_t i = 0; i < el::countof(objfiles); i++)
         EL_ASSERT(LoadMesh(&geometry, el::getResourcePath() + objfiles[i]));
 
     // Create the OpenGL objects inside the first context, created above

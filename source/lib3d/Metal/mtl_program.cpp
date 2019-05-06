@@ -1,4 +1,4 @@
-#include <Metal/mtl_program.h>
+#include "mtl_program.h"
 
 #if EL_BUILD_METAL
 

@@ -2,8 +2,6 @@ project(libplatform)
 
 set(LIB_NAME libplatform)
 
-include_directories(${LIBPLATFORM_SOURCE_DIR})
-
 set(HEADER_PATH ${CMAKE_SOURCE_DIR}/source/libplatform)
 set(SOURCE_PATH ${CMAKE_SOURCE_DIR}/source/libplatform)
 

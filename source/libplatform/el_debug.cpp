@@ -29,7 +29,7 @@ void el::trace(const char* format, ...)
         va_end(argList);
         if (len > kLength)
             len = kLength;
-        buffer[kLength] = '\0';
+        buffer[len] = '\0';
 
         debug_output(buffer);
     }

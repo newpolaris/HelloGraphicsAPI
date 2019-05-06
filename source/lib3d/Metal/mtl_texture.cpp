@@ -1,10 +1,10 @@
-#include <Metal/mtl_texture.h>
+#include "mtl_texture.h"
 
 #if EL_BUILD_METAL
 
 #include <el_debug.h>
-#include <Metal/mtl_device.h>
-#include <Metal/mtl_types.h>
+#include "mtl_device.h"
+#include "mtl_types.h"
 
 using namespace el;
 

@@ -2,8 +2,6 @@ project(lib3d)
 
 set(LIB_NAME lib3d)
 
-include_directories(${LIB3D_SOURCE_DIR})
-include_directories(${LIBPLATFORM_SOURCE_DIR})
 include_directories(${GLFW_SOURCE_DIR}/deps)
 
 set(SOURCE_PATH ${CMAKE_SOURCE_DIR}/source/lib3d)
@@ -54,7 +52,7 @@ endif()
 target_link_libraries(${LIB_NAME} PRIVATE glad)
 target_link_libraries(${LIB_NAME} PRIVATE mtlpp)
 
-target_include_directories(${LIB_NAME} PRIVATE ${GLAD_SOURCE_DIR}/include)
-target_include_directories(${LIB_NAME} PRIVATE ${MTLPP_SOURCE_DIR})
+target_include_directories(${LIB_NAME} PRIVATE ${glad_SOURCE_DIR}/include)
+target_include_directories(${LIB_NAME} PRIVATE ${mtlpp_SOURCE_DIR})
 
 set_target_properties(${LIB_NAME} PROPERTIES FOLDER "core")

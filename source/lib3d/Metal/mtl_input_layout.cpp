@@ -1,8 +1,8 @@
-#include <Metal/mtl_input_layout.h>
+#include "mtl_input_layout.h"
 
 #if EL_BUILD_METAL
 
-#include <Metal/mtl_device.h>
+#include "mtl_device.h"
 
 using namespace el;
 
