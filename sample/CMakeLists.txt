@@ -14,7 +14,7 @@ function(buildSample SAMPLE_NAME)
 
     project(${SAMPLE_NAME})
     file(GLOB HEADER_LIST ${SAMPLE_NAME}/*.h ${SAMPLE_NAME}/*.hpp)
-    file(GLOB SOURCE_LIST ${SAMPLE_NAME}/*.cpp)
+    file(GLOB SOURCE_LIST ${SAMPLE_NAME}/*.cpp ${SAMPLE_NAME}/*.mm)
     source_group(${SAMPLE_NAME} FILES ${HEADER_LIST})
     source_group(${SAMPLE_NAME} FILES ${SOURCE_LIST})
 
