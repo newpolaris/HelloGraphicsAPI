@@ -1,3 +1,11 @@
+include_directories(${ROOT_PATH}/source/lib3d)
+include_directories(${ROOT_PATH}/source/libplatform)
+include_directories(${ROOT_PATH}/external/glfw/deps)
+include_directories(${ROOT_PATH}/external/glfw/include)
+include_directories(${ROOT_PATH}/external/meshoptimizer/src)
+include_directories(${ROOT_PATH}/external/objparser)
+include_directories(${ROOT_PATH}/external/glad/include) 
+
 # Function for building single sample
 function(buildSample SAMPLE_NAME)
     set(SAMPLE_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
@@ -23,8 +31,10 @@ function(buildSample SAMPLE_NAME)
     target_include_directories(${SAMPLE_NAME} PRIVATE "${COMMON_FOLDER}")
 
     target_link_libraries(${SAMPLE_NAME} PRIVATE "lib3d")
+    target_link_libraries(${SAMPLE_NAME} PRIVATE "libplatform")
     target_link_libraries(${SAMPLE_NAME} PRIVATE "objparser")
     target_link_libraries(${SAMPLE_NAME} PRIVATE "meshoptimizer")
+    target_link_libraries(${SAMPLE_NAME} PRIVATE "glfw")
     if(APPLE)
         target_link_libraries(${SAMPLE_NAME} PRIVATE "-framework AppKit")
     endif()

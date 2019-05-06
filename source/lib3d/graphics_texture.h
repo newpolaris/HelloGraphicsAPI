@@ -5,10 +5,6 @@
 
 namespace el {
 
-}
-
-namespace el {
-
     class GraphicsTextureDesc final
     {
     public:

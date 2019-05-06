@@ -26,7 +26,7 @@
 #include <el_predefine.h>
 #include <el_debug.h>
 
-#include <OpenGL/gl_headers.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>

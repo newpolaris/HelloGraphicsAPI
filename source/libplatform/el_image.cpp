@@ -14,13 +14,13 @@ ImageDataPtr ImageData::load(const std::string& filename)
     // 1-byte aligment image
     const streamsize_t length = width * height * components;
 
-    GraphicsPixelFormat format = GraphicsPixelFormat::GraphicsPixelFormatInvalid;
+    PixelFormat format = PixelFormat::PixelFormatInvalid;
     switch (components)
     {
-    case 1: format = GraphicsPixelFormat::GraphicsPixelFormatR8Unorm; break;
-    case 2: format = GraphicsPixelFormat::GraphicsPixelFormatRG8Unorm; break;
-    case 3: format = GraphicsPixelFormat::GraphicsPixelFormatRGB8Unorm; break;
-    case 4: format = GraphicsPixelFormat::GraphicsPixelFormatRGBA8Unorm; break;
+    case 1: format = PixelFormat::PixelFormatR8Unorm; break;
+    case 2: format = PixelFormat::PixelFormatRG8Unorm; break;
+    case 3: format = PixelFormat::PixelFormatRGB8Unorm; break;
+    case 4: format = PixelFormat::PixelFormatRGBA8Unorm; break;
     }
 
     auto container = std::make_shared<ImageData>();

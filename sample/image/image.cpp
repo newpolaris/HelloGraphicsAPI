@@ -236,7 +236,7 @@ int main(int argc, char** argv)
 
 	GraphicsTextureDesc texture_desc;
 	texture_desc.setDim(GraphicsTextureDim2D);
-	texture_desc.setPixelFormat(image->format);
+	texture_desc.setPixelFormat((GraphicsPixelFormat)image->format);
 	texture_desc.setWidth(image->width);
 	texture_desc.setHeight(image->height);
 	texture_desc.setStream(static_cast<stream_t*>(image->stream.data()));

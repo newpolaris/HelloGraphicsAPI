@@ -13,18 +13,21 @@ add_subdirectory(glfw)
 set_target_properties(glfw PROPERTIES FOLDER "external")
 
 # glad
+project(GLAD)
 set(GLAD_DIR "${DEPENDENCIES_PATH}/glad")
 add_library("glad" "${GLAD_DIR}/src/glad.c")
 target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
 set_target_properties("glad" PROPERTIES FOLDER "external")
 
 # stb
+project(STB)
 set(STB_DIR "${DEPENDENCIES_PATH}/stb")
 add_library("stb" "${STB_DIR}/stb_image.cpp")
 target_include_directories("stb" PRIVATE "${STB_DIR}")
 set_target_properties("stb" PROPERTIES FOLDER "external")
 
 # objparser
+project(OBJPARSER)
 set(OBJPARSER_DIR "${DEPENDENCIES_PATH}/objparser")
 add_library("objparser" "${OBJPARSER_DIR}/objparser.cpp")
 target_include_directories("objparser" PRIVATE "${OBJPARSER_DIR}")

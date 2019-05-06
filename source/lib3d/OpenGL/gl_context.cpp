@@ -9,7 +9,6 @@
 #include <OpenGL/gl_input_layout.h>
 
 #include <sstream>
-#include <GLFW/glfw3.h>
 
 using namespace el;
 
@@ -21,7 +20,7 @@ bool initGLExtension()
 
     // The contexts are created with the same APIs so the function
     // pointers should be re-usable between them
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    gladLoadGL();
 
     // TODO:
     // how to handle glad_glGenFramebuffersEXT?
@@ -31,10 +30,6 @@ bool initGLExtension()
         EL_TRACE("Require GL_ARB_framebuffer_object");
         return false;
     }
-
-    // Only enable vsync for the first of the windows to be swapped to
-    // avoid waiting out the interval for each window
-    glfwSwapInterval(1);
 
     isInitGLExtension = true;
 
