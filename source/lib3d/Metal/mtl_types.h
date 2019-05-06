@@ -2,7 +2,7 @@
 #define __MTL_TYPES_H__
 
 #include <graphics_types.h>
-#include <Metal/mtlpp.hpp>
+#include <mtlpp.hpp>
 
 namespace el {
 

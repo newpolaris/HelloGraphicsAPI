@@ -8,7 +8,7 @@
 #include <graphics_types.h>
 #include <graphics_depth_stencil.h>
 #include <Metal/mtl_types.h>
-#include <Metal/mtlpp.hpp>
+#include <mtlpp.hpp>
 
 namespace el {
 

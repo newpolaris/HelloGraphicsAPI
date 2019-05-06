@@ -3,7 +3,7 @@
 #if EL_BUILD_METAL
 
 #include <el_debug.h>
-#include <Metal/mtlpp.hpp>
+#include <mtlpp.hpp>
 #include <Metal/mtl_device.h>
 #include <graphics_types.h>
 

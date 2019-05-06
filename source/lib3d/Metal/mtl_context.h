@@ -5,7 +5,7 @@
 
 #if EL_BUILD_METAL
 
-#include <Metal/mtlpp.hpp>
+#include <mtlpp.hpp>
 #include <Metal/mtl_types.h>
 #include <graphics_context.h>
 

@@ -2,10 +2,7 @@ project(libplatform)
 
 set(LIB_NAME libplatform)
 
-#add_definitions(-DTW_STATIC)
-#add_definitions(-DTW_NO_LIB_PRAGMA)
-#add_definitions(-DTW_NO_DIRECT3D)
-#add_definitions(-DGLEW_STATIC)
+include_directories(${LIBPLATFORM_SOURCE_DIR})
 
 set(HEADER_PATH ${CMAKE_SOURCE_DIR}/source/libplatform)
 set(SOURCE_PATH ${CMAKE_SOURCE_DIR}/source/libplatform)
@@ -30,6 +27,6 @@ set(PLATFORM_LIST ${PLATFORM_CORE})
 add_library(${LIB_NAME} ${PLATFORM_LIST})
 
 target_link_libraries(${LIB_NAME} PRIVATE stb)
+target_include_directories(${LIB_NAME} PRIVATE ${STB_SOURCE_DIR})
 
-target_include_directories(${LIB_NAME} PRIVATE "${STB_DIR}")
 set_target_properties(${LIB_NAME} PROPERTIES FOLDER "core")

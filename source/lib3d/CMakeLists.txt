@@ -2,13 +2,8 @@ project(lib3d)
 
 set(LIB_NAME lib3d)
 
-add_definitions(-DTW_STATIC)
-add_definitions(-DTW_NO_LIB_PRAGMA)
-add_definitions(-DTW_NO_DIRECT3D)
-add_definitions(-DGLEW_STATIC)
-
-include_directories(${lib3d_SOURCE_DIR})
-include_directories(${ROOT_PATH}/source/libplatform)
+include_directories(${LIB3D_SOURCE_DIR})
+include_directories(${LIBPLATFORM_SOURCE_DIR})
 include_directories(${GLFW_SOURCE_DIR}/deps)
 
 set(SOURCE_PATH ${CMAKE_SOURCE_DIR}/source/lib3d)
@@ -30,8 +25,8 @@ if(BUILD_OPENGL)
 endif()
 
 if(BUILD_METAL)
-    file(GLOB RENDERER_MTL_HEADER "Metal/*.h" "Metal/*.hpp")
-    file(GLOB RENDERER_MTL_SOURCE "Metal/*.cpp" "Metal/*.mm")
+    file(GLOB RENDERER_MTL_HEADER "Metal/*.h")
+    file(GLOB RENDERER_MTL_SOURCE "Metal/*.cpp")
 
     set(RENDERER_MTL ${RENDERER_MTL_HEADER} ${RENDERER_MTL_SOURCE})
     source_group("Metal" FILES ${RENDERER_MTL})
@@ -57,6 +52,9 @@ if(BUILD_METAL)
 endif()
 
 target_link_libraries(${LIB_NAME} PRIVATE glad)
-target_include_directories(${LIB_NAME} PRIVATE ${ROOT_PATH}/external/glad/include)
+target_link_libraries(${LIB_NAME} PRIVATE mtlpp)
+
+target_include_directories(${LIB_NAME} PRIVATE ${GLAD_SOURCE_DIR}/include)
+target_include_directories(${LIB_NAME} PRIVATE ${MTLPP_SOURCE_DIR})
 
 set_target_properties(${LIB_NAME} PROPERTIES FOLDER "core")

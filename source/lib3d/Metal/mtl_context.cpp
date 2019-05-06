@@ -4,7 +4,7 @@
 
 #include <el_debug.h>
 #include <Metal/mtl_device.h>
-#include <Metal/mtlpp.hpp>
+#include <mtlpp.hpp>
 
 using namespace el;
 
