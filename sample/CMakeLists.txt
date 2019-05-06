@@ -52,3 +52,5 @@ buildSample("bunny")
 buildSample("driver")
 # buildSample("window")
 # buildSample("context")
+
+add_subdirectory(sdl)
