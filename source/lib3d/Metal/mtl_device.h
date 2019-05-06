@@ -6,7 +6,7 @@
 #if EL_BUILD_METAL
 
 #include <graphics_device.h>
-#include <Metal/mtlpp.hpp>
+#include <mtlpp.hpp>
 
 namespace el {
 

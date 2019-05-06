@@ -2,11 +2,12 @@
  * Copyright 2016-2017 Nikolay Aleksiev. All rights reserved.
  * License: https://github.com/naleksiev/mtlpp/blob/master/LICENSE
  */
-#include <Metal/mtlpp.hpp>
+#include <mtlpp.hpp>
 
-#include <el_platform.h>
-
-#if EL_PLAT_APPLE
+// special define block to protype metal renerer
+#if  defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) || \
+     defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__) || \
+     defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
 
 //////////////////////////////////////
 // FILE: argument.mm
@@ -4776,4 +4777,4 @@ namespace mtlpp
     }
 }
 
-#endif // #if EL_PLAT_APPLE
+#endif

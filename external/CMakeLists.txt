@@ -10,14 +10,12 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(glfw)
-set_target_properties(glfw PROPERTIES FOLDER "external")
+add_subdirectory(glad)
+add_subdirectory(mtlpp)
 
-# glad
-project(GLAD)
-set(GLAD_DIR "${DEPENDENCIES_PATH}/glad")
-add_library("glad" "${GLAD_DIR}/src/glad.c")
-target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
-set_target_properties("glad" PROPERTIES FOLDER "external")
+set_target_properties(glfw PROPERTIES FOLDER "external")
+set_target_properties(mtlpp PROPERTIES FOLDER "external")
+set_target_properties(glad PROPERTIES FOLDER "external")
 
 # stb
 project(STB)

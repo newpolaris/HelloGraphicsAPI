@@ -7,7 +7,7 @@
 
 #include <graphics_types.h>
 #include <graphics_sampler.h>
-#include <Metal/mtlpp.hpp>
+#include <mtlpp.hpp>
 
 namespace el {
 

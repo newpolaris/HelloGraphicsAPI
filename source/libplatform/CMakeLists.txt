@@ -2,11 +2,6 @@ project(libplatform)
 
 set(LIB_NAME libplatform)
 
-#add_definitions(-DTW_STATIC)
-#add_definitions(-DTW_NO_LIB_PRAGMA)
-#add_definitions(-DTW_NO_DIRECT3D)
-#add_definitions(-DGLEW_STATIC)
-
 set(HEADER_PATH ${CMAKE_SOURCE_DIR}/source/libplatform)
 set(SOURCE_PATH ${CMAKE_SOURCE_DIR}/source/libplatform)
 
