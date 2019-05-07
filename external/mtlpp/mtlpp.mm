@@ -2366,7 +2366,9 @@ namespace ns
 
     Object::~Object()
     {
-        reset();
+        if (m_ptr)
+            CFRelease(m_ptr);
+        m_ptr = nullptr;
     }
 
     Object& Object::operator=(const Object& rhs)
@@ -2393,14 +2395,6 @@ namespace ns
         return *this;
     }
 #endif
-
-    void Object::reset(void* ptr)
-    {
-        Validate();
-        if (m_ptr)
-            CFRelease(m_ptr);
-        m_ptr = ptr;
-    }
     
     uint32_t ArrayBase::GetSize() const
     {

@@ -5,63 +5,158 @@
 #include <Cocoa/Cocoa.h>
 #include <Metal/Metal.h>
 #include <QuartzCore/CAMetalLayer.h>
+#include <mtlpp.hpp>
 
-@interface MetalView : NSView
-@property (assign, nonatomic) CAMetalLayer* metalLayer;
-@end
+namespace {
 
-@implementation MetalView
+    const char shadersSrc[] = R"""(
+        #include <metal_stdlib>
+        using namespace metal;
 
-+ (Class)layerClass
-{
-    return [CAMetalLayer class];
-}
+        typedef struct
+        {
+            packed_float3 position;
+            packed_float2 texcoord;
+        } vertex_t;
+    
+        typedef struct
+        {
+            float4 clipSpacePosition [[position]];
+            float2 textureCoordinate;
+        } RasterizerData;
 
-- (instancetype)initWithFrame:(NSRect)frameRect
-{
-    if ((self = [super initWithFrame:frameRect]))
+        vertex RasterizerData vertFunc(
+            const device vertex_t* vertexArray [[buffer(0)]],
+            unsigned int vID[[vertex_id]])
+        {
+            RasterizerData data;
+            data.clipSpacePosition = float4(vertexArray[vID].position, 1.0);
+            data.textureCoordinate = vertexArray[vID].texcoord;
+            return data;
+        }
+
+        fragment half4 fragFunc(
+            RasterizerData in [[stage_in]],
+            texture2d<half> colorTexture [[texture(0)]])
+        {
+            constexpr sampler textureSampler (mag_filter::nearest,
+                                              min_filter::nearest);
+            // Sample the texture to obtain a color
+            const half4 colorSample = colorTexture.sample(textureSampler, in.textureCoordinate);
+            
+            // We return the color of the texture
+            return colorSample;
+        }
+    )""";
+    
+    // AAPLVertex improve;
+    const float vertexData[] =
     {
-#if EL_PLAT_IOS
-        self.autoresizingMask = UIViewAutoresizingFlexibleWidth |
-                                UIViewAutoresizingFlexibleHeight;
-        
-        self.contentScaleFactor = [UIScreen mainScreen].nativeScale;
-        self.backgroundColor = nil;
-        
-        _metalLayer = (CAMetalLayer*)self.layer;
-#else
-        self.wantsLayer = YES;
-        self.layer = _metalLayer = [CAMetalLayer layer];
-#endif
+         0.0f,  1.0f, 0.0f,  0.5f, 0.0f,
+         1.0f, -1.0f, 0.0f,  1.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f,  0.0f, 1.0f,
+    };
 
-        [self updateDrawableSize];
+}
+
+bool execute(NSView* view)
+{
+    auto device = mtlpp::Device::CreateSystemDefaultDevice();
+    
+    CAMetalLayer* layer = [CAMetalLayer layer];
+    layer.device = (__bridge id<MTLDevice>)device.GetPtr();
+    layer.opaque = true;
+    layer.drawableSize = [view convertSizeToBacking:view.bounds.size];
+
+    view.wantsLayer = YES;
+    view.layer = layer;
+
+    auto commandQueue = device.NewCommandQueue();
+
+    ns::Error error;
+    mtlpp::Library library = device.NewLibrary(shadersSrc, mtlpp::CompileOptions(), &error);
+    if (!library)
+        EL_TRACE("Failed to created pipeline state, error %s", error.GetLocalizedDescription().GetCStr());
+
+    mtlpp::Function vertFunc = library.NewFunction("vertFunc");
+    mtlpp::Function fragFunc = library.NewFunction("fragFunc");
+    
+    char pixels[16 * 16];
+    int y, x;
+    for (y = 0;  y < 16;  y++)
+    {
+        for (x = 0;  x < 16;  x++)
+            pixels[y * 16 + x] = rand() % 256;
     }
-    return self;
+
+    mtlpp::TextureDescriptor descriptor;
+    descriptor.SetWidth(16);
+    descriptor.SetHeight(16);
+    descriptor.SetPixelFormat(mtlpp::PixelFormat::R8Unorm);
+
+    auto texture = device.NewTexture(descriptor);
+    EL_ASSERT(texture);
+    mtlpp::Region region = { 0, 0, descriptor.GetWidth(), descriptor.GetHeight() };
+    texture.Replace(region, 0, pixels, 16);
+
+    auto vertexBuffer = device.NewBuffer(vertexData, sizeof(vertexData), mtlpp::ResourceOptions::CpuCacheModeDefaultCache);
+
+    mtlpp::RenderPipelineDescriptor renderPipelineDesc;
+    renderPipelineDesc.SetVertexFunction(vertFunc);
+    renderPipelineDesc.SetFragmentFunction(fragFunc);
+    renderPipelineDesc.GetColorAttachments()[0].SetPixelFormat(mtlpp::PixelFormat::BGRA8Unorm);
+    auto renderPipelineState = device.NewRenderPipelineState(renderPipelineDesc, nullptr);
+
+    
+    mtlpp::RenderPassDescriptor renderPassDesc;
+    mtlpp::RenderPassColorAttachmentDescriptor colorAttachment = renderPassDesc.GetColorAttachments()[0];
+    colorAttachment.SetClearColor(mtlpp::ClearColor{0.5f, 0.5f, 0.5f, 1.0f});
+    colorAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
+    colorAttachment.SetStoreAction(mtlpp::StoreAction::Store);
+    
+    while (true)
+    {
+        bool isQuit = false;
+        SDL_Event e;
+        while (SDL_PollEvent(&e))
+            isQuit = (e.type == SDL_QUIT);
+        if (isQuit) break;
+        
+        MTLViewport viewport = (MTLViewport){
+            0.0, 0.0,
+            layer.drawableSize.width,
+            layer.drawableSize.height,
+            0.0, 1.0};
+        
+        @autoreleasepool
+        {
+            id<CAMetalDrawable> drawable = [layer nextDrawable];
+            
+            mtlpp::CommandBuffer commandBuffer = commandQueue.CommandBuffer();
+
+            if (drawable)
+            {
+                colorAttachment.SetTexture(mtlpp::Texture(ns::Handle{(__bridge void*)drawable.texture}));
+
+                mtlpp::RenderCommandEncoder renderCommandEncoder = commandBuffer.RenderCommandEncoder(renderPassDesc);
+                renderCommandEncoder.SetCullMode(mtlpp::CullMode::Back);
+                renderCommandEncoder.SetRenderPipelineState(renderPipelineState);
+                renderCommandEncoder.SetVertexBuffer(vertexBuffer, 0, 0);
+                renderCommandEncoder.SetFragmentTexture(texture, 0);
+                renderCommandEncoder.Draw(mtlpp::PrimitiveType::Triangle, 0, 3);
+                renderCommandEncoder.EndEncoding();
+                commandBuffer.Present(ns::Handle{(__bridge void*)drawable});
+            }
+
+            commandBuffer.Commit();
+            commandBuffer.WaitUntilCompleted();
+        }
+    }
+
+    device = ns::Handle{};
+
+    return true;
 }
-
-- (void)updateDrawableSize
-{
-    CGSize size = self.bounds.size;
-#if EL_PLAT_IOS
-    size.width *= self.contentScaleFactor;
-    size.height *= self.contentScaleFactor;
-#else
-    size.width *= self.window.screen.backingScaleFactor;
-    size.height *= self.window.screen.backingScaleFactor;
-#endif
-    _metalLayer.drawableSize = size;
-}
-
-#if EL_PLAT_IOS
-- (void)layoutSubviews
-{
-    [super layoutSubViews];
-    [self updateDrawableSize];
-}
-#endif
-
-@end
-
 
 int main()
 {
@@ -78,51 +173,11 @@ int main()
     SDL_SysWMinfo info;
     SDL_GetVersion(&info.version);
     SDL_GetWindowWMInfo(window, &info);
-
+    
     NSView* view = [info.info.cocoa.window contentView];
 
-    MetalView* metalView = [[MetalView alloc] initWithFrame:view.frame];
-    [view addSubview:metalView];
-    
-    id<MTLDevice> device = MTLCreateSystemDefaultDevice();
-    
-    CAMetalLayer* layer = [metalView metalLayer];
-    layer.device = device;
-    layer.opaque = true;
-    
-    id<MTLCommandQueue> queue = [device newCommandQueue];
-    
-    MTLRenderPassDescriptor *renderDesc = [MTLRenderPassDescriptor renderPassDescriptor];
-    MTLRenderPassColorAttachmentDescriptor *colorAttachment = renderDesc.colorAttachments[0];
-    colorAttachment.clearColor = MTLClearColorMake(0.5f, 0.5f, 0.5f, 1.0f);
-    colorAttachment.loadAction = MTLLoadActionClear;
-    colorAttachment.storeAction = MTLStoreActionStore;
-    
-    while (true)
-    {
-        bool isQuit = false;
-        SDL_Event e;
-        while (SDL_PollEvent(&e))
-            isQuit = (e.type == SDL_QUIT);
-        if (isQuit) break;
-        
-        MTLViewport viewport = (MTLViewport){
-            0.0, 0.0,
-            layer.drawableSize.width,
-            layer.drawableSize.height,
-            0.0, 1.0};
-        
-        id<CAMetalDrawable> drawable = [layer nextDrawable];
-        colorAttachment.texture = drawable.texture;
-        
-        id<MTLCommandBuffer> commands = [queue commandBuffer];
-        id<MTLRenderCommandEncoder> encoder = [commands renderCommandEncoderWithDescriptor:renderDesc];
-        [encoder setViewport:viewport];
-        [encoder endEncoding];
-        [commands presentDrawable:drawable];
-        [commands commit];
-    }
-    [metalView removeFromSuperview];
+    EL_ASSERT(execute(view));
+
     SDL_DestroyWindow(window);
     SDL_Quit();
     
