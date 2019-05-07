@@ -23,10 +23,10 @@
 //
 //========================================================================
 
-#include "predefine.h"
-#include "debug.h"
+#include <el_predefine.h>
+#include <el_debug.h>
 
-#include <OpenGL/gl.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
@@ -51,8 +51,8 @@
 
 #include <cstdio>
 
-#include <utility.h>
-#include <image.h>
+#include <el_utility.h>
+#include <el_image.h>
 #include <objparser.h>
 #include <meshoptimizer.h>
 

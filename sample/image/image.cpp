@@ -1,7 +1,7 @@
-#include "predefine.h"
-#include "debug.h"
+#include <el_predefine.h>
+#include <el_debug.h>
 
-#include <OpenGL/gl.h>
+#include <OpenGL/gl_headers.h>
 #include <GLFW/glfw3.h>
 
 #include <stdio.h>
@@ -26,8 +26,8 @@
 
 #include <cstdio>
 
-#include <utility.h>
-#include <image.h>
+#include <el_utility.h>
+#include <el_image.h>
 #include <objparser.h>
 #include <meshoptimizer.h>
 
@@ -236,7 +236,7 @@ int main(int argc, char** argv)
 
 	GraphicsTextureDesc texture_desc;
 	texture_desc.setDim(GraphicsTextureDim2D);
-	texture_desc.setPixelFormat(image->format);
+	texture_desc.setPixelFormat((GraphicsPixelFormat)image->format);
 	texture_desc.setWidth(image->width);
 	texture_desc.setHeight(image->height);
 	texture_desc.setStream(static_cast<stream_t*>(image->stream.data()));

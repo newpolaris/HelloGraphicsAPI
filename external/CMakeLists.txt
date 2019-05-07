@@ -10,25 +10,21 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(glfw)
+add_subdirectory(glad)
+add_subdirectory(mtlpp)
+add_subdirectory(stb)
+add_subdirectory(objparser)
+add_subdirectory(sdl2)
+
 set_target_properties(glfw PROPERTIES FOLDER "external")
-
-# glad
-set(GLAD_DIR "${DEPENDENCIES_PATH}/glad")
-add_library("glad" "${GLAD_DIR}/src/glad.c")
-target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
-set_target_properties("glad" PROPERTIES FOLDER "external")
-
-# stb
-set(STB_DIR "${DEPENDENCIES_PATH}/stb")
-add_library("stb" "${STB_DIR}/stb_image.cpp")
-target_include_directories("stb" PRIVATE "${STB_DIR}")
-set_target_properties("stb" PROPERTIES FOLDER "external")
-
-# objparser
-set(OBJPARSER_DIR "${DEPENDENCIES_PATH}/objparser")
-add_library("objparser" "${OBJPARSER_DIR}/objparser.cpp")
-target_include_directories("objparser" PRIVATE "${OBJPARSER_DIR}")
-set_target_properties("objparser" PROPERTIES FOLDER "external")
+set_target_properties(mtlpp PROPERTIES FOLDER "external")
+set_target_properties(glad PROPERTIES FOLDER "external")
+set_target_properties(stb PROPERTIES FOLDER "external")
+set_target_properties(objparser PROPERTIES FOLDER "external")
+set_target_properties(SDL2 PROPERTIES FOLDER "external")
+set_target_properties(SDL2main PROPERTIES FOLDER "external")
+set_target_properties(SDL2-static PROPERTIES FOLDER "external")
+set_target_properties(uninstall PROPERTIES FOLDER "external")
 
 add_subdirectory(meshoptimizer)
 if(APPLE)

@@ -1,6 +1,6 @@
-#include "predefine.h"
-#include "debug.h"
-#include <OpenGL/gl.h>
+#include <el_predefine.h>
+#include <el_debug.h>
+#include <OpenGL/gl_headers.h>
 
 #include <GLFW/glfw3.h>
 
@@ -24,15 +24,14 @@
 #include <graphics_texture.h>
 #include <graphics_data.h>
 #include <graphics_input_layout.h>
-#include <graphics_window.h>
+#include "graphics_window.h"
 
 #include <cstdio>
 #include <cmath>
 #include <random>
 
-#include <utility.h>
-#include <image.h>
-// #include <common.h>
+#include <el_utility.h>
+#include <el_image.h>
 #include <memory>
 
 #include "mesh.h"
@@ -114,7 +113,7 @@ int bunny_run()
 		"wolf.obj",
     };
     Geometry geometry;
-    for (uint32_t i = 0; i < _countof(objfiles); i++)
+    for (uint32_t i = 0; i < el::countof(objfiles); i++)
         EL_ASSERT(LoadMesh(&geometry, el::getResourcePath() + objfiles[i]));
 
     // Create the OpenGL objects inside the first context, created above

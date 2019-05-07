@@ -18,13 +18,6 @@ include(UsebackportedModules)
 include(CreateLaunchers)
 include(MSVCMultipleProcessCompile) # /MP
 
-include_directories(${PROJECT_SOURCE_DIR}/source)
-include_directories(${PROJECT_SOURCE_DIR}/external/glfw/deps)
-include_directories(${PROJECT_SOURCE_DIR}/external/glfw/include)
-include_directories(${PROJECT_SOURCE_DIR}/external/glad/include)
-include_directories(${PROJECT_SOURCE_DIR}/external/meshoptimizer/src)
-include_directories(${PROJECT_SOURCE_DIR}/external/objparser)
-
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 option(BUILD_OPENGL "Legacy OpenGL" ON)
