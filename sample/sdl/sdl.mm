@@ -22,7 +22,20 @@ namespace {
 
     const char vertexShaderSrc[] = R"""(
         #include <metal_stdlib>
+        #include <simd/simd.h>
         using namespace metal;
+    
+        namespace AAPL
+        {
+            struct constants_t
+            {
+                simd::float4x4 modelview_projection_matrix;
+                simd::float4x4 normal_matrix;
+                simd::float4   ambient_color;
+                simd::float4   diffuse_color;
+                int            multiplier;
+            } __attribute__ ((aligned (256)));
+        }
 
         typedef struct
         {
@@ -38,6 +51,8 @@ namespace {
 
         vertex RasterizerData Main(
             const device vertex_t* vertexArray [[buffer(0)]],
+            constant AAPL::constants_t& constants [[ buffer(1) ]],
+            constant float& light [[ buffer(2) ]],
             unsigned int vID[[vertex_id]])
         {
             RasterizerData data;
@@ -78,7 +93,72 @@ namespace {
          1.0f, -1.0f, 0.0f,  1.0f, 1.0f,
         -1.0f, -1.0f, 0.0f,  0.0f, 1.0f,
     };
+    
+    char pixels[16 * 16];
+}
 
+enum class ArgumentAccess : uint8_t
+{
+    ReadOnly  = 0,
+    ReadWrite = 1,
+    WriteOnly = 2,
+};
+
+struct MTLUniform
+{
+    bool isActive;
+    std::string name;
+    uint32_t location;
+    uint32_t arraySize;
+    uint32_t alignment;
+    uint32_t size;
+    ArgumentAccess access;
+};
+
+void setupArgument(const mtlpp::Argument& arg)
+{
+    MTLUniform uniform;
+    uniform.name = std::string(arg.GetName().GetCStr());
+    uniform.isActive = arg.IsActive();
+    uniform.access = (ArgumentAccess)arg.GetAccess();
+    uniform.location = arg.GetIndex();
+    
+    @autoreleasepool {
+        MTLArgument* argument = (__bridge MTLArgument*)arg.GetPtr();
+        
+        MTLDataType dataType = [argument bufferDataType];
+        MTLPointerType* pointerType = [argument bufferPointerType];
+        MTLStructType* structType = [argument bufferStructType];
+        if (dataType == MTLDataTypePointer)
+        {
+            MTLPointerType* pointerType = [argument bufferPointerType];
+        }
+    }
+   
+    
+    auto type = arg.GetType();
+    if (type == mtlpp::ArgumentType::Buffer)
+    {
+        uint32_t arraySize = 1;
+        uniform.alignment = arg.GetBufferAlignment();
+        uniform.size = arg.GetBufferDataSize();
+        auto bufferType = arg.GetBufferDataType();
+        if (bufferType == mtlpp::DataType::Array)
+            arraySize = arg.GetArrayLength();
+        else if (bufferType == mtlpp::DataType::Struct)
+        {
+            // uniform.type = bufferType;
+        }
+        // uniform.elementSize = asElementSize(bufferType);
+    }
+    else if (type == mtlpp::ArgumentType::Sampler)
+    {
+        
+    }
+    else if (type == mtlpp::ArgumentType::Texture)
+    {
+    
+    }
 }
 
 bool execute(NSView* view)
@@ -111,14 +191,6 @@ bool execute(NSView* view)
     auto g_fragmentShader = g_device->createShader(shaderDesc);
     EL_ASSERT(g_fragmentShader);
     const mtlpp::Function& fragFunc = std::dynamic_pointer_cast<el::MTLShader>(g_fragmentShader)->getFunction();
-    
-    char pixels[16 * 16];
-    int y, x;
-    for (y = 0;  y < 16;  y++)
-    {
-        for (x = 0;  x < 16;  x++)
-            pixels[y * 16 + x] = rand() % 256;
-    }
 
     GraphicsTextureDesc textureDesc;
     textureDesc.setWidth(16);
@@ -138,10 +210,19 @@ bool execute(NSView* view)
     renderPipelineDesc.SetFragmentFunction(fragFunc);
     auto colorAttachmentDesc = renderPipelineDesc.GetColorAttachments()[0];
     colorAttachmentDesc.SetPixelFormat(mtlpp::PixelFormat::BGRA8Unorm);
-    auto renderPipelineState = device.NewRenderPipelineState(renderPipelineDesc, nullptr);
+    mtlpp::PipelineOption pipelineOptions = mtlpp::PipelineOption(mtlpp::ArgumentInfo | mtlpp::BufferTypeInfo);
+    mtlpp::RenderPipelineReflection reflection;
+    ns::Error error;
+    auto renderPipelineState = device.NewRenderPipelineState(renderPipelineDesc, pipelineOptions, &reflection, &error);
+
+    auto vertexArgs = reflection.GetVertexArguments();
+    for (int i = 0; i < vertexArgs.GetSize(); i++)
+    {
+        setupArgument(vertexArgs[i]);
+    }
     
     mtlpp::RenderPassDescriptor renderPassDesc;
-    mtlpp::RenderPassColorAttachmentDescriptor colorAttachment = renderPassDesc.GetColorAttachments()[0];
+    auto colorAttachment = renderPassDesc.GetColorAttachments()[0];
     colorAttachment.SetClearColor(mtlpp::ClearColor{0.5f, 0.5f, 0.5f, 1.0f});
     colorAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
     colorAttachment.SetStoreAction(mtlpp::StoreAction::Store);
@@ -164,7 +245,7 @@ bool execute(NSView* view)
             {
                 colorAttachment.SetTexture(mtlpp::Texture(ns::Handle{(__bridge void*)drawable.texture}));
 
-                mtlpp::RenderCommandEncoder renderCommandEncoder = commandBuffer.RenderCommandEncoder(renderPassDesc);
+                auto renderCommandEncoder = commandBuffer.RenderCommandEncoder(renderPassDesc);
                 renderCommandEncoder.SetCullMode(mtlpp::CullMode::Back);
                 renderCommandEncoder.SetRenderPipelineState(renderPipelineState);
                 renderCommandEncoder.SetVertexBuffer(vertexBuffer, 0, 0);
@@ -186,6 +267,13 @@ bool execute(NSView* view)
 
 int main()
 {
+    int y, x;
+    for (y = 0;  y < 16;  y++)
+    {
+        for (x = 0;  x < 16;  x++)
+            pixels[y * 16 + x] = rand() % 256;
+    }
+    
     SDL_Init(SDL_INIT_VIDEO);
     
     SDL_Window* window = SDL_CreateWindow("sdl sample",

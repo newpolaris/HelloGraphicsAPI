@@ -137,6 +137,11 @@ namespace mtlpp
         Validate();
         return uint32_t([(__bridge MTLArgument*)m_ptr index]);
     }
+    uint32_t Argument::GetArrayLength() const
+    {
+        Validate();
+        return uint32_t([(__bridge MTLArgument*)m_ptr arrayLength]);
+    }
 
     bool Argument::IsActive() const
     {

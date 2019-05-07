@@ -821,6 +821,8 @@ namespace mtlpp
         Bool2    = 54,
         Bool3    = 55,
         Bool4    = 56,
+        
+        Pointer  MTLPP_AVAILABLE(10_13, 11_0) = 60,
     }
     MTLPP_AVAILABLE(10_11, 8_0);
 
@@ -891,6 +893,7 @@ namespace mtlpp
         ArgumentType   GetType() const;
         ArgumentAccess GetAccess() const;
         uint32_t       GetIndex() const;
+        uint32_t       GetArrayLength() const MTLPP_AVAILABLE(10_13, 10_0);
 
         bool           IsActive() const;
 
