@@ -4,6 +4,7 @@
 #include <SDL_syswm.h>
 #include <Cocoa/Cocoa.h>
 #include <Metal/Metal.h>
+#include <Metal/MTLLibrary.h>
 #include <QuartzCore/CAMetalLayer.h>
 #include <mtlpp.hpp>
 
@@ -42,7 +43,12 @@ namespace {
             packed_float3 position;
             packed_float2 texcoord;
         } vertex_t;
-    
+        struct VertexInput {
+            float3 position [[attribute(0)]];
+            float3 normal   [[attribute(1)]];
+            half2  texcoord [[attribute(2)]];
+        };
+
         typedef struct
         {
             float4 clipSpacePosition [[position]];
@@ -50,9 +56,10 @@ namespace {
         } RasterizerData;
 
         vertex RasterizerData Main(
-            const device vertex_t* vertexArray [[buffer(0)]],
-            constant AAPL::constants_t& constants [[ buffer(1) ]],
-            constant float& light [[ buffer(2) ]],
+            VertexInput in [[stage_in]],
+            const device vertex_t* vertexArray [[buffer(2)]],
+            constant AAPL::constants_t& constants [[buffer(1)]],
+            constant float& light [[buffer(0)]],
             unsigned int vID[[vertex_id]])
         {
             RasterizerData data;
@@ -127,15 +134,9 @@ void setupArgument(const mtlpp::Argument& arg)
         MTLArgument* argument = (__bridge MTLArgument*)arg.GetPtr();
         
         MTLDataType dataType = [argument bufferDataType];
-        MTLPointerType* pointerType = [argument bufferPointerType];
         MTLStructType* structType = [argument bufferStructType];
-        if (dataType == MTLDataTypePointer)
-        {
-            MTLPointerType* pointerType = [argument bufferPointerType];
-        }
     }
-   
-    
+
     auto type = arg.GetType();
     if (type == mtlpp::ArgumentType::Buffer)
     {
@@ -192,6 +193,8 @@ bool execute(NSView* view)
     EL_ASSERT(g_fragmentShader);
     const mtlpp::Function& fragFunc = std::dynamic_pointer_cast<el::MTLShader>(g_fragmentShader)->getFunction();
 
+    auto qt = vertFunc.GetVertexAttributes();
+    
     GraphicsTextureDesc textureDesc;
     textureDesc.setWidth(16);
     textureDesc.setHeight(16);
@@ -204,8 +207,34 @@ bool execute(NSView* view)
     auto texture = std::dynamic_pointer_cast<el::MTLTexture>(g_texture)->getTexture();
 
     auto vertexBuffer = device.NewBuffer(vertexData, sizeof(vertexData), mtlpp::ResourceOptions::CpuCacheModeDefaultCache);
+    
+    MTLVertexDescriptor *mtlVertexDescriptor = [[MTLVertexDescriptor alloc] init];
+    
+    // Positions.
+    mtlVertexDescriptor.attributes[0].format = MTLVertexFormatFloat3;
+    mtlVertexDescriptor.attributes[0].offset = 0;
+    mtlVertexDescriptor.attributes[0].bufferIndex = 0;
+    
+    // Normals.
+    mtlVertexDescriptor.attributes[1].format = MTLVertexFormatFloat3;
+    mtlVertexDescriptor.attributes[1].offset = 12;
+    mtlVertexDescriptor.attributes[1].bufferIndex = 0;
+    
+    // Texture coordinates.
+    mtlVertexDescriptor.attributes[2].format = MTLVertexFormatHalf2;
+    mtlVertexDescriptor.attributes[2].offset = 24;
+    mtlVertexDescriptor.attributes[2].bufferIndex = 0;
+    
+    // Single interleaved buffer.
+    mtlVertexDescriptor.layouts[0].stride = 28;
+    mtlVertexDescriptor.layouts[0].stepRate = 1;
+    mtlVertexDescriptor.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
 
+    MTLVertexBufferLayoutDescriptor;
+    
+    mtlpp::VertexDescriptor vertexDescriptor = ns::Handle{(__bridge mtlpp::VertexDescriptor*)mtlVertexDescriptor};
     mtlpp::RenderPipelineDescriptor renderPipelineDesc;
+    renderPipelineDesc.SetVertexDescriptor(vertexDescriptor);
     renderPipelineDesc.SetVertexFunction(vertFunc);
     renderPipelineDesc.SetFragmentFunction(fragFunc);
     auto colorAttachmentDesc = renderPipelineDesc.GetColorAttachments()[0];
@@ -214,6 +243,7 @@ bool execute(NSView* view)
     mtlpp::RenderPipelineReflection reflection;
     ns::Error error;
     auto renderPipelineState = device.NewRenderPipelineState(renderPipelineDesc, pipelineOptions, &reflection, &error);
+    EL_ASSERT(renderPipelineState);
 
     auto vertexArgs = reflection.GetVertexArguments();
     for (int i = 0; i < vertexArgs.GetSize(); i++)
