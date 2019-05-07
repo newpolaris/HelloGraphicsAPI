@@ -22,7 +22,7 @@ namespace el {
         ~MTLDepthStencil();
 
         bool create(const GraphicsDepthStencilDesc& desc);
-        void destory();
+        void destroy();
 
         void setDevice(GraphicsDevicePtr device);
         GraphicsDevicePtr getDevice();

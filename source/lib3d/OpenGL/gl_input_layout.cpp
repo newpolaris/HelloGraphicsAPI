@@ -17,7 +17,7 @@ bool GLInputLayout::create(GraphicsInputLayoutDesc desc)
     return true;
 }
 
-void GLInputLayout::destory()
+void GLInputLayout::destroy()
 {
 }
 

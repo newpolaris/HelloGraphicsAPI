@@ -14,7 +14,7 @@ MTLSampler::MTLSampler()
 
 MTLSampler::~MTLSampler()
 {
-    destory();
+    destroy();
 }
 
 /*
@@ -55,7 +55,7 @@ bool MTLSampler::create(const GraphicsSamplerDesc& desc)
     return true;
 }
 
-void MTLSampler::destory()
+void MTLSampler::destroy()
 {
     _sampler.reset();
 }

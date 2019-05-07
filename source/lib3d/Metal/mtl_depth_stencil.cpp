@@ -47,7 +47,7 @@ bool MTLDepthStencil::create(const GraphicsDepthStencilDesc& desc)
     return true;
 }
 
-void MTLDepthStencil::destory()
+void MTLDepthStencil::destroy()
 {
     _depthStencilState.reset();
 }

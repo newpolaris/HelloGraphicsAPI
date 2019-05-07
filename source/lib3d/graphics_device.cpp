@@ -28,19 +28,19 @@ GraphicsDevice::~GraphicsDevice()
 {
 }
 
-GraphicsDevicePtr el::createDevice(GraphicsDeviceDesc desc)
+GraphicsDevicePtr el::createDevice(const GraphicsDeviceDesc& desc)
 {
     if (desc.getType() == GraphicsDeviceTypeOpenGL)
     {
         auto device = std::make_shared<GLDevice>();
-        if (device->create(std::move(desc)))
+        if (device->create(desc))
             return device;
     }
 #if EL_PLAT_APPLE
     else if (desc.getType() == GraphicsDeviceTypeMetal)
     {
         auto device = std::make_shared<MTLDevice>();
-        if (device->create(std::move(desc)))
+        if (device->create(desc))
             return device;
     }
 #endif

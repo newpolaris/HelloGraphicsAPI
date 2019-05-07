@@ -39,7 +39,7 @@ bool MTLInputLayout::create(const GraphicsInputLayoutDesc& desc)
     return true;
 }
 
-void MTLInputLayout::destory()
+void MTLInputLayout::destroy()
 {
     _inputLayout.reset();
 }

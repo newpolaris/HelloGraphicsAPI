@@ -25,17 +25,17 @@ namespace el {
 		GraphicsDevice();
 		virtual ~GraphicsDevice();
 
-		virtual bool create(GraphicsDeviceDesc desc) = 0;
+		virtual bool create(const GraphicsDeviceDesc& desc) = 0;
 
-		virtual GraphicsProgramPtr createProgram(GraphicsProgramDesc desc) = 0;
-		virtual GraphicsShaderPtr createShader(GraphicsShaderDesc desc) = 0;
-		virtual GraphicsTexturePtr createTexture(GraphicsTextureDesc desc) = 0;
-		virtual GraphicsDataPtr createBuffer(GraphicsDataDesc desc) = 0;
-        virtual GraphicsInputLayoutPtr createInputLayout(GraphicsInputLayoutDesc desc) = 0;
+		virtual GraphicsProgramPtr createProgram(const GraphicsProgramDesc& desc) = 0;
+		virtual GraphicsShaderPtr createShader(const GraphicsShaderDesc& desc) = 0;
+		virtual GraphicsTexturePtr createTexture(const GraphicsTextureDesc& desc) = 0;
+		virtual GraphicsDataPtr createBuffer(const GraphicsDataDesc& desc) = 0;
+        virtual GraphicsInputLayoutPtr createInputLayout(const GraphicsInputLayoutDesc& desc) = 0;
         virtual GraphicsContextPtr createContext() = 0;
 	};
 
-	GraphicsDevicePtr createDevice(GraphicsDeviceDesc desc);
+	GraphicsDevicePtr createDevice(const GraphicsDeviceDesc& desc);
 
 } // namespace el {
 

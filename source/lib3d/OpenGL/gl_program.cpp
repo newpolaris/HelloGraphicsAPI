@@ -13,58 +13,6 @@ namespace el {
 
     static const bool g_isQuiet = false;
 
-    namespace gl {
-        namespace program {
-            typedef GLuint Handle;
-            const Handle kUninitialized = Handle(0);
-
-            bool isInitialized(const Handle& h)
-            {
-                return h != kUninitialized;
-            }
-
-            Handle create(const std::vector<GLuint>& shaderIDs)
-            {
-                // In opengl it is valid, but check logic error
-                EL_ASSERT(shaderIDs.size() > 0);
-
-                GLuint id = gl::CreateProgram();
-
-                GLint status = 0;
-
-                for (auto& shader : shaderIDs)
-                    gl::AttachShader(id, shader);
-                gl::LinkProgram(id);
-
-                GL_CHECK(glGetProgramiv(id, GL_LINK_STATUS, &status));
-                if (status == GL_FALSE || EL_CONFIG_DEBUG)
-                {
-                    const uint32_t kBufferSize = 512u;
-                    char log[kBufferSize];
-                    GL_CHECK(glGetProgramInfoLog(id, sizeof(log), nullptr, log));
-                    if (log[0] != '\0')
-                        EL_TRACE("%d: %s", status, log);
-                }
-                if (status == GL_FALSE)
-                {
-                    gl::DeleteProgram(id);
-                    id = 0;
-                }
-                return Handle(id);
-            }
-
-            void destroy(Handle& handle)
-            {
-                if (isInitialized(handle))
-                {
-                    gl::DeleteProgram(handle);
-                    handle = 0;
-                }
-            }
-
-        } // namespace program {
-    }
-    // namespace gl {
 } // namespace el {
 
 using namespace el;
@@ -81,9 +29,10 @@ GLProgram::GLProgram() :
 
 GLProgram::~GLProgram()
 {
+    destroy();
 }
 
-bool GLProgram::create(GraphicsProgramDesc desc)
+bool GLProgram::create(const GraphicsProgramDesc& desc)
 {
     std::vector<GLuint> shaderIDs;
     for (auto& s : desc.getShaders())
@@ -91,13 +40,36 @@ bool GLProgram::create(GraphicsProgramDesc desc)
         auto shader = std::static_pointer_cast<GLShader>(s);
         shaderIDs.push_back(shader->getID());
     }
-    GLuint id = gl::program::create(shaderIDs);
-    if (id == 0)
+    
+    if (shaderIDs.size() <= 0)
         return false;
 
-    _programID = id;
-    _programDesc = std::move(desc);
+    _programID = GL_CHECK_RET(glCreateProgram());
+    if (_programID == 0)
+        return false;
 
+    GLint status = 0;
+    for (auto& shader : shaderIDs)
+        GL_CHECK(glAttachShader(_programID, shader));
+    GL_CHECK(glLinkProgram(_programID));
+
+    GL_CHECK(glGetProgramiv(_programID, GL_LINK_STATUS, &status));
+    if (status == GL_FALSE || EL_CONFIG_DEBUG)
+    {
+        const uint32_t kBufferSize = 512u;
+        char log[kBufferSize];
+        GL_CHECK(glGetProgramInfoLog(_programID, sizeof(log), nullptr, log));
+        if (log[0] != '\0')
+            EL_TRACE("%d: %s", status, log);
+    }
+    if (status == GL_FALSE)
+    {
+        GL_CHECK(glDeleteProgram(_programID));
+        _programID = 0;
+    }
+    _programDesc = desc;
+
+    // NOTE:
     // glVertexAttribPointer's maximum index value
     // minimum values in OpenGL 2.1 = 16, ES 2.0 = 8
     // GL_CHECK(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, (GLint*)&_limits.maxVertexAttributes));
@@ -108,9 +80,11 @@ bool GLProgram::create(GraphicsProgramDesc desc)
     return true;
 }
 
-void GLProgram::destory()
+void GLProgram::destroy()
 {
-    gl::program::destroy(_programID);
+    GL_CHECK(glDeleteProgram(_programID));
+    _programID = 0;
+
 }
 
 GLuint GLProgram::getProgramID() const

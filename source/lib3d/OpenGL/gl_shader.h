@@ -14,7 +14,7 @@ namespace el {
         GLShader();
         ~GLShader();
 
-        bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
+        bool create(const GraphicsShaderDesc& desc);
         void destroy();
 
         GLuint getID() const;
@@ -24,7 +24,7 @@ namespace el {
     private:
 
         GLuint _id;
-        GraphicsShaderStageFlagBits _stage;
+        GLenum _stage;
         GraphicsShaderDesc _shaderDesc;
     };
 

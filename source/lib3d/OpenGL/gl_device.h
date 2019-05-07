@@ -9,13 +9,13 @@ namespace el {
 	{
 	public:
 
-		bool create(GraphicsDeviceDesc desc) override;
+		bool create(const GraphicsDeviceDesc& desc) override;
 
-		GraphicsProgramPtr createProgram(GraphicsProgramDesc desc) override;
-		GraphicsShaderPtr createShader(GraphicsShaderDesc desc) override;
-		GraphicsTexturePtr createTexture(GraphicsTextureDesc desc) override;
-		GraphicsDataPtr createBuffer(GraphicsDataDesc desc) override;
-        GraphicsInputLayoutPtr createInputLayout(GraphicsInputLayoutDesc desc) override;
+		GraphicsProgramPtr createProgram(const GraphicsProgramDesc& desc) override;
+		GraphicsShaderPtr createShader(const GraphicsShaderDesc& desc) override;
+		GraphicsTexturePtr createTexture(const GraphicsTextureDesc& desc) override;
+		GraphicsDataPtr createBuffer(const GraphicsDataDesc& desc) override;
+        GraphicsInputLayoutPtr createInputLayout(const GraphicsInputLayoutDesc& desc) override;
         GraphicsContextPtr createContext() override;
 	};
 

@@ -5,59 +5,11 @@
 #include <el_predefine.h>
 #include <el_debug.h>
 
-namespace el {
-namespace shader {
-
-    typedef GLuint Handle;
-
-    const Handle kUninitialized = 0;
-
-    bool isInitialized(const Handle& handle)
-    {
-        return handle != kUninitialized;
-    }
-
-    Handle create(GLenum type, const char* shaderCode)
-    {
-        GLuint id = gl::CreateShader(type);
-        EL_ASSERT(id != 0);
-        if (id != 0)
-        {
-            gl::ShaderSource(id, 1, &shaderCode, nullptr);
-            gl::CompileShader(id);
-
-            GLint compiled = 0;
-            gl::GetShaderiv(id, GL_COMPILE_STATUS, &compiled);
-            if (compiled == GL_FALSE)
-            {
-                GLint length = 0;
-                gl::GetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-                std::vector<GLchar> buffer(length + 1);
-                gl::GetShaderInfoLog(id, length, nullptr, buffer.data());
-                EL_TRACE("%s", buffer.data());
-                debug_break();
-                gl::DeleteShader(id);
-                return 0;
-            }
-        }
-        return Handle(id);
-    }
-
-    void destroy(Handle& handle)
-    {
-        // TODO: id 0 is silently ignored
-        if (isInitialized(handle))
-        {
-            gl::DeleteShader(handle);
-            handle = 0;
-        }
-    }
-} // namespace shader {
-} // namespace el {
-
 using namespace el;
 
-GLShader::GLShader() : _id(0)
+GLShader::GLShader() : 
+    _id(0),
+    _stage(GL_VERTEX_SHADER)
 {
 }
 
@@ -66,20 +18,42 @@ GLShader::~GLShader()
     destroy();
 }
 
-bool GLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
+bool GLShader::create(const GraphicsShaderDesc& desc)
 {
-    if (shaderCode == nullptr)
-        return false;
-    _stage = stage;
-    _id = shader::create(getShaderStage(stage), shaderCode);
+    _stage = asShaderStage(desc.getStageFlag());
+
+    _id = GL_CHECK_RET(glCreateShader(_stage));
     if (_id == 0)
         return false;
+
+    const GLchar* shaderCode = desc.getShaderCode();
+    if (shaderCode == nullptr)
+        return false;
+    
+    GL_CHECK(glShaderSource(_id, 1, &shaderCode, nullptr));
+    GL_CHECK(glCompileShader(_id));
+
+    GLint compiled = 0;
+    GL_CHECK(glGetShaderiv(_id, GL_COMPILE_STATUS, &compiled));
+    if (compiled == GL_FALSE)
+    {
+        GLint length = 0;
+        GL_CHECK(glGetShaderiv(_id, GL_INFO_LOG_LENGTH, &length));
+        std::vector<GLchar> buffer(length + 1);
+        GL_CHECK(glGetShaderInfoLog(_id, length, nullptr, buffer.data()));
+        GL_CHECK(glDeleteShader(_id));
+        _id = 0;
+        EL_TRACE("%s", buffer.data());
+        debug_break();
+        return false;
+    }
     return true;
 }
 
 void GLShader::destroy()
 {
-    shader::destroy(_id);
+    GL_CHECK(glDeleteShader(_id));
+    _id = 0;
 }
 
 GLuint GLShader::getID() const

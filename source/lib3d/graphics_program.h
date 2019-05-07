@@ -34,11 +34,13 @@ namespace el {
 		GraphicsProgram();
 		virtual ~GraphicsProgram();
 
-		GraphicsProgram(const GraphicsProgram&);
-		GraphicsProgram& operator=(const GraphicsProgram&);
-
 		virtual const GraphicsProgramDesc& getProgramDesc() const = 0;
         virtual const GraphicsVertexAttributes& getVertexAttributes() const = 0;
+
+    private:
+
+		GraphicsProgram(const GraphicsProgram&);
+		GraphicsProgram& operator=(const GraphicsProgram&);
 	};
 
 } // namespace el {

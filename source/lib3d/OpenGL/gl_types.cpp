@@ -213,7 +213,7 @@ GLenum el::asPrimitiveType(GraphicsPrimitiveType primitiveType)
     return 0;
 }
 
-GLenum el::getShaderStage(GraphicsShaderStageFlagBits stage)
+GLenum el::asShaderStage(GraphicsShaderStageFlagBits stage)
 {
     switch (stage) {
     case GraphicsShaderStageVertexBit:
@@ -226,7 +226,7 @@ GLenum el::getShaderStage(GraphicsShaderStageFlagBits stage)
     return 0;
 }
 
-GLenum el::getIndexType(size_t elementSize)
+GLenum el::asIndexType(size_t elementSize)
 {
     switch (elementSize)
     {

@@ -20,7 +20,7 @@ namespace el {
         ~MTLProgram();
 
         bool create(const GraphicsProgramDesc& desc);
-        void destory();
+        void destroy();
 
         const GraphicsProgramDesc& getProgramDesc() const override;
         const GraphicsVertexAttributes& getVertexAttributes() const override;

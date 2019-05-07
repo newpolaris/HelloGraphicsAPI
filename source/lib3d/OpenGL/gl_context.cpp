@@ -95,7 +95,7 @@ bool GLContext::create()
     return true;
 }
 
-void GLContext::destory()
+void GLContext::destroy()
 {
     // _attributes.clear();
     _vertexBuffers.clear();
@@ -304,7 +304,7 @@ void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount
     EL_ASSERT(_program);
     bindVertexBuffers(_vertexBuffers);
 
-    const GLenum indexType = getIndexType(_indexSize);
+    const GLenum indexType = asIndexType(_indexSize);
     EL_ASSERT(indexCount + startIndexLocation <= _indexCount); 
 
     GLenum mode = asPrimitiveType(primitive);
@@ -317,7 +317,7 @@ void GLContext::drawIndexed(GraphicsPrimitiveType primitive, uint32_t indexCount
     EL_ASSERT(_program);
     bindVertexBuffers(_vertexBuffers);
 
-    const GLenum indexType = getIndexType(_indexSize);
+    const GLenum indexType = asIndexType(_indexSize);
     EL_ASSERT(indexCount + startIndexLocation <= _indexCount); 
     EL_ASSERT(baseVertexLocation <= int32_t(_vertexCount));
 

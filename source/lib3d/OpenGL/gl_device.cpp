@@ -8,7 +8,7 @@
 
 using namespace el;
 
-bool GLDevice::create(GraphicsDeviceDesc desc)
+bool GLDevice::create(const GraphicsDeviceDesc& desc)
 {
 	// https://www.khronos.org/opengl/wiki/GLSL_:_common_mistakes#Enable_Or_Not_To_Enable
 	// For fixed pipeline
@@ -20,52 +20,52 @@ bool GLDevice::create(GraphicsDeviceDesc desc)
 	return true;
 }
 
-GraphicsProgramPtr GLDevice::createProgram(GraphicsProgramDesc desc)
+GraphicsProgramPtr GLDevice::createProgram(const GraphicsProgramDesc& desc)
 {
 	auto program = std::make_shared<GLProgram>();
     if (program == nullptr)
         return nullptr;
-	if (program->create(std::move(desc)))
+	if (program->create(desc))
 		return program;
 	return nullptr;
 }
 
-GraphicsShaderPtr GLDevice::createShader(GraphicsShaderDesc desc) 
+GraphicsShaderPtr GLDevice::createShader(const GraphicsShaderDesc& desc) 
 {
 	auto shader = std::make_shared<GLShader>();
     if (shader == nullptr)
         return nullptr;
-	if (shader->create(desc.getStageFlag(), desc.getShaderCode()))
+	if (shader->create(desc))
 		return shader;
 	return nullptr;
 }
 
-GraphicsTexturePtr GLDevice::createTexture(GraphicsTextureDesc desc)
+GraphicsTexturePtr GLDevice::createTexture(const GraphicsTextureDesc& desc)
 {
 	auto texture = std::make_shared<GLTexture>();
     if (texture == nullptr)
         return nullptr;
-	if (texture->create(std::move(desc)))
+	if (texture->create(desc))
 		return texture;
 	return nullptr;
 }
 
-GraphicsDataPtr GLDevice::createBuffer(GraphicsDataDesc desc)
+GraphicsDataPtr GLDevice::createBuffer(const GraphicsDataDesc& desc)
 {
 	auto buffer = std::make_shared<GLBuffer>();
     if (buffer == nullptr)
         return nullptr;
-	if (buffer->create(std::move(desc)))
+	if (buffer->create(desc))
 		return buffer;
 	return nullptr;
 }
 
-GraphicsInputLayoutPtr GLDevice::createInputLayout(GraphicsInputLayoutDesc desc)
+GraphicsInputLayoutPtr GLDevice::createInputLayout(const GraphicsInputLayoutDesc& desc)
 {
     auto layout = std::make_shared<GLInputLayout>();
     if (layout == nullptr)
         return nullptr;
-    if (layout->create(std::move(desc)))
+    if (layout->create(desc))
         return layout;
     return nullptr;
 }

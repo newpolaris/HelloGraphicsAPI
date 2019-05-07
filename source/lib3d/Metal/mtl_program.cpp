@@ -16,11 +16,11 @@ bool MTLProgram::create(const GraphicsProgramDesc& desc)
 {
     mtlpp::Device device;
 
-    _programDesc = std::move(desc);
+    _programDesc = desc;
     return true;
 }
 
-void MTLProgram::destory()
+void MTLProgram::destroy()
 {
 }
 

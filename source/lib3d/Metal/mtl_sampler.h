@@ -19,7 +19,7 @@ namespace el {
         ~MTLSampler();
 
         bool create(const GraphicsSamplerDesc& desc);
-        void destory();
+        void destroy();
 
         const GraphicsSamplerDesc& getSamplerDesc() const override;
 

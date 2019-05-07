@@ -18,7 +18,7 @@ namespace el {
         ~GLContext();
 
         bool create();
-        void destory();
+        void destroy();
 
         void startDebugControl();
         

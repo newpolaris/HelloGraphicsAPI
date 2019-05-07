@@ -19,7 +19,7 @@ namespace el {
         ~MTLInputLayout();
 
         bool create(const GraphicsInputLayoutDesc& desc);
-        void destory();
+        void destroy();
 
         void setDevice(GraphicsDevicePtr device);
         GraphicsDevicePtr getDevice();

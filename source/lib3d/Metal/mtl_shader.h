@@ -19,7 +19,7 @@ namespace el {
         MTLShader();
         ~MTLShader();
 
-        bool create(GraphicsShaderStageFlagBits stage, const char* shaderCode);
+        bool create(const GraphicsShaderDesc& desc);
         void destroy();
         
         const GraphicsShaderDesc& getDesc() const override;

@@ -12,7 +12,7 @@
 
 using namespace el;
 
-bool MTLDevice::create(GraphicsDeviceDesc desc)
+bool MTLDevice::create(const GraphicsDeviceDesc& desc)
 {
     _device = mtlpp::Device::CreateSystemDefaultDevice();
     if (!_device) return false;
@@ -23,48 +23,48 @@ bool MTLDevice::create(GraphicsDeviceDesc desc)
 	return true;
 }
 
-GraphicsProgramPtr MTLDevice::createProgram(GraphicsProgramDesc desc)
+GraphicsProgramPtr MTLDevice::createProgram(const GraphicsProgramDesc& desc)
 {
 	auto program = std::make_shared<MTLProgram>();
-	if (program->create(std::move(desc)))
+	if (program->create(desc))
 		return program;
 	return nullptr;
 }
 
-GraphicsShaderPtr MTLDevice::createShader(GraphicsShaderDesc desc) 
+GraphicsShaderPtr MTLDevice::createShader(const GraphicsShaderDesc& desc) 
 {
 	auto shader = std::make_shared<MTLShader>();
-	if (shader->create(desc.getStageFlag(), desc.getShaderCode()))
+	if (shader->create(desc))
 		return shader;
 	return nullptr;
 }
 
-GraphicsTexturePtr MTLDevice::createTexture(GraphicsTextureDesc desc)
+GraphicsTexturePtr MTLDevice::createTexture(const GraphicsTextureDesc& desc)
 {
 	auto texture = std::make_shared<MTLTexture>();
     if (!texture) return nullptr;
     texture->setDevice(shared_from_this());
-	if (texture->create(std::move(desc)))
+	if (texture->create(desc))
 		return texture;
 	return nullptr;
 }
 
-GraphicsDataPtr MTLDevice::createBuffer(GraphicsDataDesc desc)
+GraphicsDataPtr MTLDevice::createBuffer(const GraphicsDataDesc& desc)
 {
 	auto buffer = std::make_shared<MTLBuffer>();
     if (!buffer) return nullptr;
-	if (buffer->create(std::move(desc)))
+	if (buffer->create(desc))
 		return buffer;
 	return nullptr;
 }
 
-GraphicsInputLayoutPtr MTLDevice::createInputLayout(GraphicsInputLayoutDesc desc)
+GraphicsInputLayoutPtr MTLDevice::createInputLayout(const GraphicsInputLayoutDesc& desc)
 {
     auto inputLayout = std::make_shared<MTLInputLayout>();
     if (!inputLayout)
         return nullptr;
     inputLayout->setDevice(shared_from_this());
-    if (!inputLayout->create(std::move(desc)))
+    if (!inputLayout->create(desc))
         return inputLayout;
     return nullptr;
 }

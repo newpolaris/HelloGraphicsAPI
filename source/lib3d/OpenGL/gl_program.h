@@ -48,8 +48,8 @@ namespace el {
         GLProgram();
         ~GLProgram();
 
-        bool create(GraphicsProgramDesc desc);
-        void destory();
+        bool create(const GraphicsProgramDesc& desc);
+        void destroy();
 
         GLuint getProgramID() const;
 

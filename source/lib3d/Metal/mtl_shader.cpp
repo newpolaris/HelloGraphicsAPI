@@ -17,13 +17,13 @@ MTLShader::~MTLShader()
 {
 }
 
-bool MTLShader::create(GraphicsShaderStageFlagBits stage, const char* shaderCode)
+bool MTLShader::create(const GraphicsShaderDesc& desc)
 {
 	auto device = _device.lock();
 	if (!device) return false;
 
     ns::Error error;
-    _library = device->getDevice().NewLibrary(shaderCode, mtlpp::CompileOptions(), &error);
+    _library = device->getDevice().NewLibrary(desc.getShaderCode(), mtlpp::CompileOptions(), &error);
     if (!_library) {
         EL_TRACE("Failed to created pipeline state, error %s", 
 				 error.GetLocalizedDescription().GetCStr());

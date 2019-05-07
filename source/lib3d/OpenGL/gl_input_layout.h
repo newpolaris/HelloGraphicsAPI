@@ -13,7 +13,7 @@ namespace el {
         ~GLInputLayout();
 
         bool create(GraphicsInputLayoutDesc desc);
-        void destory();
+        void destroy();
 
         const GraphicsInputLayoutDesc& getDesc() const override;
 

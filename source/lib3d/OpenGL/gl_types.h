@@ -24,8 +24,8 @@ namespace el {
     GLenum asIndexType(GraphicsIndexType type);
 
 	GLenum asPrimitiveType(GraphicsPrimitiveType primitiveType);
-    GLenum getShaderStage(GraphicsShaderStageFlagBits stage);
-    GLenum getIndexType(size_t elementSize);
+    GLenum asShaderStage(GraphicsShaderStageFlagBits stage);
+    GLenum asIndexType(size_t elementSize);
 
     GLuint asVariableComponentCount(GLenum type);
     GLuint asVariableRowCount(GLenum type);

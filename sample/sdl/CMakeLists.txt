@@ -30,6 +30,7 @@ if(APPLE)
 endif()
 if(APPLE AND BUILD_METAL)
     target_link_libraries(${SAMPLE_NAME} PRIVATE "-framework Metal")
+    target_link_libraries(${SAMPLE_NAME} PRIVATE "-framework QuartzCore")
 endif()
 
 target_include_directories(${SAMPLE_NAME} PRIVATE "${SDL_SOURCE_FOLRDER}")
