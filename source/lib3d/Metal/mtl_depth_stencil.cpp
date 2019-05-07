@@ -49,7 +49,7 @@ bool MTLDepthStencil::create(const GraphicsDepthStencilDesc& desc)
 
 void MTLDepthStencil::destroy()
 {
-    _depthStencilState.reset();
+    _depthStencilState = ns::Handle{};
 }
 
 void MTLDepthStencil::setDevice(GraphicsDevicePtr device)

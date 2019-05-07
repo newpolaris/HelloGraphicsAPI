@@ -34,6 +34,8 @@ GraphicsProgramPtr MTLDevice::createProgram(const GraphicsProgramDesc& desc)
 GraphicsShaderPtr MTLDevice::createShader(const GraphicsShaderDesc& desc) 
 {
 	auto shader = std::make_shared<MTLShader>();
+    if (!shader) return nullptr;
+    shader->setDevice(shared_from_this());
 	if (shader->create(desc))
 		return shader;
 	return nullptr;

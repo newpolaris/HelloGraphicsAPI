@@ -82,9 +82,9 @@ bool GLTexture::create(GraphicsTextureDesc desc)
     *data = glMapBufferRange(GL_PIXEL_PACK_BUFFER, 0, mapSize, GL_MAP_READ_BIT);
 #endif
 
-    auto wrapS = asSamplerAddressMode(desc.getAddressModeU());
-    auto wrapT = asSamplerAddressMode(desc.getAddressModeV());
-    auto wrapR = asSamplerAddressMode(desc.getAddressModeW());
+    auto wrapS = asTextureWrapMode(desc.getAddressModeU());
+    auto wrapT = asTextureWrapMode(desc.getAddressModeV());
+    auto wrapR = asTextureWrapMode(desc.getAddressModeW());
 
     if (wrapS != defaultWrap)
         GL_CHECK(glTexParameteri(_target, GL_TEXTURE_WRAP_S, wrapS));

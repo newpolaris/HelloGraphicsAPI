@@ -53,7 +53,7 @@ bool MTLTexture::create(const GraphicsTextureDesc& desc)
 
 void MTLTexture::destroy()
 {
-    _texture.reset();
+    _texture = ns::Handle{};
 }
 
 void MTLTexture::setDevice(const GraphicsDevicePtr& device)
@@ -64,6 +64,11 @@ void MTLTexture::setDevice(const GraphicsDevicePtr& device)
 GraphicsDevicePtr MTLTexture::getDevice()
 {
     return _device.lock();
+}
+
+const mtlpp::Texture& MTLTexture::getTexture() const
+{
+    return _texture;
 }
 
 const GraphicsTextureDesc& MTLTexture::getTextureDesc() const

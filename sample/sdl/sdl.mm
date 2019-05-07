@@ -7,9 +7,20 @@
 #include <QuartzCore/CAMetalLayer.h>
 #include <mtlpp.hpp>
 
+#include <graphics_device.h>
+#include <graphics_texture.h>
+#include <graphics_shader.h>
+#include <graphics_data.h>
+#include <graphics_program.h>
+
+#undef EL_BUILD_METAL
+#define EL_BUILD_METAL 1
+#include <Metal/mtl_texture.h>
+#include <Metal/mtl_shader.h>
+
 namespace {
 
-    const char shadersSrc[] = R"""(
+    const char vertexShaderSrc[] = R"""(
         #include <metal_stdlib>
         using namespace metal;
 
@@ -25,7 +36,7 @@ namespace {
             float2 textureCoordinate;
         } RasterizerData;
 
-        vertex RasterizerData vertFunc(
+        vertex RasterizerData Main(
             const device vertex_t* vertexArray [[buffer(0)]],
             unsigned int vID[[vertex_id]])
         {
@@ -34,8 +45,19 @@ namespace {
             data.textureCoordinate = vertexArray[vID].texcoord;
             return data;
         }
-
-        fragment half4 fragFunc(
+    )""";
+    
+    const char fragmentShaderSrc[] = R"""(
+        #include <metal_stdlib>
+        using namespace metal;
+    
+        typedef struct
+        {
+            float4 clipSpacePosition [[position]];
+            float2 textureCoordinate;
+        } RasterizerData;
+    
+        fragment half4 Main(
             RasterizerData in [[stage_in]],
             texture2d<half> colorTexture [[texture(0)]])
         {
@@ -61,7 +83,14 @@ namespace {
 
 bool execute(NSView* view)
 {
+    using namespace el;
+
+    GraphicsDeviceDesc deviceDesc;
+    deviceDesc.setType(GraphicsDeviceTypeMetal);
+    auto g_device = createDevice(deviceDesc);
+
     auto device = mtlpp::Device::CreateSystemDefaultDevice();
+    auto commandQueue = device.NewCommandQueue();
     
     CAMetalLayer* layer = [CAMetalLayer layer];
     layer.device = (__bridge id<MTLDevice>)device.GetPtr();
@@ -71,15 +100,17 @@ bool execute(NSView* view)
     view.wantsLayer = YES;
     view.layer = layer;
 
-    auto commandQueue = device.NewCommandQueue();
-
-    ns::Error error;
-    mtlpp::Library library = device.NewLibrary(shadersSrc, mtlpp::CompileOptions(), &error);
-    if (!library)
-        EL_TRACE("Failed to created pipeline state, error %s", error.GetLocalizedDescription().GetCStr());
-
-    mtlpp::Function vertFunc = library.NewFunction("vertFunc");
-    mtlpp::Function fragFunc = library.NewFunction("fragFunc");
+    GraphicsShaderDesc shaderDesc;
+    shaderDesc.setStageFlag(GraphicsShaderStageVertexBit);
+    shaderDesc.setShaderCode(vertexShaderSrc);
+    auto g_vertexShader = g_device->createShader(shaderDesc);
+    EL_ASSERT(g_vertexShader);
+    const mtlpp::Function& vertFunc = std::dynamic_pointer_cast<el::MTLShader>(g_vertexShader)->getFunction();
+    shaderDesc.setStageFlag(GraphicsShaderStageFragmentBit);
+    shaderDesc.setShaderCode(fragmentShaderSrc);
+    auto g_fragmentShader = g_device->createShader(shaderDesc);
+    EL_ASSERT(g_fragmentShader);
+    const mtlpp::Function& fragFunc = std::dynamic_pointer_cast<el::MTLShader>(g_fragmentShader)->getFunction();
     
     char pixels[16 * 16];
     int y, x;
@@ -89,24 +120,25 @@ bool execute(NSView* view)
             pixels[y * 16 + x] = rand() % 256;
     }
 
-    mtlpp::TextureDescriptor descriptor;
-    descriptor.SetWidth(16);
-    descriptor.SetHeight(16);
-    descriptor.SetPixelFormat(mtlpp::PixelFormat::R8Unorm);
+    GraphicsTextureDesc textureDesc;
+    textureDesc.setWidth(16);
+    textureDesc.setHeight(16);
+    textureDesc.setStream(pixels);
+    textureDesc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment1);
+    textureDesc.setPixelFormat(GraphicsPixelFormat::GraphicsPixelFormatR8Unorm);
+    textureDesc.setTextureUsage(GraphicsTextureUsageFlagBitSampledBit);
 
-    auto texture = device.NewTexture(descriptor);
-    EL_ASSERT(texture);
-    mtlpp::Region region = { 0, 0, descriptor.GetWidth(), descriptor.GetHeight() };
-    texture.Replace(region, 0, pixels, 16);
+    GraphicsTexturePtr g_texture = g_device->createTexture(textureDesc);
+    auto texture = std::dynamic_pointer_cast<el::MTLTexture>(g_texture)->getTexture();
 
     auto vertexBuffer = device.NewBuffer(vertexData, sizeof(vertexData), mtlpp::ResourceOptions::CpuCacheModeDefaultCache);
 
     mtlpp::RenderPipelineDescriptor renderPipelineDesc;
     renderPipelineDesc.SetVertexFunction(vertFunc);
     renderPipelineDesc.SetFragmentFunction(fragFunc);
-    renderPipelineDesc.GetColorAttachments()[0].SetPixelFormat(mtlpp::PixelFormat::BGRA8Unorm);
+    auto colorAttachmentDesc = renderPipelineDesc.GetColorAttachments()[0];
+    colorAttachmentDesc.SetPixelFormat(mtlpp::PixelFormat::BGRA8Unorm);
     auto renderPipelineState = device.NewRenderPipelineState(renderPipelineDesc, nullptr);
-
     
     mtlpp::RenderPassDescriptor renderPassDesc;
     mtlpp::RenderPassColorAttachmentDescriptor colorAttachment = renderPassDesc.GetColorAttachments()[0];
@@ -121,13 +153,7 @@ bool execute(NSView* view)
         while (SDL_PollEvent(&e))
             isQuit = (e.type == SDL_QUIT);
         if (isQuit) break;
-        
-        MTLViewport viewport = (MTLViewport){
-            0.0, 0.0,
-            layer.drawableSize.width,
-            layer.drawableSize.height,
-            0.0, 1.0};
-        
+
         @autoreleasepool
         {
             id<CAMetalDrawable> drawable = [layer nextDrawable];

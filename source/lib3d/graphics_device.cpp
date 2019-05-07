@@ -1,5 +1,6 @@
 #include <graphics_device.h>
 
+#include <el_platform.h>
 #include <OpenGL/gl_device.h>
 #include <Metal/mtl_device.h>
 

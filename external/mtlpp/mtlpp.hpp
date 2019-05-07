@@ -108,8 +108,6 @@ namespace ns
 
         inline operator bool() const { return m_ptr != nullptr; }
         
-        void reset(void* ptr = nullptr);
-        
     protected:
         Object();
         Object(const Handle& handle);

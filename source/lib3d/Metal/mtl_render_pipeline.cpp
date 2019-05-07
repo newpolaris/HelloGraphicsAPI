@@ -72,7 +72,7 @@ bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
 
 void MTLRenderPipeline::destroy()
 {
-    _pipelineState.reset();
+    _pipelineState = ns::Handle{};
 }
 
 const GraphicsPipelineDesc& MTLRenderPipeline::getDesc() const

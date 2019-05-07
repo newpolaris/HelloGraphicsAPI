@@ -94,7 +94,7 @@ void MTLContext::finsh(bool waitForCompletion)
     {
         _commandBuffer.WaitUntilCompleted();
     }
-    _commandBuffer.reset();
+    _commandBuffer = ns::Handle{};
 }
 
 void MTLContext::setDepthTestEnable(bool enable)

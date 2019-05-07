@@ -41,7 +41,7 @@ bool MTLInputLayout::create(const GraphicsInputLayoutDesc& desc)
 
 void MTLInputLayout::destroy()
 {
-    _inputLayout.reset();
+    _inputLayout = ns::Handle{};
 }
 
 void MTLInputLayout::setDevice(GraphicsDevicePtr device)

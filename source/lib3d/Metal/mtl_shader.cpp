@@ -15,15 +15,19 @@ MTLShader::MTLShader()
 
 MTLShader::~MTLShader()
 {
+    destroy();
 }
 
 bool MTLShader::create(const GraphicsShaderDesc& desc)
 {
+    auto shaderCode = desc.getShaderCode();
+    EL_ASSERT(shaderCode);
+    
 	auto device = _device.lock();
 	if (!device) return false;
 
     ns::Error error;
-    _library = device->getDevice().NewLibrary(desc.getShaderCode(), mtlpp::CompileOptions(), &error);
+    _library = device->getDevice().NewLibrary(shaderCode, mtlpp::CompileOptions(), &error);
     if (!_library) {
         EL_TRACE("Failed to created pipeline state, error %s", 
 				 error.GetLocalizedDescription().GetCStr());
@@ -31,17 +35,23 @@ bool MTLShader::create(const GraphicsShaderDesc& desc)
 		return false;
 	}
 
-    _function = _library.NewFunction("main");
-    if (!_library) {
-		debug_break();
+    _function = _library.NewFunction("Main");
+    if (!_function)
 		return false;
-	}
     return true;
 }
 
 void MTLShader::destroy()
 {
+    _function = ns::Handle{};
+    _library = ns::Handle{};
 }
+
+const mtlpp::Function& MTLShader::getFunction() const
+{
+    return _function;
+}
+
 
 const GraphicsShaderDesc& MTLShader::getDesc() const
 {

@@ -40,7 +40,7 @@ namespace el {
     GLenum asTextureType(GraphicsPixelFormat format);
     GLenum asTextureFormat(GraphicsPixelFormat textureFormat);
     GLint  asTextureInternalFormat(GraphicsPixelFormat format);
-    GLenum asSamplerAddressMode(GraphicsSamplerAddressMode mode);
+    GLenum asTextureWrapMode(GraphicsSamplerAddressMode mode);
     GLenum asSamplerMinFilter(GraphicsFilter filter, GraphicsSamplerMipmapMode mode);
     GLenum asSamplerMagFilter(GraphicsFilter filter);
 }

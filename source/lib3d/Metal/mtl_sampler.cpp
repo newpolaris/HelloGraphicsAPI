@@ -57,7 +57,7 @@ bool MTLSampler::create(const GraphicsSamplerDesc& desc)
 
 void MTLSampler::destroy()
 {
-    _sampler.reset();
+    _sampler = ns::Handle{};
 }
 
 const GraphicsSamplerDesc& MTLSampler::getSamplerDesc() const

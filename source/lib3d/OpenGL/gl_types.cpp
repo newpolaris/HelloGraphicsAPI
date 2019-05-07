@@ -662,7 +662,7 @@ GLint el::asTextureInternalFormat(GraphicsPixelFormat format)
     return internalFormat;
 }
 
-GLenum el::asSamplerAddressMode(GraphicsSamplerAddressMode mode)
+GLenum el::asTextureWrapMode(GraphicsSamplerAddressMode mode)
 {
     switch (mode)
     {

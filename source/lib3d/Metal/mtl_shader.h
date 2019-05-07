@@ -26,6 +26,8 @@ namespace el {
 
         void setDevice(GraphicsDevicePtr device);
         GraphicsDevicePtr getDevice();
+        
+        const mtlpp::Function& getFunction() const;
 
     private:
 
