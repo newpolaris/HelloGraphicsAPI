@@ -264,16 +264,29 @@ mtlpp::TextureUsage el::asTextureUsage(GraphicsTextureUsageFlags flags)
 {
     uint32_t usage = 0;
 
-    if (flags & GraphicsTextureUsageFlagBitStorageBit)
+    if (flags & GraphicsTextureUsageStorageBit)
         usage |= TextureUsage::ShaderWrite;
-    if (flags & GraphicsTextureUsageFlagBitColorAttachmentBit)
+    if (flags & GraphicsTextureUsageColorAttachmentBit)
         usage |= TextureUsage::RenderTarget;
-    if (flags & GraphicsTextureUsageFlagBitDepthStencilAttachmentBit)
+    if (flags & GraphicsTextureUsageDepthStencilAttachmentBit)
         usage |= TextureUsage::RenderTarget;
-    if (flags & GraphicsTextureUsageFlagBitSampledBit)
+    if (flags & GraphicsTextureUsageSampledBit)
         usage |= TextureUsage::ShaderRead;
 
     return mtlpp::TextureUsage(usage);
+}
+
+mtlpp::ResourceOptions el::asTextureResourceOptions(GraphicsTextureUsageFlags flags)
+{
+	if (flags & GraphicsTextureUsageUploadableBit)
+	{
+#if EL_PLAT_IOS
+        return mtlpp::ResourceOptions::StorageModeShared;
+#else
+        return mtlpp::ResourceOptions::StorageModeManaged;
+#endif
+	}
+    return mtlpp::ResourceOptions::StorageModePrivate;
 }
 
 mtlpp::SamplerMinMagFilter el::asSamplerMinMagFilter(GraphicsFilter filter)

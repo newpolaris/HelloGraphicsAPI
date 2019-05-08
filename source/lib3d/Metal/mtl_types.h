@@ -10,11 +10,13 @@ namespace el {
 
     typedef std::shared_ptr<class MTLDevice> MTLDevicePtr;
     typedef std::shared_ptr<class MTLContext> MTLDeviceContextPtr;
+    typedef std::shared_ptr<class MTLTexture> MTLTexturePtr;
 
     typedef std::weak_ptr<class MTLDevice> MTLDeviceWeakPtr;
 
     mtlpp::PixelFormat asPixelFormat(GraphicsPixelFormat format);
     mtlpp::TextureUsage asTextureUsage(GraphicsTextureUsageFlags usage);
+    mtlpp::ResourceOptions asTextureResourceOptions(GraphicsTextureUsageFlags usage);
     mtlpp::SamplerMinMagFilter asSamplerMinMagFilter(GraphicsFilter filter);;
 
     mtlpp::SamplerMipFilter asSamplerMipFilter(GraphicsSamplerMipmapMode mode);

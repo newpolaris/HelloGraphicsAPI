@@ -58,3 +58,4 @@ if(APPLE)
 endif()
 
 add_subdirectory(sdl)
+add_subdirectory(depth)

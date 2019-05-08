@@ -22,7 +22,7 @@ namespace el {
         bool create(const GraphicsPipelineDesc& desc);
         void destroy();
         
-        const GraphicsPipelineDesc& getDesc() const override;
+        const GraphicsPipelineDesc& getPipelineDesc() const override;
 
         void setDevice(GraphicsDevicePtr device);
         GraphicsDevicePtr getDevice();

@@ -197,22 +197,24 @@ namespace el {
     };
 
     // From vulkan spec.
-    enum GraphicsTextureUsageFlagBits {
-        GraphicsTextureUsageFlagBitTransferSrcBit = 0x00000001,
-        GraphicsTextureUsageFlagBitTransferDstBit = 0x00000002,
-        GraphicsTextureUsageFlagBitSampledBit = 0x00000004,
-        GraphicsTextureUsageFlagBitStorageBit = 0x00000008,
-        GraphicsTextureUsageFlagBitColorAttachmentBit = 0x00000010,
-        GraphicsTextureUsageFlagBitDepthStencilAttachmentBit = 0x00000020,
-        GraphicsTextureUsageFlagBitTransientAttachmentBit = 0x00000040,
-        GraphicsTextureUsageFlagBitInputAttachmentBit = 0x00000080,
+    enum GraphicsTextureUsageFlagBits
+    {
+        GraphicsTextureUsageTransferSrcBit = 0x00000001,
+        GraphicsTextureUsageTransferDstBit = 0x00000002,
+        GraphicsTextureUsageSampledBit = 0x00000004,
+        GraphicsTextureUsageStorageBit = 0x00000008,
+        GraphicsTextureUsageColorAttachmentBit = 0x00000010,
+        GraphicsTextureUsageDepthStencilAttachmentBit = 0x00000020,
+        GraphicsTextureUsageTransientAttachmentBit = 0x00000040,
+        GraphicsTextureUsageInputAttachmentBit = 0x00000080,
+        GraphicsTextureUsageUploadableBit = 0x00000100,
     };
 
     typedef uint32_t GraphicsTextureUsageFlags;
-
+    
     // TODO: Replace with vulkan spec.
     // From MTLPixelFormat
-    enum class GraphicsPixelFormat
+    enum GraphicsPixelFormat
     {
         GraphicsPixelFormatInvalid = 0,
         GraphicsPixelFormatA8Unorm = 1,

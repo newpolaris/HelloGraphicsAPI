@@ -9,6 +9,8 @@ namespace el {
     {
     public:
 
+        GraphicsInputLayoutPtr _inputLayout;
+        GraphicsShaders _shaders;
     };
 
     class GraphicsPipeline
@@ -18,7 +20,7 @@ namespace el {
         GraphicsPipeline();
         virtual ~GraphicsPipeline();
         
-        virtual const GraphicsPipelineDesc& getDesc() const = 0;
+        virtual const GraphicsPipelineDesc& getPipelineDesc() const = 0;
     };
 
 } // namespace el {

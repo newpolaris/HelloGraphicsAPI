@@ -23,31 +23,13 @@ namespace {
 
     const char vertexShaderSrc[] = R"""(
         #include <metal_stdlib>
-        #include <simd/simd.h>
         using namespace metal;
     
-        namespace AAPL
-        {
-            struct constants_t
-            {
-                simd::float4x4 modelview_projection_matrix;
-                simd::float4x4 normal_matrix;
-                simd::float4   ambient_color;
-                simd::float4   diffuse_color;
-                int            multiplier;
-            } __attribute__ ((aligned (256)));
-        }
-
         typedef struct
         {
             packed_float3 position;
             packed_float2 texcoord;
         } vertex_t;
-        struct VertexInput {
-            float3 position [[attribute(0)]];
-            float3 normal   [[attribute(1)]];
-            half2  texcoord [[attribute(2)]];
-        };
 
         typedef struct
         {
@@ -56,10 +38,7 @@ namespace {
         } RasterizerData;
 
         vertex RasterizerData Main(
-            VertexInput in [[stage_in]],
-            const device vertex_t* vertexArray [[buffer(2)]],
-            constant AAPL::constants_t& constants [[buffer(1)]],
-            constant float& light [[buffer(0)]],
+            const device vertex_t* vertexArray [[buffer(0)]],
             unsigned int vID[[vertex_id]])
         {
             RasterizerData data;
@@ -104,86 +83,44 @@ namespace {
     char pixels[16 * 16];
 }
 
-enum class ArgumentAccess : uint8_t
+struct MetalSwapchain
 {
-    ReadOnly  = 0,
-    ReadWrite = 1,
-    WriteOnly = 2,
-};
-
-struct MTLUniform
-{
-    bool isActive;
-    std::string name;
-    uint32_t location;
-    uint32_t arraySize;
-    uint32_t alignment;
-    uint32_t size;
-    ArgumentAccess access;
-};
-
-void setupArgument(const mtlpp::Argument& arg)
-{
-    MTLUniform uniform;
-    uniform.name = std::string(arg.GetName().GetCStr());
-    uniform.isActive = arg.IsActive();
-    uniform.access = (ArgumentAccess)arg.GetAccess();
-    uniform.location = arg.GetIndex();
+    mtlpp::Texture _color;
+    mtlpp::Texture _depth;
+    el::GraphicsDevicePtr _device;
     
-    @autoreleasepool {
-        MTLArgument* argument = (__bridge MTLArgument*)arg.GetPtr();
-        MTLDataType dataType = [argument bufferDataType];
-        MTLStructType* structType = [argument bufferStructType];
-    }
-
-    auto type = arg.GetType();
-    if (type == mtlpp::ArgumentType::Buffer)
+    void setDevice(const el::GraphicsDevicePtr& device)
     {
-        uint32_t arraySize = 1;
-        uniform.alignment = arg.GetBufferAlignment();
-        uniform.size = arg.GetBufferDataSize();
-        auto bufferType = arg.GetBufferDataType();
-        if (bufferType == mtlpp::DataType::Array)
-            arraySize = arg.GetArrayLength();
-        else if (bufferType == mtlpp::DataType::Struct)
-        {
-            // uniform.type = bufferType;
-        }
-        // uniform.elementSize = asElementSize(bufferType);
+        _device = device;
     }
-    else if (type == mtlpp::ArgumentType::Sampler)
+    
+    void update(const mtlpp::Texture& color, el::GraphicsPixelFormat depthFormat)
     {
+        _color = color;
         
+        if (!_depth ||
+            _depth.GetWidth() != _color.GetWidth() ||
+            _depth.GetHeight() != _color.GetHeight() ||
+            _depth.GetPixelFormat() != el::asPixelFormat(depthFormat))
+        {
+            el::GraphicsTextureDesc textureDesc;
+            textureDesc.setWidth(color.GetWidth());
+            textureDesc.setHeight(color.GetHeight());
+            textureDesc.setPixelFormat(depthFormat);
+            textureDesc.setTextureUsage(el::GraphicsTextureUsageDepthStencilAttachmentBit);
+        
+            auto depth = _device->createTexture(textureDesc);
+            EL_ASSERT(depth);
+            _depth = std::dynamic_pointer_cast<el::MTLTexture>(depth)->getTexture();
+        }
     }
-    else if (type == mtlpp::ArgumentType::Texture)
-    {
-    
-    }
-}
-
-struct MetalRenderTarget
-{
 };
 
-void createDefaultRenderTarget(id<MTLTexture> color, el::GraphicsPixelFormat depthFormat)
+namespace
 {
-    MTLPixelFormat mtlDepthFormat = (MTLPixelFormat)el::asPixelFormat(depthFormat);
-    
-    id<MTLDevice> device = MTLCreateSystemDefaultDevice();
-    MTLTextureDescriptor *depthDesc = [MTLTextureDescriptor
-                                       texture2DDescriptorWithPixelFormat:mtlDepthFormat
-                                       width:color.width
-                                       height:color.height
-                                       mipmapped:FALSE];
-    
-    // depth, Stencil, DepthStencil, and Multisample textures must be allocated with the MTLResourceStorageModePrivate
-    
-    [depthDesc setUsage:MTLTextureUsageRenderTarget];
-    [depthDesc setResourceOptions:MTLResourceStorageModePrivate];
-    [depthDesc setCpuCacheMode:MTLCPUCacheModeDefaultCache];
-    id<MTLTexture> depth = [device newTextureWithDescriptor:depthDesc];
-    [depthDesc release];
+    MetalSwapchain swapchain;
 }
+
 
 bool execute(NSView* view)
 {
@@ -195,8 +132,6 @@ bool execute(NSView* view)
 
     auto device = mtlpp::Device::CreateSystemDefaultDevice();
     auto commandQueue = device.NewCommandQueue();
-    
-
     
     const auto screenFormat = GraphicsPixelFormatBGRA8Unorm;
     const auto depthFormat = GraphicsPixelFormatDepth32Float;
@@ -210,7 +145,7 @@ bool execute(NSView* view)
     view.wantsLayer = YES;
     view.layer = layer;
 
-    createDefaultRenderTarget([layer nextDrawable].texture, depthFormat);
+    swapchain.setDevice(g_device);
     
     GraphicsShaderDesc shaderDesc;
     shaderDesc.setStageFlag(GraphicsShaderStageVertexBit);
@@ -224,64 +159,33 @@ bool execute(NSView* view)
     EL_ASSERT(g_fragmentShader);
     const mtlpp::Function& fragFunc = std::dynamic_pointer_cast<MTLShader>(g_fragmentShader)->getFunction();
 
-    auto qt = vertFunc.GetVertexAttributes();
-    
     GraphicsTextureDesc textureDesc;
     textureDesc.setWidth(16);
     textureDesc.setHeight(16);
     textureDesc.setStream(pixels);
     textureDesc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment1);
-    textureDesc.setPixelFormat(GraphicsPixelFormat::GraphicsPixelFormatR8Unorm);
-    textureDesc.setTextureUsage(GraphicsTextureUsageSampledBit);
+    textureDesc.setPixelFormat(GraphicsPixelFormatR8Unorm);
+    textureDesc.setTextureUsage(GraphicsTextureUsageSampledBit | GraphicsTextureUsageUploadableBit);
 
     GraphicsTexturePtr g_texture = g_device->createTexture(textureDesc);
     auto texture = std::dynamic_pointer_cast<MTLTexture>(g_texture)->getTexture();
 
     auto vertexBuffer = device.NewBuffer(vertexData, sizeof(vertexData), mtlpp::ResourceOptions::CpuCacheModeDefaultCache);
     
-    MTLVertexDescriptor *mtlVertexDescriptor = [[MTLVertexDescriptor alloc] init];
-    
-    // Positions.
-    mtlVertexDescriptor.attributes[0].format = MTLVertexFormatFloat3;
-    mtlVertexDescriptor.attributes[0].offset = 0;
-    mtlVertexDescriptor.attributes[0].bufferIndex = 0;
-    
-    // Normals.
-    mtlVertexDescriptor.attributes[1].format = MTLVertexFormatFloat3;
-    mtlVertexDescriptor.attributes[1].offset = 12;
-    mtlVertexDescriptor.attributes[1].bufferIndex = 0;
-    
-    // Texture coordinates.
-    mtlVertexDescriptor.attributes[2].format = MTLVertexFormatHalf2;
-    mtlVertexDescriptor.attributes[2].offset = 24;
-    mtlVertexDescriptor.attributes[2].bufferIndex = 0;
-    
-    // Single interleaved buffer.
-    mtlVertexDescriptor.layouts[0].stride = 28;
-    mtlVertexDescriptor.layouts[0].stepRate = 1;
-    mtlVertexDescriptor.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
-
-    MTLVertexBufferLayoutDescriptor;
-    
-    mtlpp::VertexDescriptor vertexDescriptor = ns::Handle{(__bridge mtlpp::VertexDescriptor*)mtlVertexDescriptor};
     mtlpp::RenderPipelineDescriptor renderPipelineDesc;
-    renderPipelineDesc.SetVertexDescriptor(vertexDescriptor);
     renderPipelineDesc.SetVertexFunction(vertFunc);
     renderPipelineDesc.SetFragmentFunction(fragFunc);
+    
     auto colorAttachmentDesc = renderPipelineDesc.GetColorAttachments()[0];
-    auto k = colorAttachmentDesc.GetPixelFormat();
-    colorAttachmentDesc.SetPixelFormat(mtlpp::PixelFormat::BGRA8Unorm);
+    colorAttachmentDesc.SetPixelFormat(asPixelFormat(screenFormat));
+    colorAttachmentDesc.SetBlendingEnabled(false);
+    renderPipelineDesc.SetDepthAttachmentPixelFormat(el::asPixelFormat(depthFormat));
+    
     mtlpp::PipelineOption pipelineOptions = mtlpp::PipelineOption(mtlpp::ArgumentInfo | mtlpp::BufferTypeInfo);
     mtlpp::RenderPipelineReflection reflection;
     ns::Error error;
     auto renderPipelineState = device.NewRenderPipelineState(renderPipelineDesc, pipelineOptions, &reflection, &error);
     EL_ASSERT(renderPipelineState);
-
-    auto vertexArgs = reflection.GetVertexArguments();
-    for (int i = 0; i < vertexArgs.GetSize(); i++)
-    {
-        setupArgument(vertexArgs[i]);
-    }
     
     while (true)
     {
@@ -293,13 +197,14 @@ bool execute(NSView* view)
 
         @autoreleasepool
         {
-            id<CAMetalDrawable> drawable = [layer nextDrawable];
-
+            id<CAMetalDrawable> drawableData = [layer nextDrawable];
+            
+            mtlpp::Drawable drawable(ns::Handle{(__bridge void*)drawableData});
             if (!drawable)
                 continue;
-            auto format = drawable.texture.pixelFormat;
-            drawable.texture.retain;
-            drawable.texture.retainCount;
+            mtlpp::Texture color(ns::Handle{(__bridge void*)drawableData.texture});
+            swapchain.update(color, depthFormat);
+            
             mtlpp::CommandBuffer commandBuffer = commandQueue.CommandBuffer();
 
             mtlpp::RenderPassDescriptor renderPassDesc;
@@ -307,19 +212,36 @@ bool execute(NSView* view)
             colorAttachment.SetClearColor(mtlpp::ClearColor{0.5f, 0.5f, 0.5f, 1.0f});
             colorAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
             colorAttachment.SetStoreAction(mtlpp::StoreAction::Store);
-            colorAttachment.SetTexture(mtlpp::Texture(ns::Handle{(__bridge void*)drawable.texture}));
-
+            colorAttachment.SetTexture(swapchain._color);
+            if (swapchain._depth)
+            {
+                auto depthAttachment = renderPassDesc.GetDepthAttachment();
+                depthAttachment.SetTexture(swapchain._depth);
+                depthAttachment.SetClearDepth(1.0);
+                depthAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
+                depthAttachment.SetStoreAction(mtlpp::StoreAction::DontCare);
+            }
+            
+            mtlpp::DepthStencilDescriptor depthDesc;
+            depthDesc.SetDepthWriteEnabled(true);
+            depthDesc.SetDepthCompareFunction(mtlpp::CompareFunction::Less);
+            
+            auto depthStencilState = device.NewDepthStencilState(depthDesc);
+            
             auto renderCommandEncoder = commandBuffer.RenderCommandEncoder(renderPassDesc);
             renderCommandEncoder.SetCullMode(mtlpp::CullMode::Back);
+            renderCommandEncoder.SetDepthStencilState(depthStencilState);
             renderCommandEncoder.SetRenderPipelineState(renderPipelineState);
             renderCommandEncoder.SetVertexBuffer(vertexBuffer, 0, 0);
             renderCommandEncoder.SetFragmentTexture(texture, 0);
             renderCommandEncoder.Draw(mtlpp::PrimitiveType::Triangle, 0, 3);
             renderCommandEncoder.EndEncoding();
-            commandBuffer.Present(ns::Handle{(__bridge void*)drawable});
+            commandBuffer.Present(drawable);
 
             commandBuffer.Commit();
-            commandBuffer.WaitUntilCompleted();
+            
+            // TODO:
+            // commandBuffer.WaitUntilCompleted();
         }
     }
 

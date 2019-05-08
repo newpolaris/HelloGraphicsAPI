@@ -17,10 +17,18 @@ MTLRenderPipeline::~MTLRenderPipeline()
 {
 }
 
-bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
+struct MetalRenderPipelineDesc
 {
-    ns::Error error;
+    GraphicsInputLayoutPtr inputLayout;
+    GraphicsShaderPtr vertexShader;
+    GraphicsShaderPtr fragmentShader;
+    uint32_t sampleCount;
+    GraphicsPixelFormat colorFormat; 
+};
 
+#if 0
+void request()
+{
     mtlpp::Device device;
 
     RenderPipelineDescriptor descriptor;
@@ -39,6 +47,7 @@ bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
     // void SetAlphaToCoverageEnabled(bool alphaToCoverageEnabled);
     // void SetAlphaToOneEnabled(bool alphaToOneEnabled);
 
+    ns::Error error;
     RenderPipelineReflection reflection;
     PipelineOption pipelineOptions = PipelineOption(PipelineOption::ArgumentInfo | PipelineOption::BufferTypeInfo);
     _pipelineState = device.NewRenderPipelineState(descriptor, pipelineOptions, &reflection, &error);
@@ -67,6 +76,12 @@ bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
     }
 #endif
 
+}
+#endif
+
+bool MTLRenderPipeline::create(const GraphicsPipelineDesc& desc)
+{
+    _pipelineDesc = desc;
     return true;
 }
 
@@ -75,7 +90,7 @@ void MTLRenderPipeline::destroy()
     _pipelineState = ns::Handle{};
 }
 
-const GraphicsPipelineDesc& MTLRenderPipeline::getDesc() const
+const GraphicsPipelineDesc& MTLRenderPipeline::getPipelineDesc() const
 {
     return _pipelineDesc;
 }
