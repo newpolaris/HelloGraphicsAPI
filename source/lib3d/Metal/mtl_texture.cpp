@@ -33,7 +33,7 @@ bool MTLTexture::create(const GraphicsTextureDesc& desc)
     textureDesc.SetResourceOptions(asTextureResourceOptions(desc.getTextureUsage()));
     textureDesc.SetCpuCacheMode(mtlpp::CpuCacheMode::DefaultCache);
 
-    _texture = device->getDevice().NewTexture(textureDesc);
+    _texture = device->getMetalDevice().NewTexture(textureDesc);
     if (!_texture)
         return false;
 

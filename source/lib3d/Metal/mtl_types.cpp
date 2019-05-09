@@ -7,7 +7,7 @@ using namespace mtlpp;
 mtlpp::PixelFormat el::asPixelFormat(GraphicsPixelFormat format)
 {
     switch (format)
-{
+    {
     case GraphicsPixelFormat::GraphicsPixelFormatA8Unorm:
         return mtlpp::PixelFormat::A8Unorm;
     case GraphicsPixelFormat::GraphicsPixelFormatR8Unorm:

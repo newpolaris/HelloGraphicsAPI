@@ -2,7 +2,7 @@
 
 using namespace el;
 
-const uint32_t defaultMask = static_cast<uint32_t>(-1);
+const uint32_t el::GraphicsStencilOpState::defaultMask = static_cast<uint32_t>(-1);
 
 // Default vaules are referenced from directx-11
 

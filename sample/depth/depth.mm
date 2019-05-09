@@ -13,11 +13,14 @@
 #include <graphics_data.h>
 #include <graphics_program.h>
 
+#include <linmath.h>
+
 #undef EL_BUILD_METAL
 #define EL_BUILD_METAL 1
 #include <Metal/mtl_texture.h>
 #include <Metal/mtl_shader.h>
 #include <Metal/mtl_types.h>
+#include <Metal/mtl_device.h>
 
 namespace {
 
@@ -83,24 +86,44 @@ namespace {
     char pixels[16 * 16];
 }
 
-struct MetalSwapchain
+struct MetalSwapchain final
 {
     mtlpp::Texture _color;
     mtlpp::Texture _depth;
     el::GraphicsDevicePtr _device;
     
+    MetalSwapchain()
+    {
+    }
+
+    ~MetalSwapchain()
+    {
+        _color = ns::Handle{};
+        _depth = ns::Handle{};
+        _device = nullptr;
+    }
+
     void setDevice(const el::GraphicsDevicePtr& device)
     {
         _device = device;
     }
     
-    void update(const mtlpp::Texture& color, el::GraphicsPixelFormat depthFormat)
+    bool update(const mtlpp::Texture& color)
     {
-        _color = color;
-        
-        if (!_depth ||
-            _depth.GetWidth() != _color.GetWidth() ||
-            _depth.GetHeight() != _color.GetHeight() ||
+        return update(color, el::GraphicsPixelFormatInvalid);
+    }
+
+    bool update(const mtlpp::Texture& color, el::GraphicsPixelFormat depthFormat)
+    {
+        if (!color)
+            return false;
+
+        if (depthFormat == el::GraphicsPixelFormatInvalid)
+            _depth = ns::Handle{};
+            
+        else if (!_depth ||
+            _depth.GetWidth() != color.GetWidth() ||
+            _depth.GetHeight() != color.GetHeight() ||
             _depth.GetPixelFormat() != el::asPixelFormat(depthFormat))
         {
             el::GraphicsTextureDesc textureDesc;
@@ -110,22 +133,198 @@ struct MetalSwapchain
             textureDesc.setTextureUsage(el::GraphicsTextureUsageDepthStencilAttachmentBit);
         
             auto depth = _device->createTexture(textureDesc);
-            EL_ASSERT(depth);
-            _depth = std::dynamic_pointer_cast<el::MTLTexture>(depth)->getTexture();
+            if (!depth)
+                return false;
+
+            _depth = std::static_pointer_cast<el::MTLTexture>(depth)->getTexture();
         }
+        _color = color;
+        return true;
     }
 };
 
-namespace
+namespace el
 {
-    MetalSwapchain swapchain;
+    namespace math
+    {
+    
+        template <typename T>
+        struct vec2
+        {
+            vec2() {}
+            
+            template <typename A>
+            vec2(A v) : x(v), y(v) {} 
+
+            template <typename A, typename B>
+            vec2(A x, B y) : x(x), y(y) {}
+
+            const T& operator[](size_t i) const {
+                return v[i];
+            }
+
+            T& operator[](size_t i) {
+                return v[i];
+            }
+
+            union {
+                T v[2];
+                struct { T x, y; };
+                struct { T s, t; };
+            };
+        };
+
+        template <typename T>
+        struct vec4
+        {
+            vec4() {}
+            
+            template <typename A>
+            vec4(A v) : x(v), y(v), z(v), w(v) {} 
+
+            template <typename A, typename B, typename C, typename D>
+            vec4(A x, B y, C z, D w) : x(x), y(y), z(z), w(w) {}
+
+            const T& operator[](size_t i) const {
+                return v[i];
+            }
+
+            T& operator[](size_t i) {
+                return v[i];
+            }
+
+            union {
+                float v[4];
+                struct { float x, y, z, w; };
+            };
+        };
+
+        typedef vec2<float> float2;
+        typedef vec4<float> float4;
+    }
 }
 
+namespace el
+{
+    typedef void* SwapchainHandle;
+
+    class MetalContext final
+    {
+    public:
+
+        MetalContext();
+        ~MetalContext();
+
+        void setDevice(const GraphicsDevicePtr& device);
+
+        void beginFrame(SwapchainHandle handle);
+        void endFrame();
+        void present();
+        void commit(bool isWaitComplete = false);
+
+        mtlpp::CommandBuffer& getCommandBuffer();
+        mtlpp::Drawable& getCurrentDrawable();
+
+    private:
+
+        MetalContext(const MetalContext&);
+        MetalContext& operator=(const MetalContext&);
+
+        GraphicsPixelFormat _depthFormat;
+
+        MTLDevicePtr _device;
+        mtlpp::Device _metalDevice;
+        mtlpp::CommandBuffer _commandBuffer;
+        mtlpp::Drawable _currentDrawable;
+        CAMetalLayer* _metalLayer;
+        
+        math::float4 _clearColor;
+        float _clearDepth;
+        bool _isDepthWrite;
+        bool _isDepthTest;
+    };
+}
+
+el::MetalContext::MetalContext() :
+    _depthFormat(GraphicsPixelFormatInvalid),
+    _metalLayer(nullptr),
+    _clearColor(0.3f),
+    _clearDepth(1.f)
+{
+}
+
+el::MetalContext::~MetalContext() {
+    _commandBuffer = ns::Handle{};
+    _metalLayer = nullptr;
+    _metalDevice = ns::Handle{};
+    _device = nullptr;
+}
+
+void el::MetalContext::setDevice(const el::GraphicsDevicePtr& device) {
+    _device = std::static_pointer_cast<MTLDevice>(device);
+    EL_ASSERT(_device);
+    _metalDevice = _device->getMetalDevice();
+}
+
+mtlpp::CommandBuffer& el::MetalContext::getCommandBuffer()
+{
+    EL_ASSERT(_device);
+
+    if (!_commandBuffer)
+    {
+        auto& queue = _device->getCommandQueue();
+        EL_ASSERT(queue);
+        _commandBuffer = queue.CommandBuffer();
+    }
+    return _commandBuffer;
+}
+
+mtlpp::Drawable& el::MetalContext::getCurrentDrawable()
+{
+    EL_ASSERT(_metalLayer);
+    if (!_currentDrawable) {
+        id<CAMetalDrawable> drawable = [_metalLayer nextDrawable];
+        EL_ASSERT(drawable);
+        _currentDrawable = mtlpp::Drawable(ns::Handle{(__bridge void*)drawable});
+        EL_ASSERT(_currentDrawable);
+    }
+    return _currentDrawable;
+}
+
+void el::MetalContext::beginFrame(SwapchainHandle handle)
+{
+    _metalLayer = reinterpret_cast<CAMetalLayer*>(handle);
+}
+
+void el::MetalContext::endFrame()
+{
+    _currentDrawable = ns::Handle{};
+    _commandBuffer = ns::Handle{};
+    _metalLayer = nullptr;
+}
+
+void el::MetalContext::present()
+{
+    auto& drawable = getCurrentDrawable();
+    EL_ASSERT(drawable);
+
+    EL_ASSERT(_commandBuffer);
+    _commandBuffer.Present(drawable);
+}
+
+void el::MetalContext::commit(bool isWaitComplete)
+{
+    EL_ASSERT(_commandBuffer);
+
+    _commandBuffer.Commit(); 
+    if (isWaitComplete)
+        _commandBuffer.WaitUntilCompleted();
+}
 
 bool execute(NSView* view)
 {
     using namespace el;
-
+    
     GraphicsDeviceDesc deviceDesc;
     deviceDesc.setType(GraphicsDeviceTypeMetal);
     auto g_device = createDevice(deviceDesc);
@@ -133,19 +332,24 @@ bool execute(NSView* view)
     auto device = mtlpp::Device::CreateSystemDefaultDevice();
     auto commandQueue = device.NewCommandQueue();
     
-    const auto screenFormat = GraphicsPixelFormatBGRA8Unorm;
+    const auto colorFormat = GraphicsPixelFormatBGRA8Unorm;
     const auto depthFormat = GraphicsPixelFormatDepth32Float;
     
     CAMetalLayer* layer = [CAMetalLayer layer];
     layer.device = (__bridge id<MTLDevice>)device.GetPtr();
     layer.opaque = true;
     layer.drawableSize = [view convertSizeToBacking:view.bounds.size];
-    layer.pixelFormat = (MTLPixelFormat)asPixelFormat(screenFormat);
+    layer.pixelFormat = (MTLPixelFormat)asPixelFormat(colorFormat);
     
     view.wantsLayer = YES;
     view.layer = layer;
 
-    swapchain.setDevice(g_device);
+    SwapchainHandle swapchainHandle = layer;
+
+    typedef std::shared_ptr<MetalSwapchain> MetalSwapchainPtr;
+    MetalSwapchainPtr swapchain = std::make_shared<MetalSwapchain>();
+    EL_ASSERT(swapchain);
+    swapchain->setDevice(g_device);
     
     GraphicsShaderDesc shaderDesc;
     shaderDesc.setStageFlag(GraphicsShaderStageVertexBit);
@@ -175,9 +379,8 @@ bool execute(NSView* view)
     mtlpp::RenderPipelineDescriptor renderPipelineDesc;
     renderPipelineDesc.SetVertexFunction(vertFunc);
     renderPipelineDesc.SetFragmentFunction(fragFunc);
-    
     auto colorAttachmentDesc = renderPipelineDesc.GetColorAttachments()[0];
-    colorAttachmentDesc.SetPixelFormat(asPixelFormat(screenFormat));
+    colorAttachmentDesc.SetPixelFormat(asPixelFormat(colorFormat));
     colorAttachmentDesc.SetBlendingEnabled(false);
     renderPipelineDesc.SetDepthAttachmentPixelFormat(el::asPixelFormat(depthFormat));
     
@@ -187,6 +390,9 @@ bool execute(NSView* view)
     auto renderPipelineState = device.NewRenderPipelineState(renderPipelineDesc, pipelineOptions, &reflection, &error);
     EL_ASSERT(renderPipelineState);
     
+    auto context = std::make_shared<MetalContext>();
+    context->setDevice(g_device);
+
     while (true)
     {
         bool isQuit = false;
@@ -194,30 +400,34 @@ bool execute(NSView* view)
         while (SDL_PollEvent(&e))
             isQuit = (e.type == SDL_QUIT);
         if (isQuit) break;
-
+        
         @autoreleasepool
         {
-            id<CAMetalDrawable> drawableData = [layer nextDrawable];
+            context->beginFrame(swapchainHandle);
+
+            auto& drawable = context->getCurrentDrawable();
             
-            mtlpp::Drawable drawable(ns::Handle{(__bridge void*)drawableData});
-            if (!drawable)
-                continue;
-            mtlpp::Texture color(ns::Handle{(__bridge void*)drawableData.texture});
-            swapchain.update(color, depthFormat);
+            id<CAMetalDrawable> metalDrawable = (__bridge id<CAMetalDrawable>)drawable.GetPtr();
+            mtlpp::Texture color(ns::Handle{(__bridge void*)metalDrawable.texture});
+            EL_ASSERT(swapchain->update(color, depthFormat));
             
-            mtlpp::CommandBuffer commandBuffer = commandQueue.CommandBuffer();
+            auto& commandBuffer = context->getCommandBuffer();
 
             mtlpp::RenderPassDescriptor renderPassDesc;
             auto colorAttachment = renderPassDesc.GetColorAttachments()[0];
-            colorAttachment.SetClearColor(mtlpp::ClearColor{0.5f, 0.5f, 0.5f, 1.0f});
+            colorAttachment.SetClearColor(mtlpp::ClearColor(0.5f, 0.5f, 0.5f, 1.0f));
             colorAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
             colorAttachment.SetStoreAction(mtlpp::StoreAction::Store);
-            colorAttachment.SetTexture(swapchain._color);
-            if (swapchain._depth)
+            colorAttachment.SetTexture(swapchain->_color);
+            colorAttachment.SetLevel(0);
+            colorAttachment.SetSlice(0);
+            if (swapchain->_depth)
             {
                 auto depthAttachment = renderPassDesc.GetDepthAttachment();
-                depthAttachment.SetTexture(swapchain._depth);
+                depthAttachment.SetTexture(swapchain->_depth);
                 depthAttachment.SetClearDepth(1.0);
+                depthAttachment.SetLevel(0);
+                depthAttachment.SetSlice(0);
                 depthAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
                 depthAttachment.SetStoreAction(mtlpp::StoreAction::DontCare);
             }
@@ -236,15 +446,14 @@ bool execute(NSView* view)
             renderCommandEncoder.SetFragmentTexture(texture, 0);
             renderCommandEncoder.Draw(mtlpp::PrimitiveType::Triangle, 0, 3);
             renderCommandEncoder.EndEncoding();
-            commandBuffer.Present(drawable);
 
-            commandBuffer.Commit();
-            
-            // TODO:
-            // commandBuffer.WaitUntilCompleted();
+            context->present();
+            context->commit();
+            context->endFrame();
         }
     }
 
+    swapchain = nullptr;
     device = ns::Handle{};
 
     return true;

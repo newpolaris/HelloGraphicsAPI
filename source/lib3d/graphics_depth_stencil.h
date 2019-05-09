@@ -31,6 +31,8 @@ namespace el {
 
     private:
 
+        static const uint32_t defaultMask;
+
         GraphicsStencilOp _failOp;
         GraphicsStencilOp _passOp;
         GraphicsStencilOp _depthFailOp;

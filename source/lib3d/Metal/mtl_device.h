@@ -14,7 +14,11 @@ namespace el {
 	{
 	public:
 
+        MTLDevice();
+        ~MTLDevice();
+
 		bool create(const GraphicsDeviceDesc& desc) override;
+        void destroy();
 
 		GraphicsProgramPtr createProgram(const GraphicsProgramDesc& desc) override;
 		GraphicsShaderPtr createShader(const GraphicsShaderDesc& desc) override;
@@ -23,12 +27,12 @@ namespace el {
         GraphicsInputLayoutPtr createInputLayout(const GraphicsInputLayoutDesc& desc) override;
         GraphicsContextPtr createContext() override;
 
-        mtlpp::Device& getDevice();
+        mtlpp::Device& getMetalDevice();
         mtlpp::CommandQueue& getCommandQueue();
         
     private:
 
-        mtlpp::Device _device;
+        mtlpp::Device _metalDevice;
         mtlpp::CommandQueue _commandQueue;
 	};
 

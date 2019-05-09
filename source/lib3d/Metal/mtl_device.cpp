@@ -14,13 +14,28 @@ using namespace el;
 
 bool MTLDevice::create(const GraphicsDeviceDesc& desc)
 {
-    _device = mtlpp::Device::CreateSystemDefaultDevice();
-    if (!_device) return false;
+    _metalDevice = mtlpp::Device::CreateSystemDefaultDevice();
+    if (!_metalDevice) return false;
     
-    _commandQueue = _device.NewCommandQueue();
+    _commandQueue = _metalDevice.NewCommandQueue();
     if (!_commandQueue) return false;
 
 	return true;
+}
+
+MTLDevice::MTLDevice()
+{
+}
+
+MTLDevice::~MTLDevice()
+{
+    destroy();
+}
+
+void MTLDevice::destroy()
+{
+    _commandQueue = ns::Handle{};
+    _metalDevice = ns::Handle{};
 }
 
 GraphicsProgramPtr MTLDevice::createProgram(const GraphicsProgramDesc& desc)
@@ -82,9 +97,9 @@ GraphicsContextPtr MTLDevice::createContext()
 	return deviceContext;
 }
 
-mtlpp::Device& MTLDevice::getDevice()
+mtlpp::Device& MTLDevice::getMetalDevice()
 {
-    return _device;
+    return _metalDevice;
 }
 
 mtlpp::CommandQueue& MTLDevice::getCommandQueue()

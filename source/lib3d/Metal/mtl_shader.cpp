@@ -27,7 +27,7 @@ bool MTLShader::create(const GraphicsShaderDesc& desc)
 	if (!device) return false;
 
     ns::Error error;
-    _library = device->getDevice().NewLibrary(shaderCode, mtlpp::CompileOptions(), &error);
+    _library = device->getMetalDevice().NewLibrary(shaderCode, mtlpp::CompileOptions(), &error);
     if (!_library) {
         EL_TRACE("Failed to created pipeline state, error %s", 
 				 error.GetLocalizedDescription().GetCStr());

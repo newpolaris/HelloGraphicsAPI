@@ -6,18 +6,20 @@
 #include <el_debug.h>
 
 using namespace el;
-using namespace mtlpp;
 
-mtlpp::StencilDescriptor el::asStencilDescriptor(const GraphicsStencilOpState& state)
-{
-    mtlpp::StencilDescriptor desc;
-    desc.SetStencilCompareFunction(asCompareFunction(state.getCompareOp()));
-    desc.SetStencilFailureOperation(asStencilOperation(state.getFailOp()));
-    desc.SetDepthFailureOperation(asStencilOperation(state.getDepthFailOp()));
-    desc.SetDepthStencilPassOperation(asStencilOperation(state.getPassOp()));
-    desc.SetReadMask(state.getCompareMask());
-    desc.SetWriteMask(state.getWriteMask());
-    return desc;
+namespace el {
+
+    mtlpp::StencilDescriptor asStencilDescriptor(const GraphicsStencilOpState& state)
+    {
+        mtlpp::StencilDescriptor desc;
+        desc.SetStencilCompareFunction(asCompareFunction(state.getCompareOp()));
+        desc.SetStencilFailureOperation(asStencilOperation(state.getFailOp()));
+        desc.SetDepthFailureOperation(asStencilOperation(state.getDepthFailOp()));
+        desc.SetDepthStencilPassOperation(asStencilOperation(state.getPassOp()));
+        desc.SetReadMask(state.getCompareMask());
+        desc.SetWriteMask(state.getWriteMask());
+        return desc;
+    }
 }
 
 MTLDepthStencil::MTLDepthStencil()
@@ -31,8 +33,7 @@ MTLDepthStencil::~MTLDepthStencil()
 bool MTLDepthStencil::create(const GraphicsDepthStencilDesc& desc)
 {
     mtlpp::Device device;
-
-    DepthStencilDescriptor descriptor;
+    mtlpp::DepthStencilDescriptor descriptor;
     descriptor.SetDepthCompareFunction(asCompareFunction(desc.getDepthCompareOp()));
     descriptor.SetDepthWriteEnabled(desc.getDepthWriteEnable());
     if (desc.getStencilTestEnable())

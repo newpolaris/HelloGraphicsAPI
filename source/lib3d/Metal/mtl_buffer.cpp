@@ -29,7 +29,7 @@ bool MTLBuffer::create(GraphicsDataDesc desc)
     if (!device) return false;
 
     auto resourceOptions = asResourceOptions(desc.getUsage());
-    _buffer = device->getDevice().NewBuffer(desc.getStream(),
+    _buffer = device->getMetalDevice().NewBuffer(desc.getStream(),
                                              desc.getStreamSize(),
                                              resourceOptions);
 

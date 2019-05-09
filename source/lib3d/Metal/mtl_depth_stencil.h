@@ -12,8 +12,6 @@
 
 namespace el {
 
-    mtlpp::StencilDescriptor asStencilDescriptor(const GraphicsStencilOpState& state);
-
     class MTLDepthStencil final : GraphicsDepthStencil
     {
     public:
