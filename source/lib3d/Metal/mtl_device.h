@@ -25,6 +25,7 @@ namespace el {
 		GraphicsTexturePtr createTexture(const GraphicsTextureDesc& desc) override;
 		GraphicsDataPtr createBuffer(const GraphicsDataDesc& desc) override;
         GraphicsInputLayoutPtr createInputLayout(const GraphicsInputLayoutDesc& desc) override;
+        GraphicsDepthStencilPtr createDepthStencil(const GraphicsDepthStencilDesc& desc) override;
         GraphicsContextPtr createContext() override;
 
         mtlpp::Device& getMetalDevice();

@@ -26,10 +26,11 @@ namespace el {
         GraphicsDevicePtr getDevice();
 
         const GraphicsDepthStencilDesc& getDepthStencilDesc() const override;
+		const mtlpp::DepthStencilState& getMetalDepthStencilState() const;
 
     private:
 
-        mtlpp::DepthStencilState _depthStencilState;
+        mtlpp::DepthStencilState _metalDepthStencilState;
 
         GraphicsDepthStencilDesc _depthStencilDesc;
         MTLDeviceWeakPtr _device;

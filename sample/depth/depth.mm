@@ -12,6 +12,7 @@
 #include <graphics_shader.h>
 #include <graphics_data.h>
 #include <graphics_program.h>
+#include <graphics_depth_stencil.h>
 
 #include <linmath.h>
 
@@ -20,7 +21,7 @@
 #include <Metal/mtl_texture.h>
 #include <Metal/mtl_shader.h>
 #include <Metal/mtl_types.h>
-#include <Metal/mtl_device.h>
+#include <Metal/mtl_depth_stencil.h>
 
 namespace {
 
@@ -324,7 +325,7 @@ void el::MetalContext::commit(bool isWaitComplete)
 bool execute(NSView* view)
 {
     using namespace el;
-    
+
     GraphicsDeviceDesc deviceDesc;
     deviceDesc.setType(GraphicsDeviceTypeMetal);
     auto g_device = createDevice(deviceDesc);
@@ -389,6 +390,8 @@ bool execute(NSView* view)
     ns::Error error;
     auto renderPipelineState = device.NewRenderPipelineState(renderPipelineDesc, pipelineOptions, &reflection, &error);
     EL_ASSERT(renderPipelineState);
+
+	GraphicsDepthStencilDesc _depthDesc;
     
     auto context = std::make_shared<MetalContext>();
     context->setDevice(g_device);
@@ -431,12 +434,24 @@ bool execute(NSView* view)
                 depthAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
                 depthAttachment.SetStoreAction(mtlpp::StoreAction::DontCare);
             }
+
+            _depthDesc.setDepthWriteEnable(true);
+            _depthDesc.setDepthCompareOp(GraphicsCompareOp::GraphicsCompareOpLess);
             
-            mtlpp::DepthStencilDescriptor depthDesc;
-            depthDesc.SetDepthWriteEnabled(true);
-            depthDesc.SetDepthCompareFunction(mtlpp::CompareFunction::Less);
+            static GraphicsDepthStencilDesc depthDesc;
+            static GraphicsDepthStencilPtr depthStencil;
+            if (!depthStencil ||
+                (depthDesc == _depthDesc))
+            {
+                depthDesc = _depthDesc;
+                depthStencil = g_device->createDepthStencil(_depthDesc);
+            }
+
+
+            EL_ASSERT(depthStencil);
+			auto metalDepthStencil = std::static_pointer_cast<MTLDepthStencil>(depthStencil);
             
-            auto depthStencilState = device.NewDepthStencilState(depthDesc);
+            auto& depthStencilState = metalDepthStencil->getMetalDepthStencilState();
             
             auto renderCommandEncoder = commandBuffer.RenderCommandEncoder(renderPassDesc);
             renderCommandEncoder.SetCullMode(mtlpp::CullMode::Back);

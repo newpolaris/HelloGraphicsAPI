@@ -70,6 +70,11 @@ GraphicsInputLayoutPtr GLDevice::createInputLayout(const GraphicsInputLayoutDesc
     return nullptr;
 }
 
+GraphicsDepthStencilPtr GLDevice::createDepthStencil(const GraphicsDepthStencilDesc& desc)
+{
+    return nullptr;
+}
+
 GraphicsContextPtr GLDevice::createContext()
 {
     auto context = std::make_shared<GLContext>();
