@@ -2,8 +2,9 @@
 
 #if EL_BUILD_METAL
 
-#include "mtl_types.h"
 #include <el_debug.h>
+#include "mtl_types.h"
+#include "mtl_device.h"
 
 using namespace el;
 using namespace mtlpp;
@@ -30,7 +31,10 @@ MTLDepthStencil::~MTLDepthStencil()
 
 bool MTLDepthStencil::create(const GraphicsDepthStencilDesc& desc)
 {
-    mtlpp::Device device;
+	auto device = _device.lock();
+	if (!device) return false;
+
+    mtlpp::Device& mtlDevice = device->getDevice();
 
     DepthStencilDescriptor descriptor;
     descriptor.SetDepthCompareFunction(asCompareFunction(desc.getDepthCompareOp()));
@@ -40,30 +44,37 @@ bool MTLDepthStencil::create(const GraphicsDepthStencilDesc& desc)
         descriptor.SetFrontFaceStencil(asStencilDescriptor(desc.getFrontFaceStencil()));
         descriptor.SetBackFaceStencil(asStencilDescriptor(desc.getBackFaceStencil()));
     }
-    _depthStencilState = device.NewDepthStencilState(descriptor);
+    _metalDepthStencilState = mtlDevice.NewDepthStencilState(descriptor);
 
-    if (!_depthStencilState)
+    if (!_metalDepthStencilState)
         return false;
     return true;
 }
 
 void MTLDepthStencil::destroy()
 {
-    _depthStencilState = ns::Handle{};
+    _metalDepthStencilState = ns::Handle{};
 }
 
 void MTLDepthStencil::setDevice(GraphicsDevicePtr device)
 {
+    _device = std::static_pointer_cast<MTLDevice>(device);
 }
 
 GraphicsDevicePtr MTLDepthStencil::getDevice()
 {
-    return GraphicsDevicePtr();
+    return _device.lock();
 }
 
 const GraphicsDepthStencilDesc& MTLDepthStencil::getDepthStencilDesc() const
 {
     return _depthStencilDesc;
 }
+
+const mtlpp::DepthStencilState& MTLDepthStencil::getMetalDepthStencilState() const
+{
+    return _metalDepthStencilState;
+}
+
 
 #endif // EL_BUILD_METAL

@@ -32,6 +32,7 @@ namespace el {
 		virtual GraphicsTexturePtr createTexture(const GraphicsTextureDesc& desc) = 0;
 		virtual GraphicsDataPtr createBuffer(const GraphicsDataDesc& desc) = 0;
         virtual GraphicsInputLayoutPtr createInputLayout(const GraphicsInputLayoutDesc& desc) = 0;
+        virtual GraphicsDepthStencilPtr createDepthStencil(const GraphicsDepthStencilDesc& desc) = 0;
         virtual GraphicsContextPtr createContext() = 0;
 	};
 

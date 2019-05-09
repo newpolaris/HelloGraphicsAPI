@@ -63,7 +63,9 @@ namespace el {
 
         void setBackFaceStencil(const GraphicsStencilOpState& state);
         const GraphicsStencilOpState& getBackFaceStencil() const;
-
+        
+        friend bool operator==(const GraphicsDepthStencilDesc&, const GraphicsDepthStencilDesc&);
+        
     private:
 
         bool _enableDepthTest;
@@ -73,6 +75,10 @@ namespace el {
         GraphicsStencilOpState _frontFaceStencil;
         GraphicsStencilOpState _backFaceStencil;
     };
+    
+    inline bool operator==(const GraphicsDepthStencilDesc& a, const GraphicsDepthStencilDesc& b) {
+        if (memcmp(&a, &b, sizeof(a)))
+    }
 
     class GraphicsDepthStencil
     {

@@ -9,6 +9,7 @@
 #include <Metal/mtl_buffer.h>
 #include <Metal/mtl_context.h>
 #include <Metal/mtl_input_layout.h>
+#include <Metal/mtl_depth_stencil.h>
 
 using namespace el;
 
@@ -66,8 +67,19 @@ GraphicsInputLayoutPtr MTLDevice::createInputLayout(const GraphicsInputLayoutDes
     if (!inputLayout)
         return nullptr;
     inputLayout->setDevice(shared_from_this());
-    if (!inputLayout->create(desc))
+    if (inputLayout->create(desc))
         return inputLayout;
+    return nullptr;
+}
+
+GraphicsDepthStencilPtr MTLDevice::createDepthStencil(const GraphicsDepthStencilDesc& desc)
+{
+    auto depthStencil = std::make_shared<MTLDepthStencil>();
+    if (!depthStencil)
+        return nullptr;
+    depthStencil->setDevice(shared_from_this());
+    if (depthStencil->create(desc))
+        return depthStencil;
     return nullptr;
 }
 
