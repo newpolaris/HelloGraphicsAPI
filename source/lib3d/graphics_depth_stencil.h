@@ -78,9 +78,9 @@ namespace el {
         GraphicsStencilOpState _backFaceStencil;
     };
     
-    inline bool operator==(const GraphicsDepthStencilDesc& a, const GraphicsDepthStencilDesc& b) {
-        if (memcmp(&a, &b, sizeof(a)))
-    }
+    //inline bool operator==(const GraphicsDepthStencilDesc& a, const GraphicsDepthStencilDesc& b) {
+    //    if (memcmp(&a, &b, sizeof(a)))
+    //}
 
     class GraphicsDepthStencil
     {

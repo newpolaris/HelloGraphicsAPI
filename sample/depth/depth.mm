@@ -435,18 +435,21 @@ bool execute(NSView* view)
                 depthAttachment.SetStoreAction(mtlpp::StoreAction::DontCare);
             }
 
+            context->setDepthWriteEnable();
+            context->setDepthCompareOp();
+
             _depthDesc.setDepthWriteEnable(true);
             _depthDesc.setDepthCompareOp(GraphicsCompareOp::GraphicsCompareOpLess);
             
             static GraphicsDepthStencilDesc depthDesc;
             static GraphicsDepthStencilPtr depthStencil;
-            if (!depthStencil ||
-                (depthDesc == _depthDesc))
+
+            // update status
+            if (!depthStencil || (depthDesc == _depthDesc))
             {
                 depthDesc = _depthDesc;
                 depthStencil = g_device->createDepthStencil(_depthDesc);
             }
-
 
             EL_ASSERT(depthStencil);
 			auto metalDepthStencil = std::static_pointer_cast<MTLDepthStencil>(depthStencil);

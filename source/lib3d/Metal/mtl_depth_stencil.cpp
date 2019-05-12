@@ -36,6 +36,7 @@ bool MTLDepthStencil::create(const GraphicsDepthStencilDesc& desc)
 	auto device = _device.lock();
 	if (!device) return false;
 
+#if 0
     mtlpp::Device& mtlDevice = device->getDevice();
 
     DepthStencilDescriptor descriptor;
@@ -50,6 +51,7 @@ bool MTLDepthStencil::create(const GraphicsDepthStencilDesc& desc)
 
     if (!_metalDepthStencilState)
         return false;
+#endif
     return true;
 }
 

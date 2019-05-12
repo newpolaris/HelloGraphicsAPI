@@ -93,8 +93,8 @@ GraphicsDepthStencilPtr MTLDevice::createDepthStencil(const GraphicsDepthStencil
     if (!depthStencil)
         return nullptr;
     depthStencil->setDevice(shared_from_this());
-    if (depthStencil->create(desc))
-        return depthStencil;
+    //if (depthStencil->create(desc))
+    //    return depthStencil;
     return nullptr;
 }
 
