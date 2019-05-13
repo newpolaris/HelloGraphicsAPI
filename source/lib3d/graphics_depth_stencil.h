@@ -7,89 +7,110 @@ namespace el {
 
     class GraphicsStencilOpState final
     {
-    public:
+        public:
 
-        GraphicsStencilOpState();
+            GraphicsStencilOpState();
 
-        void setFailOp(GraphicsStencilOp func);
-        GraphicsStencilOp getFailOp() const;
+            void setFailOp(GraphicsStencilOp func);
+            GraphicsStencilOp getFailOp() const;
 
-         void setPassOp(GraphicsStencilOp func);
-        GraphicsStencilOp getPassOp() const;
+            void setPassOp(GraphicsStencilOp func);
+            GraphicsStencilOp getPassOp() const;
 
-        void setDepthFailOp(GraphicsStencilOp func);
-        GraphicsStencilOp getDepthFailOp() const;
+            void setDepthFailOp(GraphicsStencilOp func);
+            GraphicsStencilOp getDepthFailOp() const;
 
-        void setCompareOp(GraphicsCompareOp func);
-        GraphicsCompareOp getCompareOp() const;
+            void setCompareOp(GraphicsCompareOp func);
+            GraphicsCompareOp getCompareOp() const;
 
-        void setCompareMask(uint32_t mask);
-        uint32_t getCompareMask() const;
+            void setCompareMask(uint32_t mask);
+            uint32_t getCompareMask() const;
 
-        void setWriteMask(uint32_t mask);
-        uint32_t getWriteMask() const;
+            void setWriteMask(uint32_t mask);
+            uint32_t getWriteMask() const;
 
-    private:
+            friend bool operator==(const GraphicsStencilOpState&, const GraphicsStencilOpState&);
 
-        static const uint32_t defaultMask;
+        private:
 
-        GraphicsStencilOp _failOp;
-        GraphicsStencilOp _passOp;
-        GraphicsStencilOp _depthFailOp;
-        GraphicsCompareOp _compareOp;
-        uint32_t _compareMask;
-        uint32_t _writeMask;
+            static const uint32_t defaultMask;
+
+            GraphicsStencilOp _failOp;
+            GraphicsStencilOp _passOp;
+            GraphicsStencilOp _depthFailOp;
+            GraphicsCompareOp _compareOp;
+            uint32_t _compareMask;
+            uint32_t _writeMask;
     };
+
+    inline bool operator==(const GraphicsStencilOpState& a, const GraphicsStencilOpState& b)
+    {
+        return (a._failOp == b._failOp)
+            && (a._passOp == b._passOp)
+            && (a._depthFailOp == b._depthFailOp)
+            && (a._compareOp == b._compareOp)
+            && (a._compareMask == b._compareMask)
+            && (a._writeMask == b._writeMask);
+    }
 
     // From vulkan sepc.
     class GraphicsDepthStencilDesc final
     {
-    public:
+        public:
 
-        GraphicsDepthStencilDesc();
+            GraphicsDepthStencilDesc();
 
-        void setDepthTestEnable(bool enable);
-        bool getDepthTestEnable() const;
+            void setDepthTestEnable(bool enable);
+            bool getDepthTestEnable() const;
 
-        void setDepthWriteEnable(bool enable);
-        bool getDepthWriteEnable() const;
+            void setDepthWriteEnable(bool enable);
+            bool getDepthWriteEnable() const;
 
-        void setDepthCompareOp(GraphicsCompareOp func);
-        GraphicsCompareOp getDepthCompareOp() const;
+            void setDepthCompareOp(GraphicsCompareOp func);
+            GraphicsCompareOp getDepthCompareOp() const;
 
-        void setStencilTestEnable(bool enable);
-        bool getStencilTestEnable() const;
+            void setStencilTestEnable(bool enable);
+            bool getStencilTestEnable() const;
 
-        void setFrontFaceStencil(const GraphicsStencilOpState& state);
-        const GraphicsStencilOpState& getFrontFaceStencil() const;
+            void setFrontFaceStencil(const GraphicsStencilOpState& state);
+            const GraphicsStencilOpState& getFrontFaceStencil() const;
 
-        void setBackFaceStencil(const GraphicsStencilOpState& state);
-        const GraphicsStencilOpState& getBackFaceStencil() const;
-        
-        friend bool operator==(const GraphicsDepthStencilDesc&, const GraphicsDepthStencilDesc&);
-        
-    private:
+            void setBackFaceStencil(const GraphicsStencilOpState& state);
+            const GraphicsStencilOpState& getBackFaceStencil() const;
 
-        bool _enableDepthTest;
-        bool _enableDepthWrite;
-        GraphicsCompareOp _depthCompareOp;
-        bool _enableStencilTest;
-        GraphicsStencilOpState _frontFaceStencil;
-        GraphicsStencilOpState _backFaceStencil;
+            friend bool operator==(const GraphicsDepthStencilDesc&, const GraphicsDepthStencilDesc&);
+
+        private:
+
+            bool _enableDepthTest;
+            bool _enableDepthWrite;
+            GraphicsCompareOp _depthCompareOp;
+            bool _enableStencilTest;
+            GraphicsStencilOpState _frontFaceStencil;
+            GraphicsStencilOpState _backFaceStencil;
     };
-    
-    //inline bool operator==(const GraphicsDepthStencilDesc& a, const GraphicsDepthStencilDesc& b) {
-    //    if (memcmp(&a, &b, sizeof(a)))
-    //}
+
+    inline bool operator==(const GraphicsDepthStencilDesc& a, const GraphicsDepthStencilDesc& b) {
+        return (a._enableDepthTest == b._enableDepthTest)
+            && (a._enableDepthWrite == b._enableDepthWrite)
+            && (a._depthCompareOp == b._depthCompareOp)
+            && (a._enableStencilTest == b._enableStencilTest)
+            && (a._frontFaceStencil == b._frontFaceStencil)
+            && (a._backFaceStencil == b._backFaceStencil);
+    }
+
+    inline bool operator!=(const GraphicsDepthStencilDesc& a, const GraphicsDepthStencilDesc& b) {
+        return !(a == b);
+    }
 
     class GraphicsDepthStencil
     {
-    public:
+        public:
 
-        GraphicsDepthStencil();
-        virtual ~GraphicsDepthStencil();
+            GraphicsDepthStencil();
+            virtual ~GraphicsDepthStencil();
 
-        virtual const GraphicsDepthStencilDesc& getDepthStencilDesc() const = 0;
+            virtual const GraphicsDepthStencilDesc& getDepthStencilDesc() const = 0;
     };
 
 } // namespace el {

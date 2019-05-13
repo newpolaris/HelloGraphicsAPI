@@ -3,8 +3,8 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
 #include <Cocoa/Cocoa.h>
-#include <Metal/Metal.h>
 #include <QuartzCore/CAMetalLayer.h>
+#include <Metal/Metal.h>
 #include <mtlpp.hpp>
 
 #include <graphics_device.h>
@@ -22,6 +22,8 @@
 #include <Metal/mtl_shader.h>
 #include <Metal/mtl_types.h>
 #include <Metal/mtl_depth_stencil.h>
+#include <Metal/mtl_device.h>
+#include <Metal/mtl_context.h>
 
 namespace {
 
@@ -144,184 +146,6 @@ struct MetalSwapchain final
     }
 };
 
-namespace el
-{
-    namespace math
-    {
-    
-        template <typename T>
-        struct vec2
-        {
-            vec2() {}
-            
-            template <typename A>
-            vec2(A v) : x(v), y(v) {} 
-
-            template <typename A, typename B>
-            vec2(A x, B y) : x(x), y(y) {}
-
-            const T& operator[](size_t i) const {
-                return v[i];
-            }
-
-            T& operator[](size_t i) {
-                return v[i];
-            }
-
-            union {
-                T v[2];
-                struct { T x, y; };
-                struct { T s, t; };
-            };
-        };
-
-        template <typename T>
-        struct vec4
-        {
-            vec4() {}
-            
-            template <typename A>
-            vec4(A v) : x(v), y(v), z(v), w(v) {} 
-
-            template <typename A, typename B, typename C, typename D>
-            vec4(A x, B y, C z, D w) : x(x), y(y), z(z), w(w) {}
-
-            const T& operator[](size_t i) const {
-                return v[i];
-            }
-
-            T& operator[](size_t i) {
-                return v[i];
-            }
-
-            union {
-                float v[4];
-                struct { float x, y, z, w; };
-            };
-        };
-
-        typedef vec2<float> float2;
-        typedef vec4<float> float4;
-    }
-}
-
-namespace el
-{
-    typedef void* SwapchainHandle;
-
-    class MetalContext final
-    {
-    public:
-
-        MetalContext();
-        ~MetalContext();
-
-        void setDevice(const GraphicsDevicePtr& device);
-
-        void beginFrame(SwapchainHandle handle);
-        void endFrame();
-        void present();
-        void commit(bool isWaitComplete = false);
-
-        mtlpp::CommandBuffer& getCommandBuffer();
-        mtlpp::Drawable& getCurrentDrawable();
-
-    private:
-
-        MetalContext(const MetalContext&);
-        MetalContext& operator=(const MetalContext&);
-
-        GraphicsPixelFormat _depthFormat;
-
-        MTLDevicePtr _device;
-        mtlpp::Device _metalDevice;
-        mtlpp::CommandBuffer _commandBuffer;
-        mtlpp::Drawable _currentDrawable;
-        CAMetalLayer* _metalLayer;
-        
-        math::float4 _clearColor;
-        float _clearDepth;
-        bool _isDepthWrite;
-        bool _isDepthTest;
-    };
-}
-
-el::MetalContext::MetalContext() :
-    _depthFormat(GraphicsPixelFormatInvalid),
-    _metalLayer(nullptr),
-    _clearColor(0.3f),
-    _clearDepth(1.f)
-{
-}
-
-el::MetalContext::~MetalContext() {
-    _commandBuffer = ns::Handle{};
-    _metalLayer = nullptr;
-    _metalDevice = ns::Handle{};
-    _device = nullptr;
-}
-
-void el::MetalContext::setDevice(const el::GraphicsDevicePtr& device) {
-    _device = std::static_pointer_cast<MTLDevice>(device);
-    EL_ASSERT(_device);
-    _metalDevice = _device->getMetalDevice();
-}
-
-mtlpp::CommandBuffer& el::MetalContext::getCommandBuffer()
-{
-    EL_ASSERT(_device);
-
-    if (!_commandBuffer)
-    {
-        auto& queue = _device->getCommandQueue();
-        EL_ASSERT(queue);
-        _commandBuffer = queue.CommandBuffer();
-    }
-    return _commandBuffer;
-}
-
-mtlpp::Drawable& el::MetalContext::getCurrentDrawable()
-{
-    EL_ASSERT(_metalLayer);
-    if (!_currentDrawable) {
-        id<CAMetalDrawable> drawable = [_metalLayer nextDrawable];
-        EL_ASSERT(drawable);
-        _currentDrawable = mtlpp::Drawable(ns::Handle{(__bridge void*)drawable});
-        EL_ASSERT(_currentDrawable);
-    }
-    return _currentDrawable;
-}
-
-void el::MetalContext::beginFrame(SwapchainHandle handle)
-{
-    _metalLayer = reinterpret_cast<CAMetalLayer*>(handle);
-}
-
-void el::MetalContext::endFrame()
-{
-    _currentDrawable = ns::Handle{};
-    _commandBuffer = ns::Handle{};
-    _metalLayer = nullptr;
-}
-
-void el::MetalContext::present()
-{
-    auto& drawable = getCurrentDrawable();
-    EL_ASSERT(drawable);
-
-    EL_ASSERT(_commandBuffer);
-    _commandBuffer.Present(drawable);
-}
-
-void el::MetalContext::commit(bool isWaitComplete)
-{
-    EL_ASSERT(_commandBuffer);
-
-    _commandBuffer.Commit(); 
-    if (isWaitComplete)
-        _commandBuffer.WaitUntilCompleted();
-}
-
 bool execute(NSView* view)
 {
     using namespace el;
@@ -390,8 +214,6 @@ bool execute(NSView* view)
     ns::Error error;
     auto renderPipelineState = device.NewRenderPipelineState(renderPipelineDesc, pipelineOptions, &reflection, &error);
     EL_ASSERT(renderPipelineState);
-
-	GraphicsDepthStencilDesc _depthDesc;
     
     auto context = std::make_shared<MetalContext>();
     context->setDevice(g_device);
@@ -412,6 +234,7 @@ bool execute(NSView* view)
             
             id<CAMetalDrawable> metalDrawable = (__bridge id<CAMetalDrawable>)drawable.GetPtr();
             mtlpp::Texture color(ns::Handle{(__bridge void*)metalDrawable.texture});
+
             EL_ASSERT(swapchain->update(color, depthFormat));
             
             auto& commandBuffer = context->getCommandBuffer();
@@ -435,30 +258,13 @@ bool execute(NSView* view)
                 depthAttachment.SetStoreAction(mtlpp::StoreAction::DontCare);
             }
 
-            context->setDepthWriteEnable();
-            context->setDepthCompareOp();
+            context->setDepthTestEnable(true);
+            context->setDepthWriteEnable(true);
+            context->setDepthCompareOp(GraphicsCompareOp::GraphicsCompareOpLess);
 
-            _depthDesc.setDepthWriteEnable(true);
-            _depthDesc.setDepthCompareOp(GraphicsCompareOp::GraphicsCompareOpLess);
-            
-            static GraphicsDepthStencilDesc depthDesc;
-            static GraphicsDepthStencilPtr depthStencil;
-
-            // update status
-            if (!depthStencil || (depthDesc == _depthDesc))
-            {
-                depthDesc = _depthDesc;
-                depthStencil = g_device->createDepthStencil(_depthDesc);
-            }
-
-            EL_ASSERT(depthStencil);
-			auto metalDepthStencil = std::static_pointer_cast<MTLDepthStencil>(depthStencil);
-            
-            auto& depthStencilState = metalDepthStencil->getMetalDepthStencilState();
-            
             auto renderCommandEncoder = commandBuffer.RenderCommandEncoder(renderPassDesc);
             renderCommandEncoder.SetCullMode(mtlpp::CullMode::Back);
-            renderCommandEncoder.SetDepthStencilState(depthStencilState);
+            // renderCommandEncoder.SetDepthStencilState(depthStencilState);
             renderCommandEncoder.SetRenderPipelineState(renderPipelineState);
             renderCommandEncoder.SetVertexBuffer(vertexBuffer, 0, 0);
             renderCommandEncoder.SetFragmentTexture(texture, 0);

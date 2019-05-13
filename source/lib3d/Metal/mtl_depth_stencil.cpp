@@ -33,14 +33,17 @@ MTLDepthStencil::~MTLDepthStencil()
 
 bool MTLDepthStencil::create(const GraphicsDepthStencilDesc& desc)
 {
-	auto device = _device.lock();
-	if (!device) return false;
+    auto device = _device.lock();
+    if (!device) return false;
 
-#if 0
-    mtlpp::Device& mtlDevice = device->getDevice();
+    mtlpp::Device& mtlDevice = device->getMetalDevice();
 
-    DepthStencilDescriptor descriptor;
-    descriptor.SetDepthCompareFunction(asCompareFunction(desc.getDepthCompareOp()));
+    auto depthFunc = desc.getDepthTestEnable() 
+        ? asCompareFunction(desc.getDepthCompareOp()) 
+        : mtlpp::CompareFunction::Never;
+
+    mtlpp::DepthStencilDescriptor descriptor;
+    descriptor.SetDepthCompareFunction(depthFunc);
     descriptor.SetDepthWriteEnabled(desc.getDepthWriteEnable());
     if (desc.getStencilTestEnable())
     {
@@ -51,7 +54,7 @@ bool MTLDepthStencil::create(const GraphicsDepthStencilDesc& desc)
 
     if (!_metalDepthStencilState)
         return false;
-#endif
+
     return true;
 }
 

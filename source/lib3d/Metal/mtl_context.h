@@ -5,11 +5,48 @@
 
 #if EL_BUILD_METAL
 
+#include <map>
 #include <mtlpp.hpp>
-#include <Metal/mtl_types.h>
 #include <graphics_context.h>
+#include <graphics_depth_stencil.h>
+#include <math_types.h>
+
+#include "mtl_types.h"
 
 namespace el {
+
+
+    struct DepthStencilCache final
+    {
+        typedef std::map<GraphicsDepthStencilDesc, mtlpp::DepthStencilState> HashMap;
+
+        void setDevice(const MTLDevicePtr& device);
+
+        const mtlpp::DepthStencilState& request(const GraphicsDepthStencilDesc&);
+
+        MTLDevicePtr _device;
+        HashMap _cache;
+    };
+
+    inline 
+    void mtlpp::setDevice(const MTLDevicePtr& device)
+    {
+        _device = device;
+    }
+
+    inline
+    const mtlpp::DepthStencilState& DepthStencilCache::request(const GraphicsDepthStencilDesc& desc)
+    {
+        auto it = _cache.find(desc);
+        if (it != _cache.end())
+            return *it;
+
+        depthStencil = _device->createDepthStencil(desc);
+        EL_ASSERT(depthStencil);
+
+        auto metalDepthStencil = std::static_pointer_cast<MTLDepthStencil>(depthStencil);
+        return metalDepthStencil->getMetalDepthStencilState();
+    }
 
     class MTLContext final : public GraphicsContext
     {
@@ -56,6 +93,55 @@ namespace el {
         mtlpp::CommandBuffer _commandBuffer;
 
         MTLDeviceWeakPtr _device;
+    };
+
+    typedef void* SwapchainHandle;
+
+    class MetalContext final
+    {
+    public:
+
+        MetalContext();
+        ~MetalContext();
+
+        void setDevice(const GraphicsDevicePtr& device);
+
+        void beginFrame(SwapchainHandle handle);
+        void endFrame();
+        void beginPass();
+        void endPass();
+        void present();
+        void commit(bool isWaitComplete = false);
+        
+        void setDepthTestEnable(bool enable);
+        void setDepthWriteEnable(bool enable);
+        void setDepthCompareOp(GraphicsCompareOp compare);
+
+        void draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset = 0);
+
+        mtlpp::Drawable& getCurrentDrawable();
+        mtlpp::CommandBuffer& getCurrentCommandBuffer();
+        mtlpp::RenderCommandEncoder& getCurrentCommandEncoder();
+
+    private:
+
+        MetalContext(const MetalContext&);
+        MetalContext& operator=(const MetalContext&);
+
+        GraphicsPixelFormat _depthFormat;
+
+        MTLDevicePtr _device;
+        mtlpp::Device _metalDevice;
+        mtlpp::CommandBuffer _currentCommandBuffer;
+        mtlpp::RenderCommandEncoder _currentCommandEncoder;
+        mtlpp::Drawable _currentDrawable;
+        SwapchainHandle _swapchainHandle;
+        
+        math::float4 _clearColor;
+        float _clearDepth;
+
+        GraphicsDepthStencilDesc _depthStencilDesc;
+        DepthStencilCache _depthStencilCache;
     };
 
 } // namespace el {

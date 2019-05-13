@@ -24,7 +24,7 @@ endif()
 
 if(BUILD_METAL)
     file(GLOB RENDERER_MTL_HEADER "Metal/*.h")
-    file(GLOB RENDERER_MTL_SOURCE "Metal/*.cpp")
+    file(GLOB RENDERER_MTL_SOURCE "Metal/*.cpp" "Metal/*.mm")
 
     set(RENDERER_MTL ${RENDERER_MTL_HEADER} ${RENDERER_MTL_SOURCE})
     source_group("Metal" FILES ${RENDERER_MTL})

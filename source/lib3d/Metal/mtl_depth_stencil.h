@@ -12,7 +12,7 @@
 
 namespace el {
 
-    class MTLDepthStencil final : GraphicsDepthStencil
+    class MTLDepthStencil final : public GraphicsDepthStencil
     {
     public:
 

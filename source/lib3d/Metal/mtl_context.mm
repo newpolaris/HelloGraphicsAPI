@@ -2,9 +2,11 @@
 
 #if EL_BUILD_METAL
 
+#include <Metal/Metal.h>
+#include <QuartzCore/CAMetalLayer.h>
 #include <el_debug.h>
-#include "mtl_device.h"
 #include <mtlpp.hpp>
+#include "mtl_device.h"
 
 using namespace el;
 
@@ -71,9 +73,9 @@ void MTLContext::beginRendering()
 {
     auto device = _device.lock();
     EL_ASSERT(device);
-    EL_ASSERT(!_commandBuffer);
+    EL_ASSERT(!_currentCommandBuffer);
     
-    _commandBuffer = device->getCommandQueue().CommandBuffer();
+    _currentCommandBuffer = getCurrentCommandBuffer();
     EL_ASSERT(!_commandBuffer);
     
     // renderCommandEncoder.SetCullMode(mtlpp::CullMode::Back);
@@ -195,6 +197,125 @@ void MTLContext::drawInstanced(GraphicsPrimitiveType primitive, uint32_t vertexC
 void MTLContext::drawIndexedInstanced(GraphicsPrimitiveType primitive, uint32_t indexCountPerInstance, uint32_t instanceCount,
                                       uint32_t startIndexLocation, int32_t vaseVertexLocation, uint32_t startInstanceLocation)
 {
+}
+
+el::MetalContext::MetalContext() :
+    _depthFormat(GraphicsPixelFormatInvalid),
+    _swapchainHandle(nullptr),
+    _clearColor(0.3f),
+    _clearDepth(1.f)
+{
+}
+
+el::MetalContext::~MetalContext() {
+    _currentCommandBuffer = ns::Handle{};
+    _currentDrawable = ns::Handle{};
+    _swapchainHandle = nullptr;
+    _metalDevice = ns::Handle{};
+    _device = nullptr;
+}
+
+void el::MetalContext::setDevice(const el::GraphicsDevicePtr& device) {
+    _device = std::static_pointer_cast<MTLDevice>(device);
+    EL_ASSERT(_device);
+    _metalDevice = _device->getMetalDevice();
+}
+
+mtlpp::Drawable& el::MetalContext::getCurrentDrawable()
+{
+    auto layer = reinterpret_cast<CAMetalLayer*>(_swapchainHandle);
+    EL_ASSERT(layer);
+    if (!_currentDrawable) {
+        id<CAMetalDrawable> drawable = [layer nextDrawable];
+        EL_ASSERT(drawable);
+        _currentDrawable = mtlpp::Drawable(ns::Handle{(__bridge void*)drawable});
+        EL_ASSERT(_currentDrawable);
+    }
+    return _currentDrawable;
+}
+
+mtlpp::CommandBuffer& el::MetalContext::getCurrentCommandBuffer()
+{
+    EL_ASSERT(_device);
+
+    if (!_commandBuffer)
+    {
+        auto& queue = _device->getCommandQueue();
+        EL_ASSERT(queue);
+        _commandBuffer = queue.CommandBuffer();
+    }
+    return _commandBuffer;
+}
+
+mtlpp::renderCommandEncoder& el::MetalContext::getCurrentCommandEncoder()
+{
+    EL_ASSERT(_currentCommandEncoder);
+
+    if (!_commandBuffer)
+    {
+        auto& queue = _device->getCommandQueue();
+        EL_ASSERT(queue);
+        _commandBuffer = queue.CommandBuffer();
+    }
+    return _commandBuffer;
+}
+
+void el::MetalContext::beginFrame(SwapchainHandle handle)
+{
+    _swapchainHandle = reinterpret_cast<CAMetalLayer*>(handle);
+}
+
+void el::MetalContext::endFrame()
+{
+    _currentDrawable = ns::Handle{};
+    _currentCommandBuffer = ns::Handle{};
+    _swapchainHandle = nullptr;
+}
+
+void el::MetalContext::present()
+{
+    auto& drawable = getCurrentDrawable();
+    EL_ASSERT(drawable);
+
+    EL_ASSERT(_currentCommandBuffer);
+    _currentCommandBuffer.Present(drawable);
+}
+
+void el::MetalContext::commit(bool isWaitComplete)
+{
+    EL_ASSERT(_currentCommandBuffer);
+
+    _currentCommandBuffer.Commit(); 
+    if (isWaitComplete)
+        _currentCommandBuffer.WaitUntilCompleted();
+
+    _depthStencilDesc = GraphicsDepthStencilDesc();
+}
+
+void el::MetalContext::setDepthWriteEnable(bool enable)
+{
+    _depthStencilDesc.setDepthWriteEnable(enable);
+}
+
+void el::MetalContext::setDepthCompareOp(GraphicsCompareOp compare)
+{
+    _depthStencilDesc.setDepthCompareOp(compare);
+}
+
+void el::MetalContext::setDepthTestEnable(bool enable)
+{
+    _depthStencilDesc.setDepthTestEnable(enable);
+}
+
+void el::MetalContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset)
+{
+    EL_ASSERT(_currentCommandBuffer);  // per-frame
+    EL_ASSERT(_currentCommandEncoder); // per-pass
+
+    auto depthStencilState = _depthStencilCache.request(_depthStencilDesc);
+    _currentCommandEncoder.SetDepthStencilState(depthStencilState);
+
+    _currentCommandEncoder.Draw(mtlpp::PrimitiveType::Triangle, vertexStartOffset, vertexCount);
 }
 
 #endif // EL_BUILD_METAL
