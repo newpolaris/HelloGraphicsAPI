@@ -3,13 +3,13 @@
 #if EL_BUILD_METAL 
 
 #include <el_debug.h>
-#include <Metal/mtl_program.h>
+#include "mtl_program.h"
 #include "mtl_shader.h"
-#include <Metal/mtl_texture.h>
-#include <Metal/mtl_buffer.h>
-#include <Metal/mtl_context.h>
-#include <Metal/mtl_input_layout.h>
-#include <Metal/mtl_depth_stencil.h>
+#include "mtl_texture.h"
+#include "mtl_buffer.h"
+#include "mtl_context.h"
+#include "mtl_input_layout.h"
+#include "mtl_depth_stencil.h"
 
 using namespace el;
 

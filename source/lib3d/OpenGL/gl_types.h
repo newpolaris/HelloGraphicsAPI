@@ -1,7 +1,7 @@
 #ifndef __GL_TYPES_H__
 #define __GL_TYPES_H__
 
-#include <OpenGL/gl_headers.h>
+#include "gl_headers.h"
 #include <graphics_types.h>
 #include <el_debug.h>
 

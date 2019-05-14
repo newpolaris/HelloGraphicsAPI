@@ -1,10 +1,10 @@
-#include <OpenGL/gl_device.h>
-#include <OpenGL/gl_program.h>
-#include <OpenGL/gl_shader.h>
-#include <OpenGL/gl_texture.h>
-#include <OpenGL/gl_buffer.h>
-#include <OpenGL/gl_context.h>
-#include <OpenGL/gl_input_layout.h>
+#include "gl_device.h"
+#include "gl_program.h"
+#include "gl_shader.h"
+#include "gl_texture.h"
+#include "gl_buffer.h"
+#include "gl_context.h"
+#include "gl_input_layout.h"
 
 using namespace el;
 

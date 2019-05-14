@@ -1,9 +1,9 @@
-#include <OpenGL/gl_shader.h>
+#include "gl_shader.h"
 
-#include <OpenGL/gl_types.h>
-#include <OpenGL/gl_headers.h>
 #include <el_predefine.h>
 #include <el_debug.h>
+#include "gl_types.h"
+#include "gl_headers.h"
 
 using namespace el;
 

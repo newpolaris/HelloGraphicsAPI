@@ -6,7 +6,7 @@
 #if EL_BUILD_OPENGL
 
 #include <graphics_context.h>
-#include <OpenGL/gl_types.h>
+#include "gl_types.h"
 
 namespace el {
 

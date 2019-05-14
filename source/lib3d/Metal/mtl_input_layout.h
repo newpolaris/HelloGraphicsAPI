@@ -5,7 +5,7 @@
 
 #if EL_BUILD_METAL
 
-#include <Metal/mtl_types.h>
+#include "mtl_types.h"
 #include <graphics_types.h>
 #include <graphics_input_layout.h>
 

@@ -107,12 +107,13 @@ namespace el {
 
         void setDevice(const GraphicsDevicePtr& device);
 
-        void beginFrame(SwapchainHandle handle);
-        void endFrame();
         void beginPass();
         void endPass();
+        void beginFrame(SwapchainHandle handle);
+        void endFrame();
         void present();
         void commit(bool isWaitComplete = false);
+        void makeCurrent(SwapchainHandle handle);
         
         void setDepthTestEnable(bool enable);
         void setDepthWriteEnable(bool enable);

@@ -1,4 +1,4 @@
-#include <OpenGL/gl_input_layout.h>
+#include "gl_input_layout.h"
 
 using namespace el;
 

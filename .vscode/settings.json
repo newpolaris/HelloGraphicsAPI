@@ -3,6 +3,7 @@
         "vector": "cpp",
         "cassert": "cpp",
         "memory": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "iostream": "cpp"
     }
 }

@@ -7,8 +7,8 @@
 
 #include <graphics_types.h>
 #include <graphics_data.h>
-#include <Metal/mtl_types.h>
 #include <mtlpp.hpp>
+#include "mtl_types.h"
 
 namespace el {
 

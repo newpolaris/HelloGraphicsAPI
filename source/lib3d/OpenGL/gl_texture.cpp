@@ -1,4 +1,4 @@
-#include <OpenGL/gl_texture.h>
+#include "gl_texture.h"
 
 #include <el_debug.h>
 

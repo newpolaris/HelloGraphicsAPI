@@ -3,8 +3,8 @@
 
 #include <graphics_data.h>
 #include <graphics_types.h>
-#include <OpenGL/gl_types.h>
-#include <OpenGL/gl_headers.h>
+#include "gl_types.h"
+#include "gl_headers.h"
 
 namespace el {
 

@@ -3,7 +3,7 @@
 
 #include <graphics_types.h>
 #include <graphics_shader.h>
-#include <OpenGL/gl_headers.h>
+#include "gl_headers.h"
 
 namespace el {
 

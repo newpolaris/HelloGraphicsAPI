@@ -86,7 +86,7 @@ namespace {
         -1.0f, -1.0f, 0.0f,  0.0f, 1.0f,
     };
     
-    char pixels[16 * 16];
+    char _pixels[16 * 16];
 }
 
 struct MetalSwapchain final
@@ -191,7 +191,7 @@ bool execute(NSView* view)
     GraphicsTextureDesc textureDesc;
     textureDesc.setWidth(16);
     textureDesc.setHeight(16);
-    textureDesc.setStream(pixels);
+    textureDesc.setStream(_pixels);
     textureDesc.setPixelAlignment(GraphicsPixelAlignment::GraphicsPixelAlignment1);
     textureDesc.setPixelFormat(GraphicsPixelFormatR8Unorm);
     textureDesc.setTextureUsage(GraphicsTextureUsageSampledBit | GraphicsTextureUsageUploadableBit);
@@ -257,6 +257,7 @@ bool execute(NSView* view)
                 depthAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
                 depthAttachment.SetStoreAction(mtlpp::StoreAction::DontCare);
             }
+            renderPassDesc.setRenderTargetArrayLength(1);
 
             context->setDepthTestEnable(true);
             context->setDepthWriteEnable(true);
@@ -289,12 +290,12 @@ int main()
     for (y = 0;  y < 16;  y++)
     {
         for (x = 0;  x < 16;  x++)
-            pixels[y * 16 + x] = rand() % 256;
+            _pixels[y * 16 + x] = rand() % 256;
     }
     
     SDL_Init(SDL_INIT_VIDEO);
     
-    SDL_Window* window = SDL_CreateWindow("sdl sample",
+    SDL_Window* window = SDL_CreateWindow("dpeth sample",
                                           SDL_WINDOWPOS_UNDEFINED,
                                           SDL_WINDOWPOS_UNDEFINED,
                                           1280, 768,

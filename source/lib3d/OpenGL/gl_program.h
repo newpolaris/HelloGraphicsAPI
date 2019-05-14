@@ -3,7 +3,7 @@
 
 #include <graphics_types.h>
 #include <graphics_program.h>
-#include <OpenGL/gl_types.h>
+#include "gl_types.h"
 #include <linmath.h>
 #include <string>
 #include <map>

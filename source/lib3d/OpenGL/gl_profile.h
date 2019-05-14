@@ -5,7 +5,7 @@
 #include <chrono>
 #include <graphics_device.h>
 
-#include <OpenGL/gl_headers.h>
+#include "gl_headers.h"
 
 namespace el {
 

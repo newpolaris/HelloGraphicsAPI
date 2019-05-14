@@ -58,4 +58,7 @@ if(APPLE)
 endif()
 
 add_subdirectory(sdl)
-add_subdirectory(depth)
+if(APPLE)
+    add_subdirectory(depth)
+    add_subdirectory(bunny-osx)
+endif()

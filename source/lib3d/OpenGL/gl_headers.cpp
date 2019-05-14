@@ -1,4 +1,4 @@
-#include <OpenGL/gl_headers.h>
+#include "gl_headers.h"
 
 #include <string>
 #include <el_debug.h>
