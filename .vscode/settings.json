@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "vector": "cpp",
+        "cassert": "cpp",
+        "memory": "cpp",
+        "__config": "cpp"
+    }
+}

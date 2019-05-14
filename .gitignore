@@ -19,3 +19,4 @@ imgui.ini
 _build/
 .DS_Store
 HelloGraphicsAPI.app.app/
+.vscode/ipch/

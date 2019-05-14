@@ -237,7 +237,7 @@ bool execute(NSView* view)
 
             EL_ASSERT(swapchain->update(color, depthFormat));
             
-            auto& commandBuffer = context->getCommandBuffer();
+            auto& commandBuffer = context->getCurrentCommandBuffer();
 
             mtlpp::RenderPassDescriptor renderPassDesc;
             auto colorAttachment = renderPassDesc.GetColorAttachments()[0];

@@ -8,7 +8,7 @@
 #include <mtlpp.hpp>
 #include "mtl_device.h"
 
-using namespace el;
+_EL_NAME_BEGIN
 
 MTLContext::MTLContext()
 {
@@ -73,10 +73,6 @@ void MTLContext::beginRendering()
 {
     auto device = _device.lock();
     EL_ASSERT(device);
-    EL_ASSERT(!_currentCommandBuffer);
-    
-    _currentCommandBuffer = getCurrentCommandBuffer();
-    EL_ASSERT(!_commandBuffer);
     
     // renderCommandEncoder.SetCullMode(mtlpp::CullMode::Back);
     // renderCommandEncoder.SetCullMode(mtlpp::CullMode::None);
@@ -199,7 +195,7 @@ void MTLContext::drawIndexedInstanced(GraphicsPrimitiveType primitive, uint32_t 
 {
 }
 
-el::MetalContext::MetalContext() :
+MetalContext::MetalContext() :
     _depthFormat(GraphicsPixelFormatInvalid),
     _swapchainHandle(nullptr),
     _clearColor(0.3f),
@@ -207,7 +203,7 @@ el::MetalContext::MetalContext() :
 {
 }
 
-el::MetalContext::~MetalContext() {
+MetalContext::~MetalContext() {
     _currentCommandBuffer = ns::Handle{};
     _currentDrawable = ns::Handle{};
     _swapchainHandle = nullptr;
@@ -215,13 +211,13 @@ el::MetalContext::~MetalContext() {
     _device = nullptr;
 }
 
-void el::MetalContext::setDevice(const el::GraphicsDevicePtr& device) {
+void MetalContext::setDevice(const GraphicsDevicePtr& device) {
     _device = std::static_pointer_cast<MTLDevice>(device);
     EL_ASSERT(_device);
     _metalDevice = _device->getMetalDevice();
 }
 
-mtlpp::Drawable& el::MetalContext::getCurrentDrawable()
+mtlpp::Drawable& MetalContext::getCurrentDrawable()
 {
     auto layer = reinterpret_cast<CAMetalLayer*>(_swapchainHandle);
     EL_ASSERT(layer);
@@ -234,45 +230,32 @@ mtlpp::Drawable& el::MetalContext::getCurrentDrawable()
     return _currentDrawable;
 }
 
-mtlpp::CommandBuffer& el::MetalContext::getCurrentCommandBuffer()
+mtlpp::CommandBuffer& MetalContext::getCurrentCommandBuffer()
 {
     EL_ASSERT(_device);
 
-    if (!_commandBuffer)
+    if (!_currentCommandBuffer)
     {
         auto& queue = _device->getCommandQueue();
         EL_ASSERT(queue);
-        _commandBuffer = queue.CommandBuffer();
+        _currentCommandBuffer = queue.CommandBuffer();
     }
-    return _commandBuffer;
+    return _currentCommandBuffer;
 }
 
-mtlpp::renderCommandEncoder& el::MetalContext::getCurrentCommandEncoder()
-{
-    EL_ASSERT(_currentCommandEncoder);
-
-    if (!_commandBuffer)
-    {
-        auto& queue = _device->getCommandQueue();
-        EL_ASSERT(queue);
-        _commandBuffer = queue.CommandBuffer();
-    }
-    return _commandBuffer;
-}
-
-void el::MetalContext::beginFrame(SwapchainHandle handle)
+void MetalContext::beginFrame(SwapchainHandle handle)
 {
     _swapchainHandle = reinterpret_cast<CAMetalLayer*>(handle);
 }
 
-void el::MetalContext::endFrame()
+void MetalContext::endFrame()
 {
     _currentDrawable = ns::Handle{};
     _currentCommandBuffer = ns::Handle{};
     _swapchainHandle = nullptr;
 }
 
-void el::MetalContext::present()
+void MetalContext::present()
 {
     auto& drawable = getCurrentDrawable();
     EL_ASSERT(drawable);
@@ -281,7 +264,7 @@ void el::MetalContext::present()
     _currentCommandBuffer.Present(drawable);
 }
 
-void el::MetalContext::commit(bool isWaitComplete)
+void MetalContext::commit(bool isWaitComplete)
 {
     EL_ASSERT(_currentCommandBuffer);
 
@@ -292,30 +275,66 @@ void el::MetalContext::commit(bool isWaitComplete)
     _depthStencilDesc = GraphicsDepthStencilDesc();
 }
 
-void el::MetalContext::setDepthWriteEnable(bool enable)
+void MetalContext::beginPass()
+{
+    EL_ASSERT(_currentCommandBuffer);
+
+#if 0
+    mtlpp::RenderPassDescriptor renderPassDesc;
+    auto colorAttachment = renderPassDesc.GetColorAttachments()[0];
+    colorAttachment.SetClearColor(makeColor(_clearColor);
+    colorAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
+    colorAttachment.SetStoreAction(mtlpp::StoreAction::Store);
+    colorAttachment.SetTexture(swapchain->_color);
+    colorAttachment.SetLevel(0);
+    colorAttachment.SetSlice(0);
+    if (swapchain->_depth)
+    {
+        auto depthAttachment = renderPassDesc.GetDepthAttachment();
+        depthAttachment.SetTexture(swapchain->_depth);
+        depthAttachment.SetClearDepth(_clearDepth);
+        depthAttachment.SetLevel(0);
+        depthAttachment.SetSlice(0);
+        depthAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
+        depthAttachment.SetStoreAction(mtlpp::StoreAction::DontCare);
+    }
+
+    _renderCommandEncoder = _commandBuffer.RenderCommandEncoder(renderPassDesc);
+    EL_ASSERT(_renderCommandEncoder);
+#endif
+}
+
+void MetalContext::endPass()
+{
+    _currentCommandEncoder.EndEncoding();
+}
+
+void MetalContext::setDepthWriteEnable(bool enable)
 {
     _depthStencilDesc.setDepthWriteEnable(enable);
 }
 
-void el::MetalContext::setDepthCompareOp(GraphicsCompareOp compare)
+void MetalContext::setDepthCompareOp(GraphicsCompareOp compare)
 {
     _depthStencilDesc.setDepthCompareOp(compare);
 }
 
-void el::MetalContext::setDepthTestEnable(bool enable)
+void MetalContext::setDepthTestEnable(bool enable)
 {
     _depthStencilDesc.setDepthTestEnable(enable);
 }
 
-void el::MetalContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset)
+void MetalContext::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, int32_t vertexStartOffset)
 {
-    EL_ASSERT(_currentCommandBuffer);  // per-frame
-    EL_ASSERT(_currentCommandEncoder); // per-pass
+    EL_ASSERT(_currentCommandBuffer);
+    EL_ASSERT(_currentCommandEncoder);
 
     auto depthStencilState = _depthStencilCache.request(_depthStencilDesc);
     _currentCommandEncoder.SetDepthStencilState(depthStencilState);
 
     _currentCommandEncoder.Draw(mtlpp::PrimitiveType::Triangle, vertexStartOffset, vertexCount);
 }
+
+_EL_NAME_END
 
 #endif // EL_BUILD_METAL

@@ -30,6 +30,7 @@ namespace el {
             uint32_t getWriteMask() const;
 
             friend bool operator==(const GraphicsStencilOpState&, const GraphicsStencilOpState&);
+            friend bool operator<(const GraphicsStencilOpState&, const GraphicsStencilOpState&);
 
         private:
 
@@ -51,6 +52,12 @@ namespace el {
             && (a._compareOp == b._compareOp)
             && (a._compareMask == b._compareMask)
             && (a._writeMask == b._writeMask);
+    }
+
+    inline bool operator<(const GraphicsStencilOpState &a, const GraphicsStencilOpState &b)
+    {
+        return std::tie(a._failOp, a._passOp, a._depthFailOp, a._compareOp, a._compareMask, a._writeMask)
+             < std::tie(b._failOp, b._passOp, b._depthFailOp, b._compareOp, b._compareMask, b._writeMask);
     }
 
     // From vulkan sepc.
@@ -79,6 +86,7 @@ namespace el {
             const GraphicsStencilOpState& getBackFaceStencil() const;
 
             friend bool operator==(const GraphicsDepthStencilDesc&, const GraphicsDepthStencilDesc&);
+            friend bool operator<(const GraphicsDepthStencilDesc&, const GraphicsDepthStencilDesc&);
 
         private:
 
@@ -90,7 +98,8 @@ namespace el {
             GraphicsStencilOpState _backFaceStencil;
     };
 
-    inline bool operator==(const GraphicsDepthStencilDesc& a, const GraphicsDepthStencilDesc& b) {
+    inline bool operator==(const GraphicsDepthStencilDesc& a, const GraphicsDepthStencilDesc& b)
+    {
         return (a._enableDepthTest == b._enableDepthTest)
             && (a._enableDepthWrite == b._enableDepthWrite)
             && (a._depthCompareOp == b._depthCompareOp)
@@ -99,8 +108,15 @@ namespace el {
             && (a._backFaceStencil == b._backFaceStencil);
     }
 
-    inline bool operator!=(const GraphicsDepthStencilDesc& a, const GraphicsDepthStencilDesc& b) {
+    inline bool operator!=(const GraphicsDepthStencilDesc& a, const GraphicsDepthStencilDesc& b)
+    {
         return !(a == b);
+    }
+
+    inline bool operator<(const GraphicsDepthStencilDesc &a, const GraphicsDepthStencilDesc &b)
+    {
+        return std::tie(a._enableDepthTest, a._enableDepthWrite, a._depthCompareOp, a._enableStencilTest, a._frontFaceStencil, a._backFaceStencil)
+             < std::tie(b._enableDepthTest, b._enableDepthWrite, b._depthCompareOp, b._enableStencilTest, b._frontFaceStencil, a._backFaceStencil);
     }
 
     class GraphicsDepthStencil

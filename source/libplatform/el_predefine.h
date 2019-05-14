@@ -29,4 +29,11 @@
 #define EL_BUILD_METAL 0
 #endif
 
+//#if defined(__cplusplus)
+    #define _EL_NAME_BEGIN namespace el {
+    #define _EL_NAME_END }
+    #define _EL_NAME ::el::
+//#else
+//#endif
+
 #endif // __EL_PREDEFINE_H__

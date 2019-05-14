@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstdint>
 #include <string>
+#include <el_predefine.h>
 #include <el_types.h>
 
 namespace el {

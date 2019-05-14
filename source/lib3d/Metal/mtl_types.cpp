@@ -1,10 +1,18 @@
-#include <Metal/mtl_types.h>
-#include <el_debug.h>
+#include "mtl_types.h"
 
-using namespace el;
+#include <el_debug.h>
+#include <graphics_types.h>
+
+_EL_NAME_BEGIN
+
 using namespace mtlpp;
 
-mtlpp::PixelFormat el::asPixelFormat(GraphicsPixelFormat format)
+mtlpp::ClearColor asColor(const math::float4 &color)
+{
+    return mtlpp::ClearColor(color.r, color.g, color.b, color.a);
+}
+
+mtlpp::PixelFormat asPixelFormat(GraphicsPixelFormat format)
 {
     switch (format)
     {
@@ -260,7 +268,7 @@ mtlpp::PixelFormat el::asPixelFormat(GraphicsPixelFormat format)
     }
 }
 
-mtlpp::TextureUsage el::asTextureUsage(GraphicsTextureUsageFlags flags)
+mtlpp::TextureUsage asTextureUsage(GraphicsTextureUsageFlags flags)
 {
     uint32_t usage = 0;
 
@@ -276,7 +284,7 @@ mtlpp::TextureUsage el::asTextureUsage(GraphicsTextureUsageFlags flags)
     return mtlpp::TextureUsage(usage);
 }
 
-mtlpp::ResourceOptions el::asTextureResourceOptions(GraphicsTextureUsageFlags flags)
+mtlpp::ResourceOptions asTextureResourceOptions(GraphicsTextureUsageFlags flags)
 {
 	if (flags & GraphicsTextureUsageUploadableBit)
 	{
@@ -289,7 +297,7 @@ mtlpp::ResourceOptions el::asTextureResourceOptions(GraphicsTextureUsageFlags fl
     return mtlpp::ResourceOptions::StorageModePrivate;
 }
 
-mtlpp::SamplerMinMagFilter el::asSamplerMinMagFilter(GraphicsFilter filter)
+mtlpp::SamplerMinMagFilter asSamplerMinMagFilter(GraphicsFilter filter)
 {
     switch (filter)
     {
@@ -303,7 +311,7 @@ mtlpp::SamplerMinMagFilter el::asSamplerMinMagFilter(GraphicsFilter filter)
     }
 }
 
-mtlpp::SamplerMipFilter el::asSamplerMipFilter(GraphicsSamplerMipmapMode mode)
+mtlpp::SamplerMipFilter asSamplerMipFilter(GraphicsSamplerMipmapMode mode)
 {
     switch (mode)
     {
@@ -319,7 +327,7 @@ mtlpp::SamplerMipFilter el::asSamplerMipFilter(GraphicsSamplerMipmapMode mode)
     }
 }
 
-mtlpp::SamplerAddressMode el::asSamplerAddressMode(GraphicsSamplerAddressMode mode)
+mtlpp::SamplerAddressMode asSamplerAddressMode(GraphicsSamplerAddressMode mode)
 {
     switch (mode)
     {
@@ -339,7 +347,7 @@ mtlpp::SamplerAddressMode el::asSamplerAddressMode(GraphicsSamplerAddressMode mo
     }
 }
 
-mtlpp::SamplerBorderColor el::asSamplerBorderColor(GraphicsBorderColor color)
+mtlpp::SamplerBorderColor asSamplerBorderColor(GraphicsBorderColor color)
 {
     switch (color)
     {
@@ -359,7 +367,7 @@ mtlpp::SamplerBorderColor el::asSamplerBorderColor(GraphicsBorderColor color)
     }
 }
 
-mtlpp::CompareFunction el::asCompareFunction(GraphicsCompareOp func)
+mtlpp::CompareFunction asCompareFunction(GraphicsCompareOp func)
 {
     switch (func)
     {
@@ -386,7 +394,7 @@ mtlpp::CompareFunction el::asCompareFunction(GraphicsCompareOp func)
 }
 
 
-mtlpp::StencilOperation el::asStencilOperation(GraphicsStencilOp func)
+mtlpp::StencilOperation asStencilOperation(GraphicsStencilOp func)
 {
     switch (func)
     {
@@ -412,7 +420,7 @@ mtlpp::StencilOperation el::asStencilOperation(GraphicsStencilOp func)
     }
 }
 
-mtlpp::VertexFormat el::asVertexFormat(GraphicsVertexFormat format)
+mtlpp::VertexFormat asVertexFormat(GraphicsVertexFormat format)
 {
     switch (format)
     {
@@ -512,7 +520,7 @@ mtlpp::VertexFormat el::asVertexFormat(GraphicsVertexFormat format)
     }
 }
 
-mtlpp::VertexStepFunction el::asVertexStepFunction(GraphicsInputRate func)
+mtlpp::VertexStepFunction asVertexStepFunction(GraphicsInputRate func)
 {
     switch (func)
     {
@@ -521,7 +529,9 @@ mtlpp::VertexStepFunction el::asVertexStepFunction(GraphicsInputRate func)
     case GraphicsInputRateInstance:
         return VertexStepFunction::PerInstance;
     default:
-        EL_ASSERT("false");
+        EL_ASSERT(false);
         return VertexStepFunction(0);
     }
 }
+
+_EL_NAME_END

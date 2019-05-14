@@ -12,9 +12,10 @@
 #include <math_types.h>
 
 #include "mtl_types.h"
+#include "mtl_device.h"
+#include "mtl_depth_stencil.h"
 
 namespace el {
-
 
     struct DepthStencilCache final
     {
@@ -29,7 +30,7 @@ namespace el {
     };
 
     inline 
-    void mtlpp::setDevice(const MTLDevicePtr& device)
+    void DepthStencilCache::setDevice(const MTLDevicePtr& device)
     {
         _device = device;
     }
@@ -39,9 +40,9 @@ namespace el {
     {
         auto it = _cache.find(desc);
         if (it != _cache.end())
-            return *it;
+            return it->second;
 
-        depthStencil = _device->createDepthStencil(desc);
+        auto depthStencil = _device->createDepthStencil(desc);
         EL_ASSERT(depthStencil);
 
         auto metalDepthStencil = std::static_pointer_cast<MTLDepthStencil>(depthStencil);
