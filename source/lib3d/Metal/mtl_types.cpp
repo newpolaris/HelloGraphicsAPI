@@ -534,4 +534,142 @@ mtlpp::VertexStepFunction asVertexStepFunction(GraphicsInputRate func)
     }
 }
 
+el::GraphicsPixelFormat asGraphicsPixelFormat(mtlpp::PixelFormat format)
+{
+    switch (format)
+    {
+        case mtlpp::PixelFormat::Invalid:
+        case mtlpp::PixelFormat::A8Unorm:
+        case mtlpp::PixelFormat::R8Unorm:
+        case mtlpp::PixelFormat::R8Unorm_sRGB:
+        case mtlpp::PixelFormat::R8Snorm:
+        case mtlpp::PixelFormat::R8Uint:
+        case mtlpp::PixelFormat::R8Sint:
+        case mtlpp::PixelFormat::R16Unorm:
+        case mtlpp::PixelFormat::R16Snorm:
+        case mtlpp::PixelFormat::R16Uint:
+        case mtlpp::PixelFormat::R16Sint:
+        case mtlpp::PixelFormat::R16Float:
+        case mtlpp::PixelFormat::RG8Unorm:
+        case mtlpp::PixelFormat::RG8Unorm_sRGB:
+        case mtlpp::PixelFormat::RG8Snorm:
+        case mtlpp::PixelFormat::RG8Uint:
+        case mtlpp::PixelFormat::RG8Sint:
+        case mtlpp::PixelFormat::B5G6R5Unorm:
+        case mtlpp::PixelFormat::A1BGR5Unorm:
+        case mtlpp::PixelFormat::ABGR4Unorm:
+        case mtlpp::PixelFormat::BGR5A1Unorm:
+        case mtlpp::PixelFormat::R32Uint:
+        case mtlpp::PixelFormat::R32Sint:
+        case mtlpp::PixelFormat::R32Float:
+        case mtlpp::PixelFormat::RG16Unorm:
+        case mtlpp::PixelFormat::RG16Snorm:
+        case mtlpp::PixelFormat::RG16Uint:
+        case mtlpp::PixelFormat::RG16Sint:
+        case mtlpp::PixelFormat::RG16Float:
+        case mtlpp::PixelFormat::RGBA8Unorm:
+        case mtlpp::PixelFormat::RGBA8Unorm_sRGB:
+        case mtlpp::PixelFormat::RGBA8Snorm:
+        case mtlpp::PixelFormat::RGBA8Uint:
+        case mtlpp::PixelFormat::RGBA8Sint:
+            break;
+        case mtlpp::PixelFormat::BGRA8Unorm:
+            return el::GraphicsPixelFormatBGRA8Unorm;
+        case mtlpp::PixelFormat::BGRA8Unorm_sRGB:
+        case mtlpp::PixelFormat::RGB10A2Unorm:
+        case mtlpp::PixelFormat::RGB10A2Uint:
+        case mtlpp::PixelFormat::RG11B10Float:
+        case mtlpp::PixelFormat::RGB9E5Float:
+        case mtlpp::PixelFormat::BGR10_XR:
+        case mtlpp::PixelFormat::BGR10_XR_sRGB:
+        case mtlpp::PixelFormat::RG32Uint:
+        case mtlpp::PixelFormat::RG32Sint:
+        case mtlpp::PixelFormat::RG32Float:
+        case mtlpp::PixelFormat::RGBA16Unorm:
+        case mtlpp::PixelFormat::RGBA16Snorm:
+        case mtlpp::PixelFormat::RGBA16Uint:
+        case mtlpp::PixelFormat::RGBA16Sint:
+        case mtlpp::PixelFormat::RGBA16Float:
+        case mtlpp::PixelFormat::BGRA10_XR:
+        case mtlpp::PixelFormat::BGRA10_XR_sRGB:
+        case mtlpp::PixelFormat::RGBA32Uint:
+        case mtlpp::PixelFormat::RGBA32Sint:
+        case mtlpp::PixelFormat::RGBA32Float:
+        case mtlpp::PixelFormat::BC1_RGBA:
+        case mtlpp::PixelFormat::BC1_RGBA_sRGB:
+        case mtlpp::PixelFormat::BC2_RGBA:
+        case mtlpp::PixelFormat::BC2_RGBA_sRGB:
+        case mtlpp::PixelFormat::BC3_RGBA:
+        case mtlpp::PixelFormat::BC3_RGBA_sRGB:
+        case mtlpp::PixelFormat::BC4_RUnorm:
+        case mtlpp::PixelFormat::BC4_RSnorm:
+        case mtlpp::PixelFormat::BC5_RGUnorm:
+        case mtlpp::PixelFormat::BC5_RGSnorm:
+        case mtlpp::PixelFormat::BC6H_RGBFloat:
+        case mtlpp::PixelFormat::BC6H_RGBUfloat:
+        case mtlpp::PixelFormat::BC7_RGBAUnorm:
+        case mtlpp::PixelFormat::BC7_RGBAUnorm_sRGB:
+        case mtlpp::PixelFormat::PVRTC_RGB_2BPP:
+        case mtlpp::PixelFormat::PVRTC_RGB_2BPP_sRGB:
+        case mtlpp::PixelFormat::PVRTC_RGB_4BPP:
+        case mtlpp::PixelFormat::PVRTC_RGB_4BPP_sRGB:
+        case mtlpp::PixelFormat::PVRTC_RGBA_2BPP:
+        case mtlpp::PixelFormat::PVRTC_RGBA_2BPP_sRGB:
+        case mtlpp::PixelFormat::PVRTC_RGBA_4BPP:
+        case mtlpp::PixelFormat::PVRTC_RGBA_4BPP_sRGB:
+        case mtlpp::PixelFormat::EAC_R11Unorm:
+        case mtlpp::PixelFormat::EAC_R11Snorm:
+        case mtlpp::PixelFormat::EAC_RG11Unorm:
+        case mtlpp::PixelFormat::EAC_RG11Snorm:
+        case mtlpp::PixelFormat::EAC_RGBA8:
+        case mtlpp::PixelFormat::EAC_RGBA8_sRGB:
+        case mtlpp::PixelFormat::ETC2_RGB8:
+        case mtlpp::PixelFormat::ETC2_RGB8_sRGB:
+        case mtlpp::PixelFormat::ETC2_RGB8A1:
+        case mtlpp::PixelFormat::ETC2_RGB8A1_sRGB:
+        case mtlpp::PixelFormat::ASTC_4x4_sRGB:
+        case mtlpp::PixelFormat::ASTC_5x4_sRGB:
+        case mtlpp::PixelFormat::ASTC_5x5_sRGB:
+        case mtlpp::PixelFormat::ASTC_6x5_sRGB:
+        case mtlpp::PixelFormat::ASTC_6x6_sRGB:
+        case mtlpp::PixelFormat::ASTC_8x5_sRGB:
+        case mtlpp::PixelFormat::ASTC_8x6_sRGB:
+        case mtlpp::PixelFormat::ASTC_8x8_sRGB:
+        case mtlpp::PixelFormat::ASTC_10x5_sRGB:
+        case mtlpp::PixelFormat::ASTC_10x6_sRGB:
+        case mtlpp::PixelFormat::ASTC_10x8_sRGB:
+        case mtlpp::PixelFormat::ASTC_10x10_sRGB:
+        case mtlpp::PixelFormat::ASTC_12x10_sRGB:
+        case mtlpp::PixelFormat::ASTC_12x12_sRGB:
+        case mtlpp::PixelFormat::ASTC_4x4_LDR:
+        case mtlpp::PixelFormat::ASTC_5x4_LDR:
+        case mtlpp::PixelFormat::ASTC_5x5_LDR:
+        case mtlpp::PixelFormat::ASTC_6x5_LDR:
+        case mtlpp::PixelFormat::ASTC_6x6_LDR:
+        case mtlpp::PixelFormat::ASTC_8x5_LDR:
+        case mtlpp::PixelFormat::ASTC_8x6_LDR:
+        case mtlpp::PixelFormat::ASTC_8x8_LDR:
+        case mtlpp::PixelFormat::ASTC_10x5_LDR:
+        case mtlpp::PixelFormat::ASTC_10x6_LDR:
+        case mtlpp::PixelFormat::ASTC_10x8_LDR:
+        case mtlpp::PixelFormat::ASTC_10x10_LDR:
+        case mtlpp::PixelFormat::ASTC_12x10_LDR:
+        case mtlpp::PixelFormat::ASTC_12x12_LDR:
+        case mtlpp::PixelFormat::GBGR422:
+        case mtlpp::PixelFormat::BGRG422:
+        case mtlpp::PixelFormat::Depth16Unorm:
+        case mtlpp::PixelFormat::Depth32Float:
+        case mtlpp::PixelFormat::Stencil8:
+        case mtlpp::PixelFormat::Depth24Unorm_Stencil8:
+        case mtlpp::PixelFormat::Depth32Float_Stencil8:
+        case mtlpp::PixelFormat::X32_Stencil8:
+        case mtlpp::PixelFormat::X24_Stencil8:
+        default:
+            EL_ASSERT(false);
+            return GraphicsPixelFormatInvalid;
+    }
+    EL_ASSERT(false);
+    return GraphicsPixelFormatInvalid;
+}
+
 _EL_NAME_END

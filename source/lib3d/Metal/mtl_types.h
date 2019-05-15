@@ -28,6 +28,8 @@ namespace el {
     mtlpp::StencilOperation asStencilOperation(GraphicsStencilOp func);
     mtlpp::VertexFormat asVertexFormat(GraphicsVertexFormat format);
     mtlpp::VertexStepFunction asVertexStepFunction(GraphicsInputRate func);
+
+    el::GraphicsPixelFormat asGraphicsPixelFormat(mtlpp::PixelFormat format);
 };
 
 #endif // __MTL_TYPES_H__

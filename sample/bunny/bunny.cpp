@@ -107,7 +107,7 @@ int bunny_run()
     GraphicsDataPtr index_buffer;
     GraphicsInputLayoutPtr input_layout;
 
-    std::string objfiles[] = {
+    const std::string objfiles[] = {
 		"kitten.obj",
 		"rabbit.obj",
 		"wolf.obj",
@@ -249,8 +249,6 @@ int bunny_run()
             const float aspect = static_cast<float>(width) / height;
             mat4x4_perspective(project, radians(70.f), aspect, fNear, fFar);
             context[i]->setUniform("uProject", project);
-
-            // TODO: setPipeline etc;
             context[i]->setViewport(Viewport(0, 0, width, height));
             context[i]->setIndexBuffer(index_buffer);
             for (auto& draw : draws)
