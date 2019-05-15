@@ -3,11 +3,7 @@
         {
             "name": "Mac",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/source/libplatform/**",
-                "${workspaceFolder}/source/lib3d/**",
-                "${workspaceFolder}/external/sdl2/include",
-                "${workspaceFolder}/external/mtlpp"
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "EL_BUILD_METAL=1"
@@ -18,8 +14,7 @@
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
             "cppStandard": "c++11",
-            "intelliSenseMode": "clang-x64",
-            "configurationProvider": "go2sh.cmake-integration"
+            "intelliSenseMode": "clang-x64"
         }
     ],
     "version": 4

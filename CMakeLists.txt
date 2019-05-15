@@ -25,5 +25,7 @@ option(BUILD_OPENGL "Legacy OpenGL" ON)
     option(BUILD_METAL "Apple Metal" ON)
 # endif()
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/lib3d")
+
 add_subdirectory(source)
 add_subdirectory(sample)

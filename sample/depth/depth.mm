@@ -257,7 +257,7 @@ bool execute(NSView* view)
                 depthAttachment.SetLoadAction(mtlpp::LoadAction::Clear);
                 depthAttachment.SetStoreAction(mtlpp::StoreAction::DontCare);
             }
-            renderPassDesc.setRenderTargetArrayLength(1);
+            renderPassDesc.SetRenderTargetArrayLength(1);
 
             context->setDepthTestEnable(true);
             context->setDepthWriteEnable(true);
