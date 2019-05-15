@@ -7,11 +7,10 @@ message(STATUS "Generating project file for example in ${SAMPLE_FOLDER}")
 project(${SAMPLE_NAME})
 file(GLOB HEADER_LIST ${SAMPLE_FOLDER}/*.h ${SAMPLE_FOLDER}/*.hpp)
 file(GLOB SOURCE_LIST ${SAMPLE_FOLDER}/*.cpp ${SAMPLE_FOLDER}/*.mm ${SAMPLE_FOLDER}/*.m)
-source_group(${SAMPLE_NAME} FILES ${HEADER_LIST})
-source_group(${SAMPLE_NAME} FILES ${SOURCE_LIST})
+source_group(${SAMPLE_NAME} FILES ${HEADER_LIST} ${SOURCE_LIST})
 
 set(SHADER_DIR ${SAMPLE_FOLDER})
-file(GLOB SHADER_HEADERS "${SHADER_DIR}/*.h")
+# file(GLOB SHADER_HEADERS "${SHADER_DIR}/*.h")
 file(GLOB SHADERS "${SHADER_DIR}/*.vert" "${SHADER_DIR}/*.frag" "${SHADER_DIR}/*.comp" "${SHADER_DIR}/*.geom" "${SHADER_DIR}/*.tesc" "${SHADER_DIR}/*.tese" "${SHADER_DIR}/*.mesh")
 source_group("shaders" FILES ${SHADERS} ${SHADER_HEADERS})
 

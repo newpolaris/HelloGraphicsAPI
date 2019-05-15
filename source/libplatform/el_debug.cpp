@@ -37,16 +37,17 @@ void el::trace(const char* format, ...)
     }
 }
 
+// TODO: Support multi-IDE
 void el::debug_output(const char* message)
 {
 #if EL_PLAT_WINDOWS
-    OutputDebugStringA(message);
+    OutputDebugStringA(message); // visual studio
 #elif EL_PLAT_APPLE
-#    if defined(__OBJC__)
-    NSLog(@"%s", message);
-#    else
-    NSLog(CFSTR("%s"), message);
-#    endif // defined(__OBJC__)
+#   if defined(__OBJC__)
+    NSLog(@"%s", message); // Xcode
+#   else
+    NSLog(CFSTR("%s"), message); // Xcode
+#   endif // defined(__OBJC__)
 #else
     fputs(message, stdout);
     fflush(stdout);

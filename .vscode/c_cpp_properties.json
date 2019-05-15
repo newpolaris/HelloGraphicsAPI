@@ -11,12 +11,10 @@
             "defines": [
                 "EL_BUILD_METAL=1"
             ],
-            "macFrameworkPath": [
-                "/Applications/Xcode_10.1.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.14.sdk/System/Library/Frameworks"
-            ],
-            "compilerPath": "/usr/bin/clang",
+            "macFrameworkPath": [],
+            "compilerPath": "/usr/local/bin/gcc-8",
             "cStandard": "c11",
-            "cppStandard": "c++11",
+            "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
         }
     ],

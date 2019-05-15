@@ -2,6 +2,7 @@
 #define __METAL_DRIVER_H__
 
 #include <graphics_types.h>
+#include <mtlpp.hpp>
 
 namespace el {
 
@@ -20,12 +21,20 @@ namespace el {
 
         MetalDriver();
 
+        mtlpp::Device& getDevice();
+        mtlpp::CommandBuffer& getCurrentCommandBuffer();
+
         void makeCurrent(SwapchainHandle handle);
+        void beginFrame();
         void beginRenderPass();
         void endRenderPass();
-        void commit();
+        void endFrame();
+        void present();
+        void commit(bool isWaitComplete = false);
 
-        std::unique_ptr<class MetalContext> _context;
+    private:
+        
+        std::unique_ptr<struct MetalContext> _context;
     };
 
 } // namespace el {

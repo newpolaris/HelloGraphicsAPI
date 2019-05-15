@@ -2,11 +2,11 @@
 
 #include <el_debug.h>
 #include "metal_context.h"
-
-#undef EL_BUILD_METAL
-#define EL_BUILD_METAL 1
+#include "metal_driver.h"
 
 #include <Metal/mtl_types.h>
+
+_EL_NAME_BEGIN
 
 Renderer::Renderer()
 {
@@ -18,15 +18,10 @@ mtlpp::Device& Renderer::getDevice()
     return _device;;
 }
 
-mtlpp::CommandQueue& Renderer::getCommandQueue()
-{
-    return _commandQueue;
-}
-
 void Renderer::setup()
 {
-    _device = mtlpp::Device::CreateSystemDefaultDevice();
-    _commandQueue = _device.NewCommandQueue();
+    _driver = std::make_shared<MetalDriver>();
+    _device = _driver->getDevice();
     
     setupBlitRenderer();
     setupMeshRenderer();
@@ -52,15 +47,12 @@ typedef struct
 
 vertex RasterizerData main0(unsigned int vID[[vertex_id]])
 {
-    const vertex_t vertexArray[3] = {
-        { {-1.0,  3.0, 0.0}, {0.0, 2.0} },
-        { { 3.0, -1.0, 0.0}, {2.0, 0.0} },
-        { {-1.0, -1.0, 0.0}, {0.0, 0.0} }
-    };
-    
+    float x = -1.0 + float((vID & 2) << 1);
+    float y = -1.0 + float((vID & 1) << 2);
+
     RasterizerData data;
-    data.clipSpacePosition = float4(vertexArray[vID].position, 1.0);
-    data.textureCoordinate = vertexArray[vID].texcoord;
+    data.clipSpacePosition = float4(x, y, 0.0, 1.0);
+    data.textureCoordinate = float2(x, y) * 0.5 + 0.5;
     return data;
 }
     )""";
@@ -117,39 +109,30 @@ void Renderer::makeCurrent(SwapchainHandle handle)
 
 void Renderer::draw()
 {
+    _driver->beginFrame();
+
     ns::Error error;
 
-    auto surfaceFormat = el::getSwapchainPixelFormat(_handle);
-    if (_surfaceFormat != surfaceFormat)
-    {
-        mtlpp::RenderPipelineDescriptor blitPipelineDesc;
-        blitPipelineDesc.SetLabel("blitPipeline");
-        blitPipelineDesc.SetVertexFunction(_blitVertexFunction);
-        blitPipelineDesc.SetFragmentFunction(_blitFragmentFunction);
-        {
-            auto colorAttachment = blitPipelineDesc.GetColorAttachments()[0];
-            colorAttachment.SetPixelFormat(el::asPixelFormat(surfaceFormat));
-        }
-        _blitPipelineState = _device.NewRenderPipelineState(blitPipelineDesc, &error);
-        _surfaceFormat = surfaceFormat;
-    }
-    
     auto drawable = el::aquireCurrentDrawable(_handle);
-    mtlpp::Texture swapchainImage = el::getSwapchainTexture(drawable);
+    auto swapchainImage = el::getDrawableTexture(drawable);
     
     if (!_color ||
         swapchainImage.GetWidth() != _color.GetWidth() ||
         swapchainImage.GetHeight() != _color.GetHeight())
     {
         mtlpp::TextureUsage textureUsage = (mtlpp::TextureUsage)(mtlpp::TextureUsage::ShaderRead | mtlpp::TextureUsage::RenderTarget);
-        auto colorTextureDesc = mtlpp::TextureDescriptor::Texture2DDescriptor(el::asPixelFormat(_colorFormat), 0, 0, false);
+        auto colorTextureDesc = mtlpp::TextureDescriptor();
+        colorTextureDesc.SetPixelFormat(el::asPixelFormat(_colorFormat));
+        colorTextureDesc.SetMipmapLevelCount(1);
         colorTextureDesc.SetUsage(textureUsage);
         colorTextureDesc.SetStorageMode(mtlpp::StorageMode::Private);
         colorTextureDesc.SetWidth(swapchainImage.GetWidth());
         colorTextureDesc.SetHeight(swapchainImage.GetHeight());
         _color = _device.NewTexture(colorTextureDesc);
         
-        auto depthTextureDesc = mtlpp::TextureDescriptor::Texture2DDescriptor(el::asPixelFormat(_depthFormat), 0, 0, false);
+        auto depthTextureDesc = mtlpp::TextureDescriptor();
+        depthTextureDesc.SetPixelFormat(el::asPixelFormat(_depthFormat));
+        depthTextureDesc.SetMipmapLevelCount(1);
         depthTextureDesc.SetUsage(mtlpp::TextureUsage::RenderTarget);
         depthTextureDesc.SetStorageMode(mtlpp::StorageMode::Private);
         depthTextureDesc.SetWidth(swapchainImage.GetWidth());
@@ -157,7 +140,10 @@ void Renderer::draw()
         _depth = _device.NewTexture(depthTextureDesc);
     }
     
-    auto commandBuffer = _commandQueue.CommandBuffer();
+    auto commandBuffer = _driver->getCurrentCommandBuffer();
+    
+    _driver->beginRenderPass();
+
     mtlpp::RenderPassDescriptor renderPassDesc;
     {
         auto colorAttachment = renderPassDesc.GetColorAttachments()[0];
@@ -182,7 +168,10 @@ void Renderer::draw()
     // renderEncoder.SetRenderPipelineState(renderPipelineState);
     // renderEncoder.DrawIndexed((mtlpp::PrimitiveType::Triangle, uint32_t indexCount, IndexType indexType, const Buffer &indexBuffer, uint32_t indexBufferOffset);
     renderEncoder.EndEncoding();
-    
+
+    _driver->endRenderPass();
+    _driver->beginRenderPass();
+
     mtlpp::RenderPassDescriptor blitPassDesc;
     {
         auto colorAttachment = blitPassDesc.GetColorAttachments()[0];
@@ -193,14 +182,34 @@ void Renderer::draw()
         colorAttachment.SetSlice(0);
         blitPassDesc.SetRenderTargetArrayLength(1);
     }
+
+    auto surfaceFormat = el::getSwapchainPixelFormat(_handle);
+    if (_surfaceFormat != surfaceFormat)
+    {
+        mtlpp::RenderPipelineDescriptor blitPipelineDesc;
+        blitPipelineDesc.SetLabel("blitPipeline");
+        blitPipelineDesc.SetVertexFunction(_blitVertexFunction);
+        blitPipelineDesc.SetFragmentFunction(_blitFragmentFunction);
+        {
+            auto colorAttachment = blitPipelineDesc.GetColorAttachments()[0];
+            colorAttachment.SetPixelFormat(el::asPixelFormat(surfaceFormat));
+        }
+        _blitPipelineState = _device.NewRenderPipelineState(blitPipelineDesc, &error);
+        _surfaceFormat = surfaceFormat;
+    }
+
     auto blitEncoder = commandBuffer.RenderCommandEncoder(blitPassDesc);
     blitEncoder.SetLabel("blitEncoder");
     blitEncoder.SetRenderPipelineState(_blitPipelineState);
     blitEncoder.SetFragmentTexture(_color, 0);
     blitEncoder.Draw(mtlpp::PrimitiveType::Triangle, 0, 3);
     blitEncoder.EndEncoding();
-    
+    _driver->endRenderPass();
+
     commandBuffer.Present(drawable);
-    commandBuffer.Commit();
-    commandBuffer.WaitUntilCompleted();
+    // _driver->present();
+    _driver->commit();
+    _driver->endFrame();
 }
+
+_EL_NAME_END

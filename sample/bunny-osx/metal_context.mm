@@ -24,7 +24,7 @@ mtlpp::Drawable aquireCurrentDrawable(SwapchainHandle handle)
     return mtlpp::Drawable(ns::Handle{(__bridge void*)drawable});
 }
 
-mtlpp::Texture getSwapchainTexture(const mtlpp::Drawable& drawable)
+mtlpp::Texture getDrawableTexture(const mtlpp::Drawable& drawable)
 {
     auto nativeDrawable = (__bridge id<CAMetalDrawable>)drawable.GetPtr();
     EL_ASSERT(nativeDrawable);

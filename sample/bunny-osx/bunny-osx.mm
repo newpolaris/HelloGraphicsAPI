@@ -34,7 +34,7 @@ int main()
     
     NSView* view = [info.info.cocoa.window contentView];
     
-    Renderer renderer;
+    el::Renderer renderer;
     renderer.setup();
     
     CAMetalLayer* layer = [CAMetalLayer layer];
