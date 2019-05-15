@@ -1571,6 +1571,7 @@ namespace mtlpp
 
         double   GetPresentedTime() const MTLPP_AVAILABLE_IOS(10_3);
         uint64_t GetDrawableID() const MTLPP_AVAILABLE_IOS(10_3);
+        Texture  GetTexuture() const;
 
         void Present();
         void PresentAtTime(double presentationTime);

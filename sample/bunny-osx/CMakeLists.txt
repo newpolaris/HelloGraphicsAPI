@@ -6,7 +6,7 @@ message(STATUS "Generating project file for example in ${SAMPLE_FOLDER}")
 
 project(${SAMPLE_NAME})
 file(GLOB HEADER_LIST ${SAMPLE_FOLDER}/*.h ${SAMPLE_FOLDER}/*.hpp)
-file(GLOB SOURCE_LIST ${SAMPLE_FOLDER}/*.cpp ${SAMPLE_FOLDER}/*.mm)
+file(GLOB SOURCE_LIST ${SAMPLE_FOLDER}/*.cpp ${SAMPLE_FOLDER}/*.mm ${SAMPLE_FOLDER}/*.m)
 source_group(${SAMPLE_NAME} FILES ${HEADER_LIST})
 source_group(${SAMPLE_NAME} FILES ${SOURCE_LIST})
 
