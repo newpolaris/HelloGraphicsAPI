@@ -6,7 +6,8 @@
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/external/mtlpp/",
                 "${workspaceFolder}/sample/**",
-                "${workspaceFolder}/source/lib3d"
+                "${workspaceFolder}/source/lib3d",
+                "${workspaceFolder}/source/libplatform"
             ],
             "defines": [
                 "EL_BUILD_METAL=1"

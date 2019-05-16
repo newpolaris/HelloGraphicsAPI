@@ -1,4 +1,4 @@
-#include <Metal/mtlpp.hpp>
+#include <mtlpp.hpp>
 #include "window.hpp"
 
 mtlpp::Device              g_device;

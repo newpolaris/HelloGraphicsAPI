@@ -138,7 +138,7 @@ void Renderer::draw()
     
     auto commandBuffer = _driver->getCurrentCommandBuffer();
     
-    MetalRenderTarget geometryTarget(_color, _depth);
+    MetalRenderTarget geometryTarget(nullptr, _color, _depth);
     PassDescriptor renderPassDesc(math::float4(0.2f, 0.5f, 0.7f, 1.0f), 1.0);
     
     _driver->beginRenderPass(geometryTarget, renderPassDesc, "geometryPass");
@@ -163,7 +163,7 @@ void Renderer::draw()
     _driver->draw(GraphicsPrimitiveTypeTriangle, 3);
     _driver->endRenderPass();
     _driver->present();
-    _driver->commit();
+    _driver->commit(true);
     _driver->endFrame();
 }
 

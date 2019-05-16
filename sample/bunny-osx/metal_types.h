@@ -11,7 +11,7 @@ namespace el
     typedef void *NativeSurface;
     typedef void *NativeContext;
     
-    typedef std::unique_ptr<class MetalSurface> MetalSurfacePtr;
+    typedef std::shared_ptr<struct MetalSurface> MetalSurfacePtr;
     
     struct MetalContext;
     
@@ -26,25 +26,24 @@ namespace el
     {
     public:
         
-        MetalRenderTarget(MetalContext* context);
-        MetalRenderTarget(mtlpp::Texture color);
-        MetalRenderTarget(mtlpp::Texture color, mtlpp::Texture depth);
+        explicit MetalRenderTarget(MetalContext* context);
+        MetalRenderTarget(MetalContext* context, mtlpp::Texture color, mtlpp::Texture depth);
         
+        bool isDefaultRenderTarget() const;
         mtlpp::Texture getColor() const;
         mtlpp::Texture getDepth() const;
         uint32_t getLevel() const;
         
+        MetalContext* _context;
         bool _isDefaultRenderTarget;
         mtlpp::Texture _color;
         mtlpp::Texture _depth;
         uint32_t _level;
     };
     
-    class MetalSurface
+    struct MetalSurface
     {
-    public:
-        
-        MetalSurface(NativeSurface surface);
+        MetalSurface(MetalContext* context, NativeSurface layer);
         
         NativeSurface layer;
     };

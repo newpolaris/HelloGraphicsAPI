@@ -25,12 +25,25 @@ mtlpp::Texture aquireSurfaceTexture(MetalContext* context)
 
     if (!context->currentSurfaceTexture)
     {
-        auto layer = reinterpret_cast<CAMetalLayer*>(context->surface->layer);
+        auto layer = reinterpret_cast<CAMetalLayer*>(context->currentSurface->layer);
         auto drawable = [layer nextDrawable];
-        context->currentDrawable = mtlpp::Drawable(ns::Handle{(__bridge void*)drawable})
+        context->currentDrawable = mtlpp::Drawable(ns::Handle{(__bridge void*)drawable});
         context->currentSurfaceTexture = mtlpp::Texture(ns::Handle{(__bridge void*)drawable.texture});
     }
+    if (!context->currentSurfaceTexture)
+    {
+        context = nullptr;
+    }
     return context->currentSurfaceTexture;
+}
+
+void setLayerDevice(MetalContext* context, NativeSurface surface)
+{
+    EL_ASSERT(context);
+    EL_ASSERT(context->device);
+    
+    auto layer = reinterpret_cast<CAMetalLayer*>(surface);
+    layer.device = (__bridge id<MTLDevice>)context->device.GetPtr();
 }
     
 _EL_NAME_END

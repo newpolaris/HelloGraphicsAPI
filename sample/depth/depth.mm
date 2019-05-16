@@ -169,7 +169,7 @@ bool execute(NSView* view)
     view.wantsLayer = YES;
     view.layer = layer;
 
-    SwapchainHandle swapchainHandle = layer;
+    SwapchainHandle swapchainHandle = (__bridge SwapchainHandle)layer;
 
     typedef std::shared_ptr<MetalSwapchain> MetalSwapchainPtr;
     MetalSwapchainPtr swapchain = std::make_shared<MetalSwapchain>();
@@ -275,6 +275,8 @@ bool execute(NSView* view)
             context->present();
             context->commit();
             context->endFrame();
+            
+            renderPassDesc = ns::Handle{};
         }
     }
 
@@ -309,8 +311,10 @@ int main()
     
     NSView* view = [info.info.cocoa.window contentView];
 
-    EL_ASSERT(execute(view));
-
+    @autoreleasepool
+    {
+        EL_ASSERT(execute(view));
+    }
     SDL_DestroyWindow(window);
     SDL_Quit();
     

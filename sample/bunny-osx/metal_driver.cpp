@@ -11,11 +11,14 @@ MetalDriver::MetalDriver() :
 {
     _context->device = mtlpp::Device::CreateSystemDefaultDevice();
     _context->commandQueue = _context->device.NewCommandQueue();
+    _context->currentSurfacePixelFormat = mtlpp::PixelFormat::Invalid;
+    _context->currentDepthPixelFormat = mtlpp::PixelFormat::Invalid;
 }
 
 MetalDriver::~MetalDriver()
 {
     delete _context;
+    _context = nullptr;
 }
 
 mtlpp::Device &MetalDriver::getDevice()
@@ -29,9 +32,14 @@ mtlpp::CommandBuffer &MetalDriver::getCurrentCommandBuffer()
     return _context->currentCommandBuffer;
 }
 
+MetalRenderTarget MetalDriver::createDefaultRenderTarget()
+{
+    return MetalRenderTarget(_context);
+}
+
 void MetalDriver::makeCurrent(NativeSurface surface)
 {
-    _context->currentSurface = std::unique_ptr<MetalSurface>(new MetalSurface(surface));
+    _context->currentSurface = std::make_shared<MetalSurface>(_context, surface);
 }
 
 void MetalDriver::beginFrame()
@@ -49,7 +57,9 @@ void MetalDriver::commit(bool isWaitComplete)
 
 void MetalDriver::endFrame()
 {
-    _context->currentCommandBuffer = ns::Handle{};    
+    _context->currentCommandBuffer = ns::Handle{};
+    _context->currentSurfaceTexture = ns::Handle{};
+    _context->currentDrawable = ns::Handle{};
 }
 
 void MetalDriver::beginRenderPass(const MetalRenderTarget& rt, const PassDescriptor& passDesc, const std::string& label)
@@ -57,26 +67,37 @@ void MetalDriver::beginRenderPass(const MetalRenderTarget& rt, const PassDescrip
     EL_ASSERT(!_context->renderCommandEncoder);
     
     mtlpp::RenderPassDescriptor desc;
-
-    auto colorAttachment = desc.GetColorAttachments()[0];
-    colorAttachment.SetClearColor(asMetalClearColor(passDesc.clearColor));
-    colorAttachment.SetLoadAction(passDesc.loadColor);
-    colorAttachment.SetStoreAction(passDesc.storeColor);
-    colorAttachment.SetTexture(rt.getColor());
-    colorAttachment.SetLevel(rt.getLevel());
-    colorAttachment.SetSlice(0);
-    desc.SetRenderTargetArrayLength(1);
     
-    _context->currentSurfacePixelFormat = colorAttachment.GetTexture().GetPixelFormat();
-
-    auto depthAttachment = desc.GetDepthAttachment();
-    depthAttachment.SetClearDepth(passDesc.clearDepth);
-    depthAttachment.SetTexture(rt.getDepth());
-    depthAttachment.SetLoadAction(passDesc.loadDepth);
-    depthAttachment.SetStoreAction(passDesc.storeDepth);
+    _context->currentSurfacePixelFormat = mtlpp::PixelFormat::Invalid;
+    _context->currentDepthPixelFormat = mtlpp::PixelFormat::Invalid;
+    
+    auto color = rt.getColor();
+    if (color)
+    {
+        auto colorAttachment = desc.GetColorAttachments()[0];
+        colorAttachment.SetClearColor(asMetalClearColor(passDesc.clearColor));
+        colorAttachment.SetLoadAction(passDesc.loadColor);
+        colorAttachment.SetStoreAction(passDesc.storeColor);
+        colorAttachment.SetTexture(rt.getColor());
+        colorAttachment.SetLevel(rt.getLevel());
+        colorAttachment.SetSlice(0);
+        desc.SetRenderTargetArrayLength(1);
         
-    _context->currentDepthPixelFormat = depthAttachment.GetTexture().GetPixelFormat();
+        _context->currentSurfacePixelFormat = color.GetPixelFormat();
+    }
 
+    auto depth = rt.getDepth();
+    if (depth)
+    {
+        auto depthAttachment = desc.GetDepthAttachment();
+        depthAttachment.SetClearDepth(passDesc.clearDepth);
+        depthAttachment.SetLoadAction(passDesc.loadDepth);
+        depthAttachment.SetStoreAction(passDesc.storeDepth);
+        depthAttachment.SetTexture(depth);
+        
+        _context->currentDepthPixelFormat = depth.GetPixelFormat();
+    }
+    
     auto encoder = _context->currentCommandBuffer.RenderCommandEncoder(desc);
     if (!label.empty())
         encoder.SetLabel(label.c_str());

@@ -18,7 +18,7 @@ namespace el {
         mtlpp::Device& getDevice();
         mtlpp::CommandBuffer& getCurrentCommandBuffer();
 
-        MetalRendertarget createDefaultRenderTarget();
+        MetalRenderTarget createDefaultRenderTarget();
         
         void makeCurrent(NativeSurface surface);
         void beginFrame();

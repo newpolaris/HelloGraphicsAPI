@@ -21,7 +21,8 @@ namespace el {
     };
 
     el::GraphicsPixelFormat getSurfacePixelFormat(MetalContext* context);
-    mtlpp::Drawable aquireDrawable(MetalContext* context);
+    mtlpp::Texture aquireSurfaceTexture(MetalContext* context);
+    void setLayerDevice(MetalContext* context, NativeSurface surface);
 
 } // namespace el {
 
