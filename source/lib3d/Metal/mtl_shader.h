@@ -7,8 +7,8 @@
 
 #include <graphics_types.h>
 #include <graphics_shader.h>
-#include "mtl_types.h"
 #include <mtlpp.hpp>
+#include "mtl_types.h"
 
 namespace el {
     

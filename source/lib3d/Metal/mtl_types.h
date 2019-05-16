@@ -15,7 +15,7 @@ namespace el {
 
     typedef std::weak_ptr<class MTLDevice> MTLDeviceWeakPtr;
 
-    mtlpp::ClearColor asColor(const math::float4 &color);
+    mtlpp::ClearColor asMetalClearColor(const math::float4 &color);
     mtlpp::PixelFormat asPixelFormat(GraphicsPixelFormat format);
     mtlpp::TextureUsage asTextureUsage(GraphicsTextureUsageFlags usage);
     mtlpp::ResourceOptions asTextureResourceOptions(GraphicsTextureUsageFlags usage);
@@ -28,6 +28,7 @@ namespace el {
     mtlpp::StencilOperation asStencilOperation(GraphicsStencilOp func);
     mtlpp::VertexFormat asVertexFormat(GraphicsVertexFormat format);
     mtlpp::VertexStepFunction asVertexStepFunction(GraphicsInputRate func);
+    mtlpp::PrimitiveType asMetalPrimitiveType(GraphicsPrimitiveType type);
 
     el::GraphicsPixelFormat asGraphicsPixelFormat(mtlpp::PixelFormat format);
 };

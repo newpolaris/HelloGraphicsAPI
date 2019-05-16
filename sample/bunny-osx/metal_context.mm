@@ -7,28 +7,30 @@
 
 _EL_NAME_BEGIN
 
-el::GraphicsPixelFormat getSwapchainPixelFormat(SwapchainHandle handle)
+el::GraphicsPixelFormat getSurfacePixelFormat(MetalContext* context)
 {
-    EL_ASSERT(handle);
-    CAMetalLayer* layer = reinterpret_cast<CAMetalLayer*>(handle);
-    EL_ASSERT(layer);
+    EL_ASSERT(context);
+    EL_ASSERT(context->currentSurface);
+    EL_ASSERT(context->currentSurface->layer);
+    
+    auto layer = reinterpret_cast<CAMetalLayer*>(context->currentSurface->layer);
     return el::asGraphicsPixelFormat((mtlpp::PixelFormat)layer.pixelFormat);
 }
 
-mtlpp::Drawable aquireCurrentDrawable(SwapchainHandle handle)
+mtlpp::Texture aquireSurfaceTexture(MetalContext* context)
 {
-    EL_ASSERT(handle);
-    CAMetalLayer* layer = reinterpret_cast<CAMetalLayer*>(handle);
-    EL_ASSERT(layer);
-    auto drawable = [layer nextDrawable];
-    return mtlpp::Drawable(ns::Handle{(__bridge void*)drawable});
-}
+    EL_ASSERT(context);
+    EL_ASSERT(context->currentSurface);
+    EL_ASSERT(context->currentSurface->layer);
 
-mtlpp::Texture getDrawableTexture(const mtlpp::Drawable& drawable)
-{
-    auto nativeDrawable = (__bridge id<CAMetalDrawable>)drawable.GetPtr();
-    EL_ASSERT(nativeDrawable);
-    return mtlpp::Texture(ns::Handle{(__bridge void*)nativeDrawable.texture});
+    if (!context->currentSurfaceTexture)
+    {
+        auto layer = reinterpret_cast<CAMetalLayer*>(context->surface->layer);
+        auto drawable = [layer nextDrawable];
+        context->currentDrawable = mtlpp::Drawable(ns::Handle{(__bridge void*)drawable})
+        context->currentSurfaceTexture = mtlpp::Texture(ns::Handle{(__bridge void*)drawable.texture});
+    }
+    return context->currentSurfaceTexture;
 }
     
 _EL_NAME_END

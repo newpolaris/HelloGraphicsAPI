@@ -7,7 +7,7 @@ _EL_NAME_BEGIN
 
 using namespace mtlpp;
 
-mtlpp::ClearColor asColor(const math::float4 &color)
+mtlpp::ClearColor asMetalClearColor(const math::float4 &color)
 {
     return mtlpp::ClearColor(color.r, color.g, color.b, color.a);
 }
@@ -670,6 +670,19 @@ el::GraphicsPixelFormat asGraphicsPixelFormat(mtlpp::PixelFormat format)
     }
     EL_ASSERT(false);
     return GraphicsPixelFormatInvalid;
+}
+
+mtlpp::PrimitiveType asMetalPrimitiveType(GraphicsPrimitiveType type)
+{
+    switch (type)
+    {
+        case GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle:
+            return mtlpp::PrimitiveType::Triangle;
+        case GraphicsPrimitiveType::GraphicsPrimitiveTypeFan:
+        default:
+            EL_ASSERT(false);
+            return mtlpp::PrimitiveType(0);
+    }
 }
 
 _EL_NAME_END

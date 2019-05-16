@@ -3,8 +3,8 @@
 
 #include <mtlpp.hpp>
 #include <graphics_types.h>
+#include "metal_types.h"
 
-typedef void* SwapchainHandle;
 
 namespace el
 {
@@ -20,7 +20,8 @@ namespace el
         void setupBlitRenderer();
         void setupMeshRenderer();
 
-        void makeCurrent(SwapchainHandle handle);
+        void makeCurrent(NativeSurface surface);
+        void resizeTexture(uint32_t width, uint32_t height);
         void draw();
 
         std::shared_ptr<class MetalDriver> _driver;
@@ -32,8 +33,6 @@ namespace el
         mtlpp::Texture _color;
         mtlpp::Texture _depth;
 
-        GraphicsPixelFormat _surfaceFormat;
-        SwapchainHandle _handle;
         const GraphicsPixelFormat _colorFormat = GraphicsPixelFormatRG11B10Float;
         const GraphicsPixelFormat _depthFormat = GraphicsPixelFormatDepth32Float;
     };

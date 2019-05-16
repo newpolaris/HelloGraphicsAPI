@@ -355,7 +355,7 @@ namespace el {
         GraphicsPixelAlignment8 = 8,
     };
 
-    enum class GraphicsPrimitiveType : uint8_t
+    enum GraphicsPrimitiveType : uint8_t
     {
         GraphicsPrimitiveTypeTriangle = 4,
         GraphicsPrimitiveTypeFan = 5,
