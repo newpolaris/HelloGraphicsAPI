@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Metal/mtlpp.hpp>
+#include <mtlpp.hpp>
 
 class Window
 {

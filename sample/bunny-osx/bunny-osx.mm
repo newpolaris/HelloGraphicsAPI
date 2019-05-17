@@ -49,14 +49,16 @@ int main()
 
     while (true)
     {
-        bool isQuit = false;
-        SDL_Event e;
-        while (SDL_PollEvent(&e))
-            isQuit = (e.type == SDL_QUIT);
-        if (isQuit) break;
-        
+        @autoreleasepool {
+            bool isQuit = false;
+            SDL_Event e;
+            while (SDL_PollEvent(&e))
+                isQuit = (e.type == SDL_QUIT);
+            if (isQuit) break;
+        }
         renderer.makeCurrent(layer);
         renderer.draw();
+
     }
 
     SDL_DestroyWindow(window);
