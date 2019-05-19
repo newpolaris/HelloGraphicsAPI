@@ -2,6 +2,7 @@
 #define __GRAPHICS_TYPES_H__
 
 #include <memory>
+#include <map>
 #include <vector>
 #include <cstdint>
 #include <string>

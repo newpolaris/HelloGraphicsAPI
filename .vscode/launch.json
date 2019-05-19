@@ -5,6 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(lldb) Launch mtl",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/sample/mtl/Debug/metal",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb"
+        },
+        {
             "name": "(lldb) Launch bunny-osx",
             "type": "cppdbg",
             "request": "launch",

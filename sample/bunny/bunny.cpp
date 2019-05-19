@@ -264,7 +264,10 @@ int bunny_run()
                 context[i]->setUniform("uOrientation", draw.orientation);
 
                 // Shared bewteen context
-                context[i]->drawIndexed(GraphicsPrimitiveType::GraphicsPrimitiveTypeTriangle, mesh.indexCount, mesh.indexOffset, mesh.vertexOffset);
+                context[i]->drawIndexed(GraphicsPrimitiveTypeTriangle,
+                                        mesh.indexCount,
+                                        mesh.indexOffset,
+                                        mesh.vertexOffset);
             }
 
             profile[i].end();

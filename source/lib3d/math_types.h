@@ -86,6 +86,11 @@ namespace el
         typedef vec2<float> float2;
         typedef vec3<float> float3;
         typedef vec4<float> float4;
+
+        typedef float scalar;
+        typedef vec2<scalar> vect2;
+        typedef vec3<scalar> vect3;
+        typedef vec4<scalar> vect4;
     }
 }
 
