@@ -15,7 +15,7 @@ GLTexture::~GLTexture()
     destroy();
 }
 
-bool GLTexture::create(GraphicsTextureDesc desc)
+bool GLTexture::create(const GraphicsTextureDesc& desc)
 {
     // TODO:
     // int value;
@@ -116,7 +116,7 @@ bool GLTexture::create(GraphicsTextureDesc desc)
 
     GL_CHECK(glBindTexture(_target, 0));
 
-    _textureDesc = std::move(desc);
+    _desc = desc;
     
     return true;
 }
@@ -146,7 +146,7 @@ GLuint GLTexture::getTextureID() const
     return _textureID;
 }
 
-const GraphicsTextureDesc& GLTexture::getTextureDesc() const
+const GraphicsTextureDesc& GLTexture::getDesc() const
 {
-    return _textureDesc;
+    return _desc;
 }

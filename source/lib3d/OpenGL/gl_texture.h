@@ -15,7 +15,7 @@ namespace el
         GLTexture();
         ~GLTexture();
 
-        bool create(GraphicsTextureDesc desc);
+        bool create(const GraphicsTextureDesc &desc);
         void destroy();
 
         void bind(GLuint unit) const; 
@@ -23,14 +23,14 @@ namespace el
 
         GLuint getTextureID() const;
 
-        const GraphicsTextureDesc& getTextureDesc() const override;
+        const GraphicsTextureDesc& getDesc() const override;
 
     private:
 
         GLuint _textureID;
         GLenum _target;
 
-        GraphicsTextureDesc _textureDesc;
+        GraphicsTextureDesc _desc;
     };
 } // namespace el
 

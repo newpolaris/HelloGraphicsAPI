@@ -39,13 +39,12 @@ bool MTLTexture::create(const GraphicsTextureDesc& desc)
 
     if (desc.getStream())
     {
-        // calc. bytesPerRow with alignment fixing
         const int alignment = (int)desc.getPixelAlignment();
         uint32_t bytesPerRow = desc.getWidth() * asTexelSize(desc.getPixelFormat());
         bytesPerRow = ((bytesPerRow + alignment - 1) / alignment) * alignment;
 
         if (desc.getStreamSize() > 0) {
-            EL_ASSERT(bytesPerRow == desc.getStreamSize() / desc.getHeight());
+            EL_ASSERT(desc.getStreamSize() == bytesPerRow * desc.getHeight());
         }
 
         auto region = mtlpp::Region( 0, 0, textureDesc.GetWidth(), textureDesc.GetHeight() );
@@ -76,7 +75,7 @@ const mtlpp::Texture& MTLTexture::getTexture() const
     return _texture;
 }
 
-const GraphicsTextureDesc& MTLTexture::getTextureDesc() const
+const GraphicsTextureDesc& MTLTexture::getDesc() const
 {
 	return _textureDesc;
 }

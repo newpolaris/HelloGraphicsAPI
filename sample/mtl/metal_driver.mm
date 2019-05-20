@@ -4,6 +4,8 @@
 #include "metal_context.h"
 #include <math_types.h>
 #include <Metal/mtl_types.h>
+#include <graphics_data.h>
+#include <graphics_texture.h>
 
 _EL_NAME_BEGIN
 
@@ -138,12 +140,11 @@ void MetalDriver::beginRenderPass(const MetalRenderTargetPtr& rt, const RenderPa
     EL_ASSERT(_context->currentRenderEncoder == nil);
     _context->currentRenderEncoder = [_context->currentCommandBuffer renderCommandEncoderWithDescriptor:renderPassDesc];
 }
-
-void MetalDriver::draw(const PipelineDesc& desc)
+void MetalDriver::setPipelineState(const PipelineState& state)
 {
     MetalPipelineDesc pipelineDesc {
-        desc.program->vertexFunction,
-        desc.program->fragmentFunction,
+        state.program->vertexFunction,
+        state.program->fragmentFunction,
         _context->currentColorFormats,
         _context->currentDepthFormat
     };
@@ -152,10 +153,25 @@ void MetalDriver::draw(const PipelineDesc& desc)
     EL_ASSERT(pipeline);
 
     [_context->currentRenderEncoder setRenderPipelineState:pipeline];
-    [_context->currentRenderEncoder setVertexBytes:vertexData length:sizeof(vertexData) atIndex:0];
-    [_context->currentRenderEncoder drawPrimitives:MTLPrimitiveTypeTriangle
-                                       vertexStart:0
-                                       vertexCount:3];
+}
+
+
+void MetalDriver::setVertexBuffer(const MetalBufferPtr& vertex, uint32_t slot)
+{
+    [_context->currentRenderEncoder setVertexBuffer:vertex->buffer offset:0 atIndex:slot];
+
+}
+void MetalDriver::draw(MTLPrimitiveType primitive, uint32_t vertexCount, uint32_t vertexOffset)
+{
+    // [_context->currentRenderEncoder setVertexBytes:vertexData length:sizeof(vertexData) atIndex:0];
+    // [_context->currentRenderEncoder setCullMode:(MTLCullMode)]
+    // [_context->curretnRenderEncoder setFrontFacingWinding:(MTLWinding)];
+    // [_context->currentRenderEncoder setCullMode:(MTLCullMode)];
+    // [_context->currentRenderEncoder setLabel:(NSString * _Nullable)]
+    // [_context->currentRenderEncoder setViewport:(MTLViewport)]
+    [_context->currentRenderEncoder drawPrimitives:primitive
+                                       vertexStart:vertexOffset
+                                       vertexCount:vertexCount];
 }
 
 void MetalDriver::endRenderPass()
@@ -194,17 +210,25 @@ MetalRenderTargetPtr MetalDriver::createDefaultRenderTarget()
     return target;
 }
 
-
-MetalDriver::MetalBufferPtr MetalDriver::createVertexBuffer(const void *stream, size_t streamsize)
+MetalTexturePtr MetalDriver::createTexture(const GraphicsTextureDesc &desc)
 {
-    el::GraphicsDataDesc vertexData;
-    vertexData.setStream((const el::stream_t*)stream);
-    vertexData.setElementSize(sizeof(char));
-    vertexData.setNumElements(streamsize);
+    auto texture = std::make_shared<MetalTexture>();
+    if (!texture) return nil;
+    if (!texture->create(_context->device, desc))
+        return nil;
+    return texture;
+}
+
+MetalBufferPtr MetalDriver::createVertexBuffer(const void *stream, size_t streamsize)
+{
+    GraphicsDataDesc desc;
+    desc.setStream((const el::stream_t*)stream);
+    desc.setElementSize(sizeof(char));
+    desc.setNumElements(streamsize);
     
     auto buffer = std::make_shared<MetalBuffer>();
     if (!buffer) return nullptr;
-    if (!buffer->create(_context->device, vertexData))
+    if (!buffer->create(_context->device, desc))
         return nullptr;
     return buffer;
 }

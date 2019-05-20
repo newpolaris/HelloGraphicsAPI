@@ -9,7 +9,7 @@
 
 namespace el {
 
-    struct PipelineDesc
+    struct PipelineState
     {
         MetalProgramPtr program;
     };
@@ -27,9 +27,12 @@ namespace el {
         void commit(bool isWaitFinish = false);
         void beginRenderPass(const MetalRenderTargetPtr& rt, const RenderPassParms& params);
         void endRenderPass();
-        void draw(const PipelineDesc& program);
         
-        typedef std::shared_ptr<struct MetalBuffer> MetalBufferPtr;
+        void setPipelineState(const PipelineState& state);
+        void setVertexBuffer(const MetalBufferPtr& buffer, uint32_t slot);
+        void draw(MTLPrimitiveType primitive, uint32_t vertexCount, uint32_t vertexOffset);
+        
+        MetalTexturePtr createTexture(const GraphicsTextureDesc &desc);
         MetalBufferPtr createVertexBuffer(const void* stream, size_t streamsize);
         MetalProgramPtr createProgram(const char* vertexShaderSrc, const char* fragmentShaderSrc);
         MetalRenderTargetPtr createDefaultRenderTarget();

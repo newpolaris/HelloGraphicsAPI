@@ -91,7 +91,7 @@ namespace el {
         GraphicsTexture();
         virtual ~GraphicsTexture();
 
-        virtual const GraphicsTextureDesc& getTextureDesc() const = 0;
+        virtual const GraphicsTextureDesc& getDesc() const = 0;
 
     private:
 

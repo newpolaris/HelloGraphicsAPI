@@ -25,7 +25,7 @@ namespace el {
         void setDevice(const GraphicsDevicePtr& device);
         GraphicsDevicePtr getDevice();
 
-        const GraphicsTextureDesc& getTextureDesc() const override;
+        const GraphicsTextureDesc& getDesc() const override;
         
         const mtlpp::Texture& getTexture() const;
 

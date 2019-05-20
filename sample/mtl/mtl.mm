@@ -128,7 +128,6 @@ int main()
     for (uint32_t i = 0; i < el::countof(objfiles); i++)
         EL_ASSERT(LoadMesh(&geometry, el::getResourcePath() + objfiles[i]));
 #endif
-
     
     el::MetalDriver driver;
     driver.setup(nativeSurface);
@@ -142,10 +141,21 @@ int main()
     auto vertexBuffer = driver.createVertexBuffer(el::vertexData, sizeof(el::vertexData));
     auto program = driver.createProgram(el::vertexShaderSrc, el::fragmentShaderSrc);
     
+    el::GraphicsTextureDesc textureDesc;
+    
+    auto texture = driver.createTexture(textureDesc);
+    EL_ASSERT(texture);
+    
     auto defaultTarget = driver.createDefaultRenderTarget();
     
-    el::PipelineDesc pipelineDesc {
+    el::PipelineState pipelineState {
         program,
+    };
+    
+    struct DrawCommands
+    {
+        uint32_t vertexCount;
+        uint32_t vertexOffset;
     };
     
     while (true)
@@ -159,11 +169,14 @@ int main()
 #if __has_feature(objc_arc)
         @autoreleasepool {
 #endif
-        driver.beginFrame();
-        driver.beginRenderPass(defaultTarget, params);
-        driver.draw(pipelineDesc);
-        driver.endRenderPass();
-        driver.commit();
+            driver.beginFrame();
+            driver.beginRenderPass(defaultTarget, params);
+            driver.setVertexBuffer(vertexBuffer, 0);
+
+            driver.setPipelineState(pipelineState);
+            driver.draw(MTLPrimitiveTypeTriangle, 3, 0);
+            driver.endRenderPass();
+            driver.commit();
             
 #if __has_feature(objc_arc)
         }

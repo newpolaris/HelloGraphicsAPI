@@ -3,6 +3,7 @@
 
 #include "metal_types.h"
 #include <graphics_data.h>
+#include <graphics_texture.h>
 
 namespace el {
 
@@ -58,6 +59,20 @@ namespace el {
         id<MTLBuffer> buffer;
     };
 
+    struct MetalTexture final : public GraphicsTexture
+    {
+        MetalTexture();
+        ~MetalTexture();
+        
+        bool create(id<MTLDevice> device, const GraphicsTextureDesc &desc);
+        void destroy();
+        
+        const GraphicsTextureDesc &getDesc() const override;
+        
+        GraphicsTextureDesc desc;
+        id<MTLTexture> texture;
+    };
+    
 } // namespace el
 
 #endif // __METAL_RESOURCES_H__

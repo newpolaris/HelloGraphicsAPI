@@ -19,7 +19,9 @@ namespace el
 
     typedef std::shared_ptr<struct MetalProgram> MetalProgramPtr;
     typedef std::shared_ptr<struct MetalRenderTarget> MetalRenderTargetPtr;
-
+    typedef std::shared_ptr<struct MetalBuffer> MetalBufferPtr;
+    typedef std::shared_ptr<struct MetalTexture> MetalTexturePtr;
+    
     MTLClearColor asMTLClearColor(const math::float4 &color);
     MTLLoadAction asLoadAction(const RenderPassParms& params, GraphicsTargetBufferFlagBits bit);
     MTLStoreAction asStoreAction(const RenderPassParms& params, GraphicsTargetBufferFlagBits bit);
