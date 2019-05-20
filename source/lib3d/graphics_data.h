@@ -44,8 +44,6 @@ namespace el {
         GraphicsData();
         virtual ~GraphicsData();
 
-        virtual bool create(GraphicsDataDesc desc) = 0;
-
         virtual const GraphicsDataDesc& getDesc() const = 0;
 
     private:

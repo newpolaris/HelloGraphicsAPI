@@ -194,4 +194,19 @@ MetalRenderTargetPtr MetalDriver::createDefaultRenderTarget()
     return target;
 }
 
+
+MetalDriver::MetalBufferPtr MetalDriver::createVertexBuffer(const void *stream, size_t streamsize)
+{
+    el::GraphicsDataDesc vertexData;
+    vertexData.setStream((const el::stream_t*)stream);
+    vertexData.setElementSize(sizeof(char));
+    vertexData.setNumElements(streamsize);
+    
+    auto buffer = std::make_shared<MetalBuffer>();
+    if (!buffer) return nullptr;
+    if (!buffer->create(_context->device, vertexData))
+        return nullptr;
+    return buffer;
+}
+
 _EL_NAME_END

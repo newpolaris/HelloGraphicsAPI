@@ -138,22 +138,9 @@ int main()
     params.clearColor = el::math::float4(0.2f, 0.4f, 0.6f, 1.0f);
     // params.viewport
     // params.label = "color-pass";
-    
+
+    auto vertexBuffer = driver.createVertexBuffer(el::vertexData, sizeof(el::vertexData));
     auto program = driver.createProgram(el::vertexShaderSrc, el::fragmentShaderSrc);
-    
-#if 0
-    id<MTLDevice> device = MTLCreateSystemDefaultDevice();
-    
-    id<MTLBuffer> vertexBuffer = [device newBufferWithBytes:el::vertexData
-                                                     length:sizeof(el::vertexData)
-                                                    options:MTLResourceStorageModeShared];
-
-
-    id<MTLRenderCommandEncoder> encoder;
-    [encoder setVertexBuffer:vertexBuffer
-                      offset:0
-                     atIndex:0];
-#endif
     
     auto defaultTarget = driver.createDefaultRenderTarget();
     

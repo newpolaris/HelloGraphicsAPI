@@ -123,5 +123,47 @@ id<MTLTexture> MetalRenderTarget::getDepth()
     return depth;
 }
 
+MetalBuffer::MetalBuffer()
+{
+}
+
+MetalBuffer::~MetalBuffer()
+{
+    destroy();
+}
+
+const GraphicsDataDesc& MetalBuffer::getDesc() const
+{
+    return desc;
+}
+
+#if 0
+mtlpp::ResourceOptions asResourceOptions(GraphicsUsageFlags flags)
+{
+    auto options = mtlpp::ResourceOptions::CpuCacheModeWriteCombined;
+    if (flags & GraphicsUsageFlagReadBit)
+        options = mtlpp::ResourceOptions::CpuCacheModeDefaultCache;
+    return options;
+}
+#endif
+
+bool MetalBuffer::create(id<MTLDevice> device, const GraphicsDataDesc& desc)
+{
+    // auto resourceOptions = asResourceOptions(desc.getUsage());
+
+    buffer  = [device newBufferWithBytes:desc.getStream()
+                                  length:desc.getStreamSize()
+                                 options:MTLResourceStorageModeShared];
+    if (buffer == nil) return false;
+
+    this->desc = desc;
+    return true;
+}
+
+void MetalBuffer::destroy()
+{
+    [buffer release];
+    buffer = nil;
+}
 
 _EL_NAME_END

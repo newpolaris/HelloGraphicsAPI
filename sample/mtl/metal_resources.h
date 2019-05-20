@@ -2,6 +2,7 @@
 #define __METAL_RESOURCES_H__
 
 #include "metal_types.h"
+#include <graphics_data.h>
 
 namespace el {
 
@@ -42,7 +43,21 @@ namespace el {
         MetalRenderTarget(const MetalRenderTarget&);
         MetalRenderTarget& operator=(const MetalRenderTarget&);
     };
-    
-} // namespace el {
+
+    struct MetalBuffer final : public GraphicsData
+    {
+        MetalBuffer();
+        ~MetalBuffer();
+        
+        bool create(id<MTLDevice> device, const GraphicsDataDesc &desc);
+        void destroy();
+
+        const GraphicsDataDesc &getDesc() const override;
+
+        GraphicsDataDesc desc;
+        id<MTLBuffer> buffer;
+    };
+
+} // namespace el
 
 #endif // __METAL_RESOURCES_H__

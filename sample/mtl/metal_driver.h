@@ -29,6 +29,8 @@ namespace el {
         void endRenderPass();
         void draw(const PipelineDesc& program);
         
+        typedef std::shared_ptr<struct MetalBuffer> MetalBufferPtr;
+        MetalBufferPtr createVertexBuffer(const void* stream, size_t streamsize);
         MetalProgramPtr createProgram(const char* vertexShaderSrc, const char* fragmentShaderSrc);
         MetalRenderTargetPtr createDefaultRenderTarget();
 

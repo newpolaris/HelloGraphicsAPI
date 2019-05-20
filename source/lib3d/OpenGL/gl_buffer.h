@@ -15,7 +15,7 @@ namespace el {
         GLBuffer();
         ~GLBuffer();
 
-        bool create(GraphicsDataDesc desc) override;
+        bool create(GraphicsDataDesc desc);
         void destroy();
 
         void bind() const;
