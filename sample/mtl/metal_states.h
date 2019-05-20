@@ -6,22 +6,22 @@
 
 namespace el {
 
-    struct PipelineDesc
+    struct MetalPipelineDesc
     {
         id<MTLFunction> vertexFunction;
         id<MTLFunction> fragmentFunction;
         MetalPixelFormats colorFormats;
         MetalPixelFormat depthFormat;
-        
-        bool operator<(const PipelineDesc& desc) const
+
+        bool operator<(const MetalPipelineDesc &desc) const
         {
-            const auto& a = std::tie(vertexFunction, fragmentFunction, colorFormats, depthFormat);
-            const auto& b = std::tie(desc.vertexFunction, desc.fragmentFunction, desc.colorFormats, desc.depthFormat);
+            const auto &a = std::tie(vertexFunction, fragmentFunction, colorFormats, depthFormat);
+            const auto &b = std::tie(desc.vertexFunction, desc.fragmentFunction, desc.colorFormats, desc.depthFormat);
             return a < b;
         }
     };
 
-    id<MTLRenderPipelineState> aquirePipeline(id<MTLDevice> device, const PipelineDesc& desc);
+    id<MTLRenderPipelineState> aquirePipeline(id<MTLDevice> device, const MetalPipelineDesc &desc);
     void cleanupPipeline();
 
 } // namespace el {

@@ -5,33 +5,14 @@
 #include "metal_resources.h"
 #include <math_types.h>
 #include <vector>
+#include <graphics_types.h>
 
 namespace el {
-    
-    struct MetalAttachmentDesc
-    {
-        MTLLoadAction load;
-        MTLStoreAction store;
-    };
-    
-    typedef std::vector<MetalAttachmentDesc> MetalAttachmentDescs;
-    
-    struct MetalRenderPassDesc
-    {
-        //MetalRenderPassDesc();
-        //MetalRenderPassDesc(math::float4 color);
-        //MetalRenderPassDesc(math::float4 color, float depth);
-        
-        float clearDepth;
-        math::float4 clearColor;
-        MetalAttachmentDesc depthAttachment;
-        MetalAttachmentDescs colorAttachments;
-    };
-    
-    extern MetalRenderPassDesc renderPassColor;
-    extern MetalRenderPassDesc renderPassDepth;
 
-    void setupRenderPasses();
+    struct PipelineDesc
+    {
+        MetalProgramPtr program;
+    };
     
     struct MetalDriver final
     {
@@ -44,11 +25,12 @@ namespace el {
         void makeCurrent();
         void beginFrame();
         void commit(bool isWaitFinish = false);
-        void beginRenderPass(const MetalRenderPassDesc& passDesc);
+        void beginRenderPass(const MetalRenderTargetPtr& rt, const RenderPassParms& params);
         void endRenderPass();
-        void drawFrame(const MetalProgram& program);
+        void draw(const PipelineDesc& program);
         
-        MetalProgram createProgram(const char* vertexShaderSrc, const char* fragmentShaderSrc);
+        MetalProgramPtr createProgram(const char* vertexShaderSrc, const char* fragmentShaderSrc);
+        MetalRenderTargetPtr createDefaultRenderTarget();
 
         struct MetalContext* _context;
     };

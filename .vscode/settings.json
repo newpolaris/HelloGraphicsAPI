@@ -4,7 +4,9 @@
         "cassert": "cpp",
         "memory": "cpp",
         "__config": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "__locale": "cpp",
+        "locale": "cpp"
     },
     "vim.hlsearch": true
 }

@@ -4,13 +4,14 @@
 
 _EL_NAME_BEGIN
 
-std::map<PipelineDesc, id<MTLRenderPipelineState>> cache;
+std::map<MetalPipelineDesc, id<MTLRenderPipelineState>> cache;
 
-id<MTLRenderPipelineState> createPipeline(const PipelineDesc &desc, id<MTLDevice> device) 
+id<MTLRenderPipelineState> createPipeline(id<MTLDevice> device, const MetalPipelineDesc &desc) 
 {
     MTLRenderPipelineDescriptor* descriptor = [MTLRenderPipelineDescriptor new];
-    descriptor.colorAttachments[0].pixelFormat = MTLPixelFormatBGRA8Unorm;
-    descriptor.depthAttachmentPixelFormat = MTLPixelFormatInvalid;
+    for (auto i = 0u; i < desc.colorFormats.size(); i++)
+        descriptor.colorAttachments[i].pixelFormat = desc.colorFormats[i];
+    descriptor.depthAttachmentPixelFormat = desc.depthFormat;
     descriptor.vertexFunction = desc.vertexFunction;
     descriptor.fragmentFunction = desc.fragmentFunction;
     
@@ -28,13 +29,13 @@ id<MTLRenderPipelineState> createPipeline(const PipelineDesc &desc, id<MTLDevice
     return pipeline;
 }
 
-id<MTLRenderPipelineState> aquirePipeline(id<MTLDevice> device, const PipelineDesc& desc)
+id<MTLRenderPipelineState> aquirePipeline(id<MTLDevice> device, const MetalPipelineDesc& desc)
 {
     auto it = cache.find(desc);
     if (it != cache.end())
         return it->second;
     
-    const auto& pipeline = createPipeline(desc, device);
+    const auto& pipeline = createPipeline(device, desc);
     cache.emplace(desc, pipeline);
    
     return pipeline;

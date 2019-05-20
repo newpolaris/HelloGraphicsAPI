@@ -1,13 +1,13 @@
 #include <graphics_types.h>
 #include <el_debug.h>
 
-using namespace el;
+_EL_NAME_BEGIN
 
-uint32_t el::asVertexFormatSize(GraphicsVertexFormat format)
+uint32_t asVertexFormatSize(GraphicsVertexFormat format)
 {
     switch (format) 
     {
-    case GraphicsVertexFormat::Float:               return 4;
+    case GraphicsVertexFormat::Float:               return 4*1;
     case GraphicsVertexFormat::Float2:              return 4*2;
     case GraphicsVertexFormat::Float3:              return 4*3;
     case GraphicsVertexFormat::Float4:              return 4*4;
@@ -17,7 +17,7 @@ uint32_t el::asVertexFormatSize(GraphicsVertexFormat format)
     }
 }
 
-uint32_t el::asTexelSize(GraphicsPixelFormat format)
+uint32_t asTexelSize(GraphicsPixelFormat format)
 {
     switch (format)
     {
@@ -81,3 +81,29 @@ uint32_t el::asTexelSize(GraphicsPixelFormat format)
         return 0;
     };
 }
+
+RenderPassParms::RenderPassParms() :
+    flags(GraphicsRenderPassFlags{}),
+    clearColor(math::float4(0.f, 0.f, 0.f, 0.f)),
+    clearDepth(1.0),
+    viewport(Viewport{})
+{
+}
+
+RenderPassParms::RenderPassParms(math::float4 color) :
+    flags(GraphicsRenderPassFlags{GraphicsTargetBufferFlagBitColor, 0, 0}),
+    clearColor(color),
+    clearDepth(1.0),
+    viewport(Viewport{})
+{
+}
+
+RenderPassParms::RenderPassParms(math::float4 color, double depth) :
+    flags(GraphicsRenderPassFlags{GraphicsTargetBufferFlagBitColorDepth, 0, 0}),
+    clearColor(color),
+    clearDepth(depth),
+    viewport(Viewport{})
+{
+}
+
+_EL_NAME_END

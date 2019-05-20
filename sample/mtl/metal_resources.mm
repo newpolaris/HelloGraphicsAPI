@@ -1,6 +1,7 @@
 #include "metal_resources.h"
 #include <el_debug.h>
 #include <initializer_list>
+#include "metal_context.h"
 
 _EL_NAME_BEGIN
 
@@ -27,7 +28,7 @@ bool MetalProgram::create(id<MTLDevice> device, const char* vertex, const char* 
     for (auto source : sources)
     {
         NSString* objcSource = [NSString stringWithCString:source
-            encoding:NSUTF8StringEncoding]; // autorelease
+                                                  encoding:NSUTF8StringEncoding];
         id<MTLLibrary> library = [device newLibraryWithSource:objcSource
             options:nil
             error:&error];
@@ -39,11 +40,15 @@ bool MetalProgram::create(id<MTLDevice> device, const char* vertex, const char* 
             return false;
         }
         id<MTLFunction> function = [library newFunctionWithName:@"main0"];
-        outputs[function.functionType] = function;
 
 #if !__has_feature(objc_arc)
         [library release];
 #endif
+        
+        if (function == nil)
+            return false;
+        
+        outputs[function.functionType] = function;
     }
     
     vertexFunction = outputs[MTLFunctionTypeVertex];
@@ -61,5 +66,62 @@ void MetalProgram::destroy()
     vertexFunction = nil;
     fragmentFunction = nil;
 }
+
+
+MetalRenderTarget::MetalRenderTarget(MetalContext& context) :
+    isDefault(true),
+    context(context),
+    color(nil),
+    depth(nil)
+{
+}
+
+MetalRenderTarget::MetalRenderTarget(MetalContext& context, id<MTLTexture> color) :
+    isDefault(false),
+    context(context)
+{
+    this->color = color;
+#if !__has_feature(objc_arc)
+    [color retain];
+#endif
+}
+
+MetalRenderTarget::MetalRenderTarget(MetalContext& context, id<MTLTexture> color, id<MTLTexture> depth) :
+    isDefault(false),
+    context(context)
+{
+    this->color = color;
+    this->depth = depth;
+#if !__has_feature(objc_arc)
+    [color retain];
+    [depth retain];
+#endif
+}
+
+MetalRenderTarget::~MetalRenderTarget()
+{
+#if !__has_feature(objc_arc)
+    [color release];
+    color = nil;
+    [depth release];
+    depth = nil;
+#endif
+}
+
+id<MTLTexture> MetalRenderTarget::getColor()
+{
+    if (isDefault) {
+        id<CAMetalDrawable> drawable = aquireDrawable(&context);
+        if (drawable != nil)
+            return drawable.texture;
+    }
+    return color;
+}
+
+id<MTLTexture> MetalRenderTarget::getDepth()
+{
+    return depth;
+}
+
 
 _EL_NAME_END

@@ -8,6 +8,7 @@
 #include <string>
 #include <el_predefine.h>
 #include <el_types.h>
+#include <math_types.h>
 
 namespace el {
 
@@ -459,6 +460,37 @@ namespace el {
 
     uint32_t asVertexFormatSize(GraphicsVertexFormat format);
     uint32_t asTexelSize(GraphicsPixelFormat format);
+
+    enum GraphicsTargetBufferFlagBits : uint8_t
+    {
+        GraphicsTargetBufferFlagBitNone = 0,
+        GraphicsTargetBufferFlagBitColor = 1 << 0,
+        GraphicsTargetBufferFlagBitDepth = 1 << 1,
+        GraphicsTargetBufferFlagBitStencil = 1 << 2,
+        GraphicsTargetBufferFlagBitColorDepth = GraphicsTargetBufferFlagBitColor | GraphicsTargetBufferFlagBitDepth,
+        GraphicsTargetBufferFlagBitAll = GraphicsTargetBufferFlagBitColorDepth | GraphicsTargetBufferFlagBitStencil,
+    };
+    typedef uint8_t GraphicsTargetBufferFlags;
+
+    struct GraphicsRenderPassFlags
+    {
+        GraphicsTargetBufferFlags clear;
+        GraphicsTargetBufferFlags loadDiscard;
+        GraphicsTargetBufferFlags storeDiscard;
+    };
+
+    struct RenderPassParms
+    {
+        RenderPassParms();
+        RenderPassParms(math::float4 color);
+        RenderPassParms(math::float4 color, double depth);
+
+        GraphicsRenderPassFlags flags;
+        math::float4 clearColor;
+        double clearDepth;
+        uint32_t clearStencil;
+        Viewport viewport;
+    };
 
 } // namespace el
 

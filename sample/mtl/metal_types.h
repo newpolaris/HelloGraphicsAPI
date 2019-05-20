@@ -7,19 +7,22 @@
 #include <el_platform.h>
 #include <math_types.h>
 #include <vector>
+#include <graphics_types.h>
 
-namespace el {
+namespace el 
+{
     struct MetalDriver;
-    struct MetalProgram;
-    
+    struct MetalContext;
+
     typedef MTLPixelFormat MetalPixelFormat;
     typedef std::vector<MetalPixelFormat> MetalPixelFormats;
 
-    inline MTLClearColor asMTLClearColor(const math::float4 &color)
-    {
-        return MTLClearColorMake(color.r, color.g, color.b, color.a);
-    }
+    typedef std::shared_ptr<struct MetalProgram> MetalProgramPtr;
+    typedef std::shared_ptr<struct MetalRenderTarget> MetalRenderTargetPtr;
 
+    MTLClearColor asMTLClearColor(const math::float4 &color);
+    MTLLoadAction asLoadAction(const RenderPassParms& params, GraphicsTargetBufferFlagBits bit);
+    MTLStoreAction asStoreAction(const RenderPassParms& params, GraphicsTargetBufferFlagBits bit);
 }
 
 #endif // __METLA_TYPES_H__

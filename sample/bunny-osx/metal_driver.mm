@@ -75,7 +75,7 @@ void MetalDriver::beginRenderPass(const MetalRenderTarget& rt, const PassDescrip
     if (color)
     {
         auto colorAttachment = desc.GetColorAttachments()[0];
-        colorAttachment.SetClearColor(asMetalClearColor(passDesc.clearColor));
+        colorAttachment.SetClearColor(asMTLClearColor(passDesc.clearColor));
         colorAttachment.SetLoadAction(passDesc.loadColor);
         colorAttachment.SetStoreAction(passDesc.storeColor);
         colorAttachment.SetTexture(rt.getColor());

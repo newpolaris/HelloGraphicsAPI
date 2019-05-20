@@ -18,30 +18,87 @@
 #include "metal_resources.h"
 #include "metal_states.h"
 #include "native_window_helper.h"
+#include <cmath>
 
-const char vertexShaderSrc[] = R"""(
-#include <metal_stdlib>
-using namespace metal;
+namespace el {
 
-vertex float4 main0(
-                    const device packed_float3* vertexArray [[buffer(0)]],
-                    unsigned int vID[[vertex_id]])
-{
-    return float4(vertexArray[vID], 1.0);
+    float radians(float degrees)
+    {
+        const float pi = std::acos(-1.f);
+        return degrees * pi / 180.f;
+    }
+
+    const char vertexShaderSrc[] = R"""(
+        #include <metal_stdlib>
+        using namespace metal;
+    
+        typedef struct
+        {
+            packed_float3 position;
+            packed_float2 texcoord;
+        } vertex_t;
+
+        typedef struct
+        {
+            float4 clipSpacePosition [[position]];
+            float2 textureCoordinate;
+        } RasterizerData;
+
+        vertex RasterizerData main0(
+            const device vertex_t* vertexArray [[buffer(0)]],
+            unsigned int vID[[vertex_id]])
+        {
+            RasterizerData data;
+            data.clipSpacePosition = float4(vertexArray[vID].position, 1.0);
+            data.textureCoordinate = vertexArray[vID].texcoord;
+            return data;
+        }
+    )""";
+    
+    const char fragmentShaderSrc[] = R"""(
+        #include <metal_stdlib>
+        using namespace metal;
+    
+        typedef struct
+        {
+            float4 clipSpacePosition [[position]];
+            float2 textureCoordinate;
+        } RasterizerData;
+    
+        fragment half4 main0(
+            RasterizerData in [[stage_in]],
+            texture2d<half> colorTexture [[texture(0)]])
+        {
+            constexpr sampler textureSampler (mag_filter::nearest,
+                                              min_filter::nearest);
+            // Sample the texture to obtain a color
+            const half4 colorSample = colorTexture.sample(textureSampler, in.textureCoordinate);
+            
+            // We return the color of the texture
+            return colorSample;
+        }
+    )""";
+    
+    // AAPLVertex improve;
+    const float vertexData[] =
+    {
+         0.0f,  1.0f, 0.0f,  0.5f, 0.0f,
+         1.0f, -1.0f, 0.0f,  1.0f, 1.0f,
+        -1.0f, -1.0f, 0.0f,  0.0f, 1.0f,
+    };
+    
+    char _pixels[16 * 16];
 }
-)""";
-
-const char fragmentShaderSrc[] = R"""(
-#include <metal_stdlib>
-using namespace metal;
-fragment half4 fragFunc()
-{
-    return half4(1.0, 0.0, 0.0, 1.0);
-}
-)""";
 
 int main()
 {
+    int y, x;
+    for (y = 0;  y < 16;  y++)
+    {
+        for (x = 0;  x < 16;  x++)
+            el::_pixels[y * 16 + x] = rand() % 256;
+    }
+    
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window* window = SDL_CreateWindow("sdl sample",
@@ -53,20 +110,56 @@ int main()
     EL_ASSERT(window != nullptr);
 
     void *view = ::getNativeWindow(window);
-
+    
+    el::Viewport viewport;
+    
     const auto colorFormat = el::GraphicsPixelFormatBGRA8Unorm;
     const auto depthFormat = el::GraphicsPixelFormatDepth32Float;
     void *nativeSurface = setupMetalLayer(view);
+
+#if 0
+    const std::string objfiles[] = {
+		"kitten.obj",
+		"rabbit.obj",
+		"wolf.obj",
+    };
+
+    Geometry geometry;
+    for (uint32_t i = 0; i < el::countof(objfiles); i++)
+        EL_ASSERT(LoadMesh(&geometry, el::getResourcePath() + objfiles[i]));
+#endif
+
     
     el::MetalDriver driver;
     driver.setup(nativeSurface);
     
-    el::setupRenderPasses();
+    el::RenderPassParms params {};
+    params.flags.clear = el::GraphicsTargetBufferFlagBitColor;
+    params.clearColor = el::math::float4(0.2f, 0.4f, 0.6f, 1.0f);
+    // params.viewport
+    // params.label = "color-pass";
     
-    auto clearSurface = el::renderPassColor;
-    clearSurface.clearColor = el::math::float4(0.2f, 0.4f, 0.6f, 1.0f);
+    auto program = driver.createProgram(el::vertexShaderSrc, el::fragmentShaderSrc);
     
-    auto program = driver.createProgram(vertexShaderSrc, fragmentShaderSrc);
+#if 0
+    id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+    
+    id<MTLBuffer> vertexBuffer = [device newBufferWithBytes:el::vertexData
+                                                     length:sizeof(el::vertexData)
+                                                    options:MTLResourceStorageModeShared];
+
+
+    id<MTLRenderCommandEncoder> encoder;
+    [encoder setVertexBuffer:vertexBuffer
+                      offset:0
+                     atIndex:0];
+#endif
+    
+    auto defaultTarget = driver.createDefaultRenderTarget();
+    
+    el::PipelineDesc pipelineDesc {
+        program,
+    };
     
     while (true)
     {
@@ -79,11 +172,11 @@ int main()
 #if __has_feature(objc_arc)
         @autoreleasepool {
 #endif
-            driver.beginFrame();
-            driver.beginRenderPass(clearSurface);
-            driver.drawFrame(program);
-            driver.endRenderPass();
-            driver.commit();
+        driver.beginFrame();
+        driver.beginRenderPass(defaultTarget, params);
+        driver.draw(pipelineDesc);
+        driver.endRenderPass();
+        driver.commit();
             
 #if __has_feature(objc_arc)
         }
@@ -91,7 +184,7 @@ int main()
     }
 
     el::cleanupPipeline();
-    program.destroy();
+    program = nullptr;
     driver.cleanup();
 
     SDL_DestroyWindow(window);
