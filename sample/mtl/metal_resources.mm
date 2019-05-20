@@ -4,7 +4,9 @@
 
 _EL_NAME_BEGIN
 
-MetalProgram::MetalProgram()
+MetalProgram::MetalProgram() :
+    vertexFunction(nil),
+    fragmentFunction(nil)
 {
 }
 
@@ -25,10 +27,11 @@ bool MetalProgram::create(id<MTLDevice> device, const char* vertex, const char* 
     for (auto source : sources)
     {
         NSString* objcSource = [NSString stringWithCString:source
-            encoding:NSUTF8StringEncoding];
+            encoding:NSUTF8StringEncoding]; // autorelease
         id<MTLLibrary> library = [device newLibraryWithSource:objcSource
             options:nil
             error:&error];
+
         if (!library) {
             auto description = [error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding];
             EL_TRACE("Fail to create MTLPipelineState\n%s", description);
@@ -39,7 +42,6 @@ bool MetalProgram::create(id<MTLDevice> device, const char* vertex, const char* 
         outputs[function.functionType] = function;
 
 #if !__has_feature(objc_arc)
-        [objcSource release];
         [library release];
 #endif
     }

@@ -6,10 +6,14 @@
 #include <el_debug.h>
 #include <el_platform.h>
 #include <math_types.h>
+#include <vector>
 
 namespace el {
     struct MetalDriver;
     struct MetalProgram;
+    
+    typedef MTLPixelFormat MetalPixelFormat;
+    typedef std::vector<MetalPixelFormat> MetalPixelFormats;
 
     inline MTLClearColor asMTLClearColor(const math::float4 &color)
     {

@@ -21,7 +21,8 @@ struct MetalContext
     id<CAMetalDrawable> currentDrawable;
     id<MTLRenderCommandEncoder> currentRenderEncoder;
     CAMetalLayer *layer;
-
+    MetalPixelFormats currentColorFormats;
+    MetalPixelFormat currentDepthFormat;
 #if !__has_feature(objc_arc)
     NSAutoreleasePool *framePool;
     NSAutoreleasePool *driverPool;
@@ -47,6 +48,7 @@ MetalDriver::MetalDriver() :
     _context->currentDrawable = nil;
     _context->currentRenderEncoder = nil;
     _context->layer = nil;
+    _context->currentDepthFormat = MTLPixelFormatInvalid;
 
 #if !__has_feature(objc_arc)
     _context->framePool = nil;
@@ -83,6 +85,8 @@ void MetalDriver::cleanup()
     _context->currentRenderEncoder = nil;
     _context->currentCommandBuffer = nil;
     _context->currentDrawable = nil;
+    _context->currentColorFormats.clear();
+    _context->currentDepthFormat = MTLPixelFormatInvalid;
 
     if (_context->commandQueue)
     {
@@ -91,6 +95,7 @@ void MetalDriver::cleanup()
         [oneOffBuffer waitUntilCompleted];
     }
     _context->layer = nil;
+
 #if !__has_feature(objc_arc)
     [_context->commandQueue release];
     [_context->device release];
@@ -144,6 +149,7 @@ struct MetalRenderTarget final
     ~MetalRenderTarget();
     
     id<MTLTexture> getColor();
+    id<MTLTexture> getDepth();
     
     bool isDefault;
     MetalContext& context;
@@ -153,7 +159,9 @@ struct MetalRenderTarget final
 
 MetalRenderTarget::MetalRenderTarget(MetalContext& context) :
     isDefault(true),
-    context(context)
+    context(context),
+    color(nil),
+    depth(nil)
 {
 }
 
@@ -199,37 +207,46 @@ id<MTLTexture> MetalRenderTarget::getColor()
     return color;
 }
 
+id<MTLTexture> MetalRenderTarget::getDepth()
+{
+    return depth;
+}
+
 void MetalDriver::beginRenderPass(const MetalRenderPassDesc& passDesc)
 {
     MetalRenderTarget target(*_context);
-
-    EL_ASSERT(true);
-
+    
+    const uint8_t numRenderTarget = passDesc.colorAttachments.size();
     const MTLClearColor clearColor = asMTLClearColor(passDesc.clearColor);
 
-    // _context->currentSurfaceFormats.resize(passDesc.colorAttachments.size());
-    // _context->currentDepthFormat
-    
-
-    // [_context->device newTextureWithDescriptor>
+    _context->currentColorFormats.resize(numRenderTarget);
     
     MTLRenderPassDescriptor* renderPassDesc = [MTLRenderPassDescriptor renderPassDescriptor];
     
-    for (auto i = 0u; i < passDesc.colorAttachments.size(); i++)
+    for (auto i = 0u; i < numRenderTarget; i++)
     {
-        const auto& color = passDesc.colorAttachments[i];
-        const auto& texture = target.getColor();
+        id<MTLTexture> texture = target.getColor();
+        const auto& colorDesc = passDesc.colorAttachments[i];
 
         MTLRenderPassColorAttachmentDescriptor* colorAttachment = renderPassDesc.colorAttachments[i];
         [colorAttachment setClearColor:clearColor];
-        [colorAttachment setLoadAction:color.load];
-        [colorAttachment setStoreAction:color.store];
-
+        [colorAttachment setLoadAction:colorDesc.load];
+        [colorAttachment setStoreAction:colorDesc.store];
         [colorAttachment setTexture:texture];
 
-        // _context->currentSurfaceFormats[i] = texture.pixelFormat;
+        _context->currentColorFormats[i] = texture.pixelFormat;
     }
-
+    
+    id<MTLTexture> depth = target.getDepth();
+    const auto& depthDesc = passDesc.depthAttachment;
+    MTLRenderPassDepthAttachmentDescriptor* depthAttachment = renderPassDesc.depthAttachment;
+    [depthAttachment setClearDepth:passDesc.clearDepth];
+    [depthAttachment setLoadAction:depthDesc.load];
+    [depthAttachment setStoreAction:depthDesc.store];
+    [depthAttachment setTexture:depth];
+     
+    _context->currentDepthFormat = depth.pixelFormat;
+    
     EL_ASSERT(_context->currentRenderEncoder == nil);
     _context->currentRenderEncoder = [_context->currentCommandBuffer renderCommandEncoderWithDescriptor:renderPassDesc];
 }
@@ -238,9 +255,10 @@ void MetalDriver::drawFrame(const MetalProgram& program)
 {
     PipelineDesc desc {
         program.vertexFunction,
-        program.fragmentFunction
+        program.fragmentFunction,
+        _context->currentColorFormats,
+        _context->currentDepthFormat
     };
-
 
     id<MTLRenderPipelineState> pipeline = aquirePipeline(_context->device, desc);
     EL_ASSERT(pipeline);

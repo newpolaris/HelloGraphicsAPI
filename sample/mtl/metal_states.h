@@ -10,11 +10,13 @@ namespace el {
     {
         id<MTLFunction> vertexFunction;
         id<MTLFunction> fragmentFunction;
-
+        MetalPixelFormats colorFormats;
+        MetalPixelFormat depthFormat;
+        
         bool operator<(const PipelineDesc& desc) const
         {
-            const auto& a = std::tie(vertexFunction, fragmentFunction);
-            const auto& b = std::tie(desc.vertexFunction, desc.fragmentFunction);
+            const auto& a = std::tie(vertexFunction, fragmentFunction, colorFormats, depthFormat);
+            const auto& b = std::tie(desc.vertexFunction, desc.fragmentFunction, desc.colorFormats, desc.depthFormat);
             return a < b;
         }
     };
