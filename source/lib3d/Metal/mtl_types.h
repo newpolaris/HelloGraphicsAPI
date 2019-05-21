@@ -3,7 +3,7 @@
 
 #include <mtlpp.hpp>
 #include <graphics_types.h>
-#include <math_types.h>
+#include <el_math.h>
 
 namespace el {
 

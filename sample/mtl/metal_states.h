@@ -21,8 +21,8 @@ namespace el {
         }
     };
 
-    id<MTLRenderPipelineState> aquirePipeline(id<MTLDevice> device, const MetalPipelineDesc &desc);
-    void cleanupPipeline();
+    id<MTLRenderPipelineState> aquirePipeline(MetalContext* context, const MetalPipelineDesc &desc);
+    void cleanupPipeline(MetalContext* context);
 
 } // namespace el {
 

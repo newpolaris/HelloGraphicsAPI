@@ -1,10 +1,9 @@
 #include "metal_states.h"
-#include <el_debug.h>
 #include <map>
+#include <el_debug.h>
+#include "metal_context.h"
 
 _EL_NAME_BEGIN
-
-std::map<MetalPipelineDesc, id<MTLRenderPipelineState>> cache;
 
 id<MTLRenderPipelineState> createPipeline(id<MTLDevice> device, const MetalPipelineDesc &desc) 
 {
@@ -29,25 +28,27 @@ id<MTLRenderPipelineState> createPipeline(id<MTLDevice> device, const MetalPipel
     return pipeline;
 }
 
-id<MTLRenderPipelineState> aquirePipeline(id<MTLDevice> device, const MetalPipelineDesc& desc)
+id<MTLRenderPipelineState> aquirePipeline(MetalContext* context, const MetalPipelineDesc& desc)
 {
-    auto it = cache.find(desc);
-    if (it != cache.end())
+    EL_ASSERT(context);
+    
+    auto it = context->pipelineCache.find(desc);
+    if (it != context->pipelineCache.end())
         return it->second;
     
-    const auto& pipeline = createPipeline(device, desc);
-    cache.emplace(desc, pipeline);
+    const auto& pipeline = createPipeline(context->device, desc);
+    context->pipelineCache.emplace(desc, pipeline);
    
     return pipeline;
 }
 
-void cleanupPipeline()
+void cleanupPipeline(MetalContext* context)
 {
 #if !__has_feature(objc_arc)
-    for (auto it : cache)
+    for (auto it : context->pipelineCache)
         [it.second release];
 #endif
-    cache.clear();
+    context->pipelineCache.clear();
 }
 
 _EL_NAME_END

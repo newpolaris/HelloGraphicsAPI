@@ -123,7 +123,8 @@ id<MTLTexture> MetalRenderTarget::getDepth()
     return depth;
 }
 
-MetalBuffer::MetalBuffer()
+MetalBuffer::MetalBuffer() :
+    buffer(nil)
 {
 }
 
@@ -164,6 +165,71 @@ void MetalBuffer::destroy()
 {
     [buffer release];
     buffer = nil;
+}
+
+MetalTexture::MetalTexture() :
+    texture(nil)
+{
+}
+
+ MetalTexture::~MetalTexture()
+ {
+     destroy();
+ }
+    
+bool MetalTexture::create(id<MTLDevice> device, const GraphicsTextureDesc &desc)
+{
+    if (device == nil) return false;
+    if (desc.getHeight() == 0 || desc.getWidth() == 0)
+        return false;
+
+    auto format = asMetalPixelFormat(desc.getPixelFormat());
+    MTLTextureDescriptor* textureDesc = [[MTLTextureDescriptor new] autorelease];
+    
+    textureDesc.width = desc.getWidth();
+    textureDesc.height = desc.getHeight();
+    textureDesc.mipmapLevelCount = 1;
+    textureDesc.sampleCount = 1;
+    textureDesc.pixelFormat = format;
+    textureDesc.usage = asMetalTextureUsage(desc.getTextureUsage());
+    textureDesc.resourceOptions = asMetalTextureResourceOptions(desc.getTextureUsage());
+    textureDesc.cpuCacheMode = MTLCPUCacheModeDefaultCache;
+
+    texture = [device newTextureWithDescriptor:textureDesc];
+    
+    if (texture == nil)
+        return false;
+
+    if (desc.getStream())
+    {
+        const int alignment = (int)desc.getPixelAlignment();
+        uint32_t bytesPerRow = desc.getWidth() * asTexelSize(desc.getPixelFormat());
+        // TODO:
+        bytesPerRow = ((bytesPerRow + alignment - 1) / alignment) * alignment;
+        
+        // TODO:
+        if ((desc.getStreamSize() % bytesPerRow) != 0)
+        {
+            
+            return false;
+        }
+    
+        auto region = MTLRegionMake2D( 0, 0, textureDesc.width, textureDesc.height );
+        [texture replaceRegion:region mipmapLevel:0 withBytes:desc.getStream() bytesPerRow:bytesPerRow];
+    }
+	this->desc = desc;
+    return true;
+}
+
+void MetalTexture::destroy()
+{
+    [texture release];
+    texture = nil;
+}
+    
+const GraphicsTextureDesc &MetalTexture::getDesc() const
+{
+    return desc;
 }
 
 _EL_NAME_END

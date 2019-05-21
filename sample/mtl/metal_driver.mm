@@ -2,8 +2,6 @@
 #include "metal_states.h"
 #include "metal_resources.h"
 #include "metal_context.h"
-#include <math_types.h>
-#include <Metal/mtl_types.h>
 #include <graphics_data.h>
 #include <graphics_texture.h>
 
@@ -65,6 +63,8 @@ void MetalDriver::cleanup()
     _context->currentColorFormats.clear();
     _context->currentDepthFormat = MTLPixelFormatInvalid;
 
+    cleanupPipeline(_context);
+    
     if (_context->commandQueue)
     {
         id<MTLCommandBuffer> oneOffBuffer = [_context->commandQueue commandBuffer];
@@ -134,11 +134,19 @@ void MetalDriver::beginRenderPass(const MetalRenderTargetPtr& rt, const RenderPa
     _context->currentDepthFormat = depth.pixelFormat;
     
     // TODO:
-    MTLRenderPassStencilAttachmentDescriptor* stencilAttachment = renderPassDesc.stencilAttachment;
-    [stencilAttachment setClearStencil:params.clearStencil];
+    // MTLRenderPassStencilAttachmentDescriptor* stencilAttachment = renderPassDesc.stencilAttachment;
+    // [stencilAttachment setClearStencil:params.clearStencil];
     
     EL_ASSERT(_context->currentRenderEncoder == nil);
     _context->currentRenderEncoder = [_context->currentCommandBuffer renderCommandEncoderWithDescriptor:renderPassDesc];
+    
+    // TODO:
+    // Metal requires a new command encoder for each render pass, and they cannot be reused.
+    // We must bind certain states for each command encoder, so we dirty the states here to force a
+    // rebinding at the first the draw call of this pass.
+    // mContext->pipelineState.invalidate();
+    // mContext->depthStencilState.invalidate();
+    // mContext->cullModeState.invalidate();
 }
 void MetalDriver::setPipelineState(const PipelineState& state)
 {
@@ -149,18 +157,26 @@ void MetalDriver::setPipelineState(const PipelineState& state)
         _context->currentDepthFormat
     };
 
-    id<MTLRenderPipelineState> pipeline = aquirePipeline(_context->device, pipelineDesc);
+    id<MTLRenderPipelineState> pipeline = aquirePipeline(_context, pipelineDesc);
     EL_ASSERT(pipeline);
-
+    
+    // TODO:
+    // if (updateIfChanged(pipelineDesc)) {
     [_context->currentRenderEncoder setRenderPipelineState:pipeline];
+    // }
 }
 
 
 void MetalDriver::setVertexBuffer(const MetalBufferPtr& vertex, uint32_t slot)
 {
     [_context->currentRenderEncoder setVertexBuffer:vertex->buffer offset:0 atIndex:slot];
-
 }
+
+void MetalDriver::setFragmentTexture(const MetalTexturePtr& texture, uint32_t slot)
+{
+    [_context->currentRenderEncoder setFragmentTexture:texture->texture atIndex:slot];
+}
+
 void MetalDriver::draw(MTLPrimitiveType primitive, uint32_t vertexCount, uint32_t vertexOffset)
 {
     // [_context->currentRenderEncoder setVertexBytes:vertexData length:sizeof(vertexData) atIndex:0];
@@ -169,6 +185,10 @@ void MetalDriver::draw(MTLPrimitiveType primitive, uint32_t vertexCount, uint32_
     // [_context->currentRenderEncoder setCullMode:(MTLCullMode)];
     // [_context->currentRenderEncoder setLabel:(NSString * _Nullable)]
     // [_context->currentRenderEncoder setViewport:(MTLViewport)]
+    
+    // TODO:
+    // [_context->currentRenderEncoder setFragmentSamplerState:(nullable id<MTLSamplerState>) atIndex:(NSUInteger)];
+    
     [_context->currentRenderEncoder drawPrimitives:primitive
                                        vertexStart:vertexOffset
                                        vertexCount:vertexCount];
@@ -212,11 +232,13 @@ MetalRenderTargetPtr MetalDriver::createDefaultRenderTarget()
 
 MetalTexturePtr MetalDriver::createTexture(const GraphicsTextureDesc &desc)
 {
-    auto texture = std::make_shared<MetalTexture>();
-    if (!texture) return nil;
-    if (!texture->create(_context->device, desc))
-        return nil;
-    return texture;
+    @autoreleasepool {
+        auto texture = std::make_shared<MetalTexture>();
+        if (!texture) return nil;
+        if (!texture->create(_context->device, desc))
+            return nil;
+        return texture;
+    }
 }
 
 MetalBufferPtr MetalDriver::createVertexBuffer(const void *stream, size_t streamsize)

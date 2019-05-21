@@ -9,7 +9,7 @@
 #include <mtlpp.hpp>
 #include <graphics_context.h>
 #include <graphics_depth_stencil.h>
-#include <math_types.h>
+#include <el_math.h>
 
 #include "mtl_types.h"
 #include "mtl_device.h"

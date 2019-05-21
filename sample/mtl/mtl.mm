@@ -1,24 +1,14 @@
 #include <SDL.h>
-#include <SDL_syswm.h>
 #include <Cocoa/Cocoa.h>
-#include <mtlpp.hpp>
-#include <el_debug.h>
-
-#include <Metal/mtl_types.h>
-#include <Metal/mtl_texture.h>
-#include <Metal/mtl_shader.h>
-#include <Metal/mtl_device.h>
-#include <Metal/mtl_context.h>
 #include <Metal/Metal.h>
-
+#include <cmath>
+#include <el_debug.h>
 #include <el_utility.h>
-#include <math_types.h>
+#include <el_math.h>
+#include <graphics_data.h>
 
 #include "metal_driver.h"
-#include "metal_resources.h"
-#include "metal_states.h"
 #include "native_window_helper.h"
-#include <cmath>
 
 namespace el {
 
@@ -113,8 +103,8 @@ int main()
     
     el::Viewport viewport;
     
-    const auto colorFormat = el::GraphicsPixelFormatBGRA8Unorm;
-    const auto depthFormat = el::GraphicsPixelFormatDepth32Float;
+    // const auto colorFormat = el::GraphicsPixelFormatBGRA8Unorm;
+    // const auto depthFormat = el::GraphicsPixelFormatDepth32Float;
     void *nativeSurface = setupMetalLayer(view);
 
 #if 0
@@ -142,7 +132,12 @@ int main()
     auto program = driver.createProgram(el::vertexShaderSrc, el::fragmentShaderSrc);
     
     el::GraphicsTextureDesc textureDesc;
-    
+    textureDesc.setWidth(16);
+    textureDesc.setHeight(16);
+    textureDesc.setStream((el::stream_t*)el::_pixels);
+    textureDesc.setStreamSize(16*16);
+    textureDesc.setPixelFormat(el::GraphicsPixelFormatR8Unorm);
+    textureDesc.setTextureUsage(el::GraphicsTextureUsageSampledBit | el::GraphicsTextureUsageUploadableBit);
     auto texture = driver.createTexture(textureDesc);
     EL_ASSERT(texture);
     
@@ -172,7 +167,7 @@ int main()
             driver.beginFrame();
             driver.beginRenderPass(defaultTarget, params);
             driver.setVertexBuffer(vertexBuffer, 0);
-
+            driver.setFragmentTexture(texture, 0);
             driver.setPipelineState(pipelineState);
             driver.draw(MTLPrimitiveTypeTriangle, 3, 0);
             driver.endRenderPass();
@@ -182,9 +177,9 @@ int main()
         }
 #endif
     }
-
-    el::cleanupPipeline();
     program = nullptr;
+    vertexBuffer = nullptr;
+    texture = nullptr;
     driver.cleanup();
 
     SDL_DestroyWindow(window);

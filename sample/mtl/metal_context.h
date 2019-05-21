@@ -2,6 +2,7 @@
 #define __METAL_CONTEXT_H__
 
 #include "metal_types.h"
+#include "metal_states.h"
 
 namespace el {
 
@@ -21,6 +22,8 @@ namespace el {
         NSAutoreleasePool *framePool;
         NSAutoreleasePool *driverPool;
     #endif
+        
+        std::map<MetalPipelineDesc, id<MTLRenderPipelineState>> pipelineCache;
     };
 
 }

@@ -8,5 +8,5 @@
         "__locale": "cpp",
         "locale": "cpp"
     },
-    "vim.hlsearch": true
+    "vim.hlsearch": true,
 }
