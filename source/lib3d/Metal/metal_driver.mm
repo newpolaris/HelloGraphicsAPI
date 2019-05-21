@@ -7,14 +7,8 @@
 
 _EL_NAME_BEGIN
 
-const float vertexData[] =
-{
-    0.0f,  1.0f, 0.0f,
-    -1.0f, -1.0f, 0.0f,
-    1.0f, -1.0f, 0.0f,
-};
-
-MetalDriver::MetalDriver() :
+MetalDriver::MetalDriver(PlatformMetal* platform) :
+    _platform(*platform),
     _context(new MetalContext)
 {
     _context->device = nil;
@@ -88,6 +82,10 @@ void MetalDriver::cleanup()
     _context = nullptr;
 }
 
+void MetalDriver::makeCurrent()
+{
+}
+
 void MetalDriver::beginFrame()
 {
 #if !__has_feature(objc_arc)
@@ -140,11 +138,7 @@ void MetalDriver::beginRenderPass(const MetalRenderTargetPtr& rt, const RenderPa
     EL_ASSERT(_context->currentRenderEncoder == nil);
     _context->currentRenderEncoder = [_context->currentCommandBuffer renderCommandEncoderWithDescriptor:renderPassDesc];
     
-    // TODO:
-    // Metal requires a new command encoder for each render pass, and they cannot be reused.
-    // We must bind certain states for each command encoder, so we dirty the states here to force a
-    // rebinding at the first the draw call of this pass.
-    // mContext->pipelineState.invalidate();
+    // _context->pipelineState.invalidate();
     // mContext->depthStencilState.invalidate();
     // mContext->cullModeState.invalidate();
 }
@@ -177,7 +171,7 @@ void MetalDriver::setFragmentTexture(const MetalTexturePtr& texture, uint32_t sl
     [_context->currentRenderEncoder setFragmentTexture:texture->texture atIndex:slot];
 }
 
-void MetalDriver::draw(MTLPrimitiveType primitive, uint32_t vertexCount, uint32_t vertexOffset)
+void MetalDriver::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, uint32_t vertexOffset)
 {
     // [_context->currentRenderEncoder setVertexBytes:vertexData length:sizeof(vertexData) atIndex:0];
     // [_context->currentRenderEncoder setCullMode:(MTLCullMode)]
@@ -188,8 +182,8 @@ void MetalDriver::draw(MTLPrimitiveType primitive, uint32_t vertexCount, uint32_
     
     // TODO:
     // [_context->currentRenderEncoder setFragmentSamplerState:(nullable id<MTLSamplerState>) atIndex:(NSUInteger)];
-    
-    [_context->currentRenderEncoder drawPrimitives:primitive
+    auto metalPrimitive = asMetalPrimitiveType(primitive);
+    [_context->currentRenderEncoder drawPrimitives:metalPrimitive
                                        vertexStart:vertexOffset
                                        vertexCount:vertexCount];
 }

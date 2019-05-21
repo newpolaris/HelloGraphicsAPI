@@ -11,7 +11,7 @@
 
 namespace el 
 {
-    struct MetalDriver;
+    class MetalDriver;
     struct MetalContext;
 
     typedef MTLPixelFormat MetalPixelFormat;
@@ -21,12 +21,7 @@ namespace el
     typedef std::shared_ptr<struct MetalRenderTarget> MetalRenderTargetPtr;
     typedef std::shared_ptr<struct MetalBuffer> MetalBufferPtr;
     typedef std::shared_ptr<struct MetalTexture> MetalTexturePtr;
-    
-    struct PipelineState
-    {
-        MetalProgramPtr program;
-    };
-    
+
     MTLClearColor asMTLClearColor(const math::float4 &color);
     MTLLoadAction asLoadAction(const RenderPassParms& params, GraphicsTargetBufferFlagBits bit);
     MTLStoreAction asStoreAction(const RenderPassParms& params, GraphicsTargetBufferFlagBits bit);
@@ -34,6 +29,7 @@ namespace el
     MTLPixelFormat asMetalPixelFormat(GraphicsPixelFormat format);
     MTLTextureUsage asMetalTextureUsage(GraphicsTextureUsageFlags flags);
     MTLResourceOptions asMetalTextureResourceOptions(GraphicsTextureUsageFlags flags);
+    MTLPrimitiveType asMetalPrimitiveType(GraphicsPrimitiveType type);
 }
 
 #endif // __METLA_TYPES_H__

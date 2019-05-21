@@ -1,22 +1,16 @@
-#include <SDL.h>
-#include <Cocoa/Cocoa.h>
-#include <Metal/Metal.h>
 #include <cmath>
+#include <SDL.h>
 #include <el_debug.h>
 #include <el_utility.h>
 #include <el_math.h>
 #include <graphics_data.h>
+#include <graphics_texture.h>
 
-#include "metal_driver.h"
-#include "native_window_helper.h"
+#include <graphics_platform.h>
+#include <graphics_driver.h>
+#include <native_window_helper.h>
 
 namespace el {
-
-    float radians(float degrees)
-    {
-        const float pi = std::acos(-1.f);
-        return degrees * pi / 180.f;
-    }
 
     const char vertexShaderSrc[] = R"""(
         #include <metal_stdlib>
@@ -91,7 +85,7 @@ int main()
     
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window* window = SDL_CreateWindow("sdl sample",
+    SDL_Window* window = SDL_CreateWindow("triangle-sample",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
             1280, 768,
@@ -100,36 +94,19 @@ int main()
     EL_ASSERT(window != nullptr);
 
     void *view = ::getNativeWindow(window);
-    
-    el::Viewport viewport;
-    
-    // const auto colorFormat = el::GraphicsPixelFormatBGRA8Unorm;
-    // const auto depthFormat = el::GraphicsPixelFormatDepth32Float;
     void *nativeSurface = setupMetalLayer(view);
-
-#if 0
-    const std::string objfiles[] = {
-		"kitten.obj",
-		"rabbit.obj",
-		"wolf.obj",
-    };
-
-    Geometry geometry;
-    for (uint32_t i = 0; i < el::countof(objfiles); i++)
-        EL_ASSERT(LoadMesh(&geometry, el::getResourcePath() + objfiles[i]));
-#endif
     
-    el::MetalDriver driver;
-    driver.setup(nativeSurface);
+    auto platform = el::DefaultPlatform::create(el::GraphicsDeviceTypeMetal);
+    auto driver = platform->createDriver(nullptr);
+
+    driver->setup(nativeSurface);
     
     el::RenderPassParms params {};
     params.flags.clear = el::GraphicsTargetBufferFlagBitColor;
     params.clearColor = el::math::float4(0.2f, 0.4f, 0.6f, 1.0f);
-    // params.viewport
-    // params.label = "color-pass";
 
-    auto vertexBuffer = driver.createVertexBuffer(el::vertexData, sizeof(el::vertexData));
-    auto program = driver.createProgram(el::vertexShaderSrc, el::fragmentShaderSrc);
+    auto vertexBuffer = driver->createVertexBuffer(el::vertexData, sizeof(el::vertexData));
+    auto program = driver->createProgram(el::vertexShaderSrc, el::fragmentShaderSrc);
     
     el::GraphicsTextureDesc textureDesc;
     textureDesc.setWidth(16);
@@ -138,10 +115,10 @@ int main()
     textureDesc.setStreamSize(16*16);
     textureDesc.setPixelFormat(el::GraphicsPixelFormatR8Unorm);
     textureDesc.setTextureUsage(el::GraphicsTextureUsageSampledBit | el::GraphicsTextureUsageUploadableBit);
-    auto texture = driver.createTexture(textureDesc);
+    auto texture = driver->createTexture(textureDesc);
     EL_ASSERT(texture);
     
-    auto defaultTarget = driver.createDefaultRenderTarget();
+    auto defaultTarget = driver->createDefaultRenderTarget();
     
     el::PipelineState pipelineState {
         program,
@@ -164,14 +141,14 @@ int main()
 #if __has_feature(objc_arc)
         @autoreleasepool {
 #endif
-            driver.beginFrame();
-            driver.beginRenderPass(defaultTarget, params);
-            driver.setVertexBuffer(vertexBuffer, 0);
-            driver.setFragmentTexture(texture, 0);
-            driver.setPipelineState(pipelineState);
-            driver.draw(MTLPrimitiveTypeTriangle, 3, 0);
-            driver.endRenderPass();
-            driver.commit();
+            driver->beginFrame();
+            driver->beginRenderPass(defaultTarget, params);
+            driver->setVertexBuffer(vertexBuffer, 0);
+            driver->setFragmentTexture(texture, 0);
+            driver->setPipelineState(pipelineState);
+            driver->draw(el::GraphicsPrimitiveTypeTriangle, 3, 0);
+            driver->endRenderPass();
+            driver->commit();
             
 #if __has_feature(objc_arc)
         }
@@ -180,8 +157,10 @@ int main()
     program = nullptr;
     vertexBuffer = nullptr;
     texture = nullptr;
-    driver.cleanup();
-
+    driver->cleanup();
+    
+    el::DefaultPlatform::destroy(&platform);
+    
     SDL_DestroyWindow(window);
     SDL_Quit();
 

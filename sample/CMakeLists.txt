@@ -6,7 +6,34 @@ include_directories(${ROOT_PATH}/external/meshoptimizer/src)
 include_directories(${ROOT_PATH}/external/objparser)
 include_directories(${ROOT_PATH}/external/glad/include) 
 
-# Function for building single sample
+add_subdirectory(sampleapp)
+
+function(buildSampleAppChild SAMPLE_NAME)
+    set(SAMPLE_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
+    set(COMMON_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/common)
+    message(STATUS "Generating project file for example in ${SAMPLE_FOLDER}")
+
+    project(${SAMPLE_NAME})
+    file(GLOB HEADER_LIST ${SAMPLE_NAME}/*.h ${SAMPLE_NAME}/*.hpp)
+    file(GLOB SOURCE_LIST ${SAMPLE_NAME}/*.cpp ${SAMPLE_NAME}/*.mm)
+    source_group(${SAMPLE_NAME} FILES ${HEADER_LIST})
+    source_group(${SAMPLE_NAME} FILES ${SOURCE_LIST})
+
+    set(SHADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
+    file(GLOB SHADER_HEADERS "${SHADER_DIR}/*.h")
+    file(GLOB SHADERS "${SHADER_DIR}/*.vert" "${SHADER_DIR}/*.frag" "${SHADER_DIR}/*.comp" "${SHADER_DIR}/*.geom" "${SHADER_DIR}/*.tesc" "${SHADER_DIR}/*.tese" "${SHADER_DIR}/*.mesh")
+    source_group("shaders" FILES ${SHADERS} ${SHADER_HEADERS})
+
+    add_executable(${SAMPLE_NAME} ${HEADER_LIST} ${SOURCE_LIST} ${SHADERS} ${SHADER_HEADERS})
+
+    target_link_libraries(${SAMPLE_NAME} PRIVATE "libsampleapp")
+    target_include_directories(${SAMPLE_NAME} PRIVATE "${libsampleapp_SOURCE_DIR}")
+
+    set_target_properties(${SAMPLE_NAME} PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
+    set_target_properties(${SAMPLE_NAME} PROPERTIES PROJECT_LABEL ${SAMPLE_NAME})
+    set_target_properties(${SAMPLE_NAME} PROPERTIES FOLDER "sample")
+endfunction(buildSampleAppChild)
+
 function(buildSample SAMPLE_NAME)
     set(SAMPLE_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
     set(COMMON_FOLDER ${CMAKE_CURRENT_SOURCE_DIR}/common)
@@ -61,6 +88,7 @@ if(APPLE)
 endif()
 
 if(APPLE)
-    # add_subdirectory(bunny-osx)
-    add_subdirectory(mtl)
+    buildSampleAppChild(triangle)
+    buildSampleAppChild(bunny-osx2)
 endif()
+

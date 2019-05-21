@@ -1,8 +1,8 @@
 #ifndef __METAL_STATES_H__
 #define __METAL_STATES_H__
 
-#include "metal_types.h"
 #include <tuple>
+#include "metal_types.h"
 
 namespace el {
 

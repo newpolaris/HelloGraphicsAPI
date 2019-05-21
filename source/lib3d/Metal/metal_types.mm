@@ -274,7 +274,7 @@ MTLPixelFormat asMetalPixelFormat(GraphicsPixelFormat format)
         return MTLPixelFormatASTC_12x10_LDR;
     case GraphicsPixelFormatASTC_12x12_LDR:
         return MTLPixelFormatASTC_12x12_LDR;
-#endif // #if EL_PLAT_IOS
+#endif // EL_PLAT_IOS
     default:
         EL_ASSERT(false);
         return MTLPixelFormatInvalid;

@@ -15,7 +15,8 @@ set(PLATFORM_CORE_LIST
     ${HEADER_PATH}/el_platform.h
     ${HEADER_PATH}/el_predefine.h
     ${HEADER_PATH}/el_utility.h
-    ${SOURCE_PATH}/el_utility.cpp)
+    ${SOURCE_PATH}/el_utility.cpp
+    ${HEADER_PATH}/el_math.h)
 
 set(PLATFORM_CORE ${PLATFORM_CORE_LIST})
 source_group("Core" FILES ${PLATFORM_CORE_LIST})
