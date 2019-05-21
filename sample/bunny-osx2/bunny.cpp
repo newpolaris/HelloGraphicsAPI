@@ -21,65 +21,54 @@ namespace el {
     }
 
     const char vertexShaderSrc[] = R"""(
-        #include <metal_stdlib>
-        using namespace metal;
-    
-        typedef struct
-        {
-            packed_float3 position;
-            packed_float2 texcoord;
-        } vertex_t;
-
-        typedef struct
-        {
-            float4 clipSpacePosition [[position]];
-            float2 textureCoordinate;
-        } RasterizerData;
-
-        vertex RasterizerData main0(
-            const device vertex_t* vertexArray [[buffer(0)]],
-            unsigned int vID[[vertex_id]])
-        {
-            RasterizerData data;
-            data.clipSpacePosition = float4(vertexArray[vID].position, 1.0);
-            data.textureCoordinate = vertexArray[vID].texcoord;
-            return data;
-        }
+#include <metal_stdlib>
+#pragma clang diagnostic ignored "-Wparentheses-equality"
+using namespace metal;
+struct xlatMtlShaderInput {
+  float3 vPosition [[attribute(0)]];
+  float3 vNormal [[attribute(1)]];
+};
+struct xlatMtlShaderOutput {
+  float4 gl_Position [[position]];
+  float3 color;
+};
+struct xlatMtlShaderUniform {
+  float uScale;
+  float3 uTranslate;
+  float4 uOrientation;
+  float4x4 uProject;
+};
+vertex xlatMtlShaderOutput xlatMtlMain (xlatMtlShaderInput _mtl_i [[stage_in]], constant xlatMtlShaderUniform& _mtl_u [[buffer(0)]])
+{
+  xlatMtlShaderOutput _mtl_o;
+  _mtl_o.color = ((_mtl_i.vNormal * 0.5) + float3(0.5, 0.5, 0.5));
+  float3 b_1 = 0;
+  b_1 = (((_mtl_u.uOrientation.yzx * _mtl_i.vPosition.zxy) - (_mtl_u.uOrientation.zxy * _mtl_i.vPosition.yzx)) + (_mtl_u.uOrientation.w * _mtl_i.vPosition));
+  float4 tmpvar_2 = 0;
+  tmpvar_2.w = 1.0;
+  tmpvar_2.xyz = (((_mtl_i.vPosition + 
+    (2.0 * ((_mtl_u.uOrientation.yzx * b_1.zxy) - (_mtl_u.uOrientation.zxy * b_1.yzx)))
+  ) * _mtl_u.uScale) + _mtl_u.uTranslate);
+  _mtl_o.gl_Position = (_mtl_u.uProject * tmpvar_2);
+  return _mtl_o;
+}
     )""";
     
     const char fragmentShaderSrc[] = R"""(
-        #include <metal_stdlib>
-        using namespace metal;
+#include <metal_stdlib>
+using namespace metal;
+
+struct xlatMtlShaderOutput {
+    float4 gl_Position [[position]];
+    float3 color;
+};
     
-        typedef struct
-        {
-            float4 clipSpacePosition [[position]];
-            float2 textureCoordinate;
-        } RasterizerData;
-    
-        fragment half4 main0(
-            RasterizerData in [[stage_in]],
-            texture2d<half> colorTexture [[texture(0)]])
-        {
-            constexpr sampler textureSampler (mag_filter::nearest,
-                                              min_filter::nearest);
-            // Sample the texture to obtain a color
-            const half4 colorSample = colorTexture.sample(textureSampler, in.textureCoordinate);
-            
-            // We return the color of the texture
-            return colorSample;
-        }
+fragment half4 main0(
+   RasterizerData in [[stage_in]]
+{
+    return half4(in.color, 1.0);
+}
     )""";
-    
-    // AAPLVertex improve;
-    const float vertexData[] =
-    {
-         0.0f,  1.0f, 0.0f,  0.5f, 0.0f,
-         1.0f, -1.0f, 0.0f,  1.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f,  0.0f, 1.0f,
-    };
-    
-    char _pixels[16 * 16];
 }
 
 int main()
@@ -115,19 +104,33 @@ int main()
     params.flags.clear = el::GraphicsTargetBufferFlagBitColor;
     params.clearColor = el::math::float4(0.2f, 0.4f, 0.6f, 1.0f);
 
-    auto vertexBuffer = driver->createVertexBuffer(el::vertexData, sizeof(el::vertexData));
+    auto vertexBuffer = driver->createVertexBuffer(geometry.getVertexData(), sizeof(Vertex) * geometry.getVertexCount());
+    auto indexBuffer = driver->createIndexBuffer(geometry.getIndexData(), sizeof(uint32_t), geometry.getIndexCount());
+
+#if 0
+    GraphicsDataDesc vertices_buffer_desc;
+    vertices_buffer_desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
+    vertices_buffer_desc.setStream(geometry.getVertexData());
+    vertices_buffer_desc.setElementSize(sizeof(Vertex));
+    vertices_buffer_desc.setNumElements(geometry.getVertexCount());
+
+    vertex_buffer = device->createBuffer(vertices_buffer_desc);
+
+    GraphicsDataDesc indices_buffer_desc;
+    indices_buffer_desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
+    indices_buffer_desc.setStream(geometry.getIndexData());
+    indices_buffer_desc.setElementSize(sizeof(uint32_t));
+    indices_buffer_desc.setNumElements(geometry.getIndexCount());
+
+    index_buffer = device->createBuffer(indices_buffer_desc);
+
+    GraphicsInputLayoutDesc input_layout_desc;
+    input_layout_desc.setAttributes(Vertex::getAttributeDescription());
+    input_layout_desc.setBindings(Vertex::getBindingDescription());
+    input_layout = device->createInputLayout(input_layout_desc);
+#endif
+
     auto program = driver->createProgram(el::vertexShaderSrc, el::fragmentShaderSrc);
-    
-    el::GraphicsTextureDesc textureDesc;
-    textureDesc.setWidth(16);
-    textureDesc.setHeight(16);
-    textureDesc.setStream((el::stream_t*)el::_pixels);
-    textureDesc.setStreamSize(16*16);
-    textureDesc.setPixelFormat(el::GraphicsPixelFormatR8Unorm);
-    textureDesc.setTextureUsage(el::GraphicsTextureUsageSampledBit | el::GraphicsTextureUsageUploadableBit);
-    auto texture = driver->createTexture(textureDesc);
-    EL_ASSERT(texture);
-    
     auto defaultTarget = driver->createDefaultRenderTarget();
     
     el::PipelineState pipelineState {
@@ -167,7 +170,10 @@ int main()
     program = nullptr;
     vertexBuffer = nullptr;
     texture = nullptr;
+
     driver->cleanup();
+    delete driver;
+    driver = nullptr;
     
     el::DefaultPlatform::destroy(&platform);
     
