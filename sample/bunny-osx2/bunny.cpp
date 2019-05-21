@@ -10,7 +10,15 @@
 #include <graphics_driver.h>
 #include <native_window_helper.h>
 
+#include "mesh.h"
+
 namespace el {
+
+    float radians(float degrees)
+    {
+        const float pi = std::acos(-1.f);
+        return degrees * pi / 180.f;
+    }
 
     const char vertexShaderSrc[] = R"""(
         #include <metal_stdlib>
@@ -76,12 +84,14 @@ namespace el {
 
 int main()
 {
-    int y, x;
-    for (y = 0;  y < 16;  y++)
-    {
-        for (x = 0;  x < 16;  x++)
-            el::_pixels[y * 16 + x] = rand() % 256;
-    }
+    const std::string objfiles[] = {
+		"kitten.obj",
+		"rabbit.obj",
+		"wolf.obj",
+    };
+    Geometry geometry;
+    for (uint32_t i = 0; i < el::countof(objfiles); i++)
+        EL_ASSERT(LoadMesh(&geometry, el::getResourcePath() + objfiles[i]));
     
     SDL_Init(SDL_INIT_VIDEO);
 
