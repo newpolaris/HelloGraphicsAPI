@@ -1,4 +1,5 @@
 #include <cmath>
+#include <random>
 #include <SDL.h>
 #include <el_debug.h>
 #include <el_utility.h>
@@ -84,6 +85,14 @@ fragment half4 main0(
 }
 )""";
     
+    struct transforms
+    {
+        float uScale;
+        math::float3 uTranslate;
+        math::float4 uOrientation;
+        mat4x4 uProject;
+    };
+
 } // namespace el {
 
 int main()
@@ -144,6 +153,28 @@ int main()
     layoutDesc.setAttributes(el::Vertex::getAttributeDescription());
     layoutDesc.setBindings(el::Vertex::getBindingDescription());
 
+    const float fNear = 0.1f;
+    const float fFar = 1000.f;
+    std::default_random_engine eng(10);
+    std::uniform_real_distribution<float> urd(0, 1);
+    const uint32_t draw_count = 2000;
+    std::vector<el::MeshDraw> draws(draw_count);
+    for (uint32_t i = 0; i < draw_count; i++) {
+        vec3 axis;
+        axis[0] = urd(eng)*2 - 1;
+        axis[1] = urd(eng)*2 - 1;
+        axis[2] = urd(eng)*2 - 1;
+
+        const float angle = el::radians(urd(eng) * 90.f);
+
+        draws[i].translate[0] = urd(eng) * 20.f - 10.f;
+        draws[i].translate[1] = urd(eng) * 20.f - 10.f;
+        draws[i].translate[2] = urd(eng) * -20.f - fNear;
+        draws[i].scale = urd(eng) + 0.5f;
+        quat_rotate(draws[i].orientation, angle, axis); 
+        draws[i].meshIndex = static_cast<uint32_t>(urd(eng) * geometry.meshes.size());
+    }
+
     auto program = driver->createProgram(el::vertexShaderSrc, el::fragmentShaderSrc);
     auto defaultTarget = driver->createDefaultRenderTarget();
 
@@ -157,6 +188,14 @@ int main()
         uint32_t vertexOffset;
     };
     
+    mat4x4 adjust;
+    mat4x4_identity(adjust);
+    adjust[2][2] = 0.5;
+    adjust[2][3] = 0.5;
+    
+    el::transforms transform;
+    auto uniformTrans = driver->createUniform(sizeof(transform));
+    
     while (true)
     {
         bool isQuit = false;
@@ -164,6 +203,19 @@ int main()
         while (SDL_PollEvent(&e))
             isQuit = (e.type == SDL_QUIT);
         if (isQuit) break;
+
+        int w, h;
+        SDL_GetWindowSize(window, &w, &h);
+
+        const float aspect = static_cast<float>(w) / h;
+        mat4x4 project;
+        mat4x4_perspective(project, el::radians(70.f), aspect, fNear, fFar);
+        mat4x4 adjusted;
+        
+        mat4x4_mul(transform.uProject, adjust, project);
+        
+        // context[i]->setUniform("uProject", project);
+        // context[i]->setViewport(Viewport(0, 0, width, height));
 
 #if __has_feature(objc_arc)
         @autoreleasepool {
@@ -174,6 +226,11 @@ int main()
 
             const auto& mesh = geometry.meshes[0];
 
+            // const auto& mesh = geometry.meshes[draw.meshIndex];
+            // context[i]->setUniform("uScale", draw.scale);
+            // context[i]->setUniform("uTranslate", draw.translate);
+            // context[i]->setUniform("uOrientation", draw.orientation);
+            driver->setUniform(0, uniformTrans);
             driver->setVertexBuffer(vertexBuffer, 0, mesh.vertexOffset);
             driver->draw(el::GraphicsPrimitiveTypeTriangle, 
                          indexBuffer,
