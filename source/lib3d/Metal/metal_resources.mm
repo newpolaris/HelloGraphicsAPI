@@ -155,7 +155,8 @@ bool MetalBuffer::create(id<MTLDevice> device, const GraphicsDataDesc& desc)
     buffer  = [device newBufferWithBytes:desc.getStream()
                                   length:desc.getStreamSize()
                                  options:MTLResourceStorageModeShared];
-    if (buffer == nil) return false;
+    if (buffer == nil)
+        return false;
 
     this->desc = desc;
     return true;

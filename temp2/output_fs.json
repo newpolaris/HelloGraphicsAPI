@@ -1,0 +1,21 @@
+{
+  "language": "gles",
+  "profile_version": 110,
+  "fs": {
+    "file": "output_fs",
+    "inputs": [
+      {
+        "id": 17,
+        "name": "color",
+        "location": 0
+      }
+    ],
+    "outputs": [
+      {
+        "id": 22,
+        "name": "fragColor",
+        "location": 0
+      }
+    ]
+  }
+}

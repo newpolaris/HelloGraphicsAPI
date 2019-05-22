@@ -1,4 +1,5 @@
 #include <graphics_input_layout.h>
+#include <tuple>
 
 using namespace el;
 
@@ -44,6 +45,20 @@ void GraphicsInputBinding::setInputRate(GraphicsInputRate rate)
 GraphicsInputRate GraphicsInputBinding::getInputRate() const
 {
     return _inputRate;
+}
+
+bool GraphicsInputBinding::operator==(const GraphicsInputBinding& other) const
+{
+    const auto& a = std::tie(_binding, _stride, _inputRate);
+    const auto& b = std::tie(other._binding, other._stride, other._inputRate);
+    return a == b;
+}
+
+bool GraphicsInputBinding::operator<(const GraphicsInputBinding& other) const
+{
+    const auto& a = std::tie(_binding, _stride, _inputRate);
+    const auto& b = std::tie(other._binding, other._stride, other._inputRate);
+    return a < b;
 }
 
 GraphicsInputAttribute::GraphicsInputAttribute() :
@@ -111,6 +126,20 @@ void GraphicsInputAttribute::setOffset(uint32_t offset)
 uint32_t GraphicsInputAttribute::getOffset() const
 {
     return _offset;
+}
+
+bool GraphicsInputAttribute::operator==(const GraphicsInputAttribute& other) const
+{
+    const auto& a = std::tie(_binding, _name, _location, _format, _offset);
+    const auto& b = std::tie(other._binding, other._name, other._location, other._format, other._offset);
+    return a == b;
+}
+
+bool GraphicsInputAttribute::operator<(const GraphicsInputAttribute& other) const
+{
+    const auto& a = std::tie(_binding, _name, _location, _format, _offset);
+    const auto& b = std::tie(other._binding, other._name, other._location, other._format, other._offset);
+    return a < b;
 }
 
 GraphicsInputLayoutDesc::GraphicsInputLayoutDesc()

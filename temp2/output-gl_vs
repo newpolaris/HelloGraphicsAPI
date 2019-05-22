@@ -1,0 +1,24 @@
+#version 120
+
+struct matrices
+{
+    mat4 projection;
+    mat4 view;
+    mat4 model;
+};
+
+uniform matrices _19;
+
+attribute vec3 aPos;
+flat varying vec4 outColor;
+attribute vec4 aColor;
+varying vec2 outCoord;
+attribute vec2 aCoord;
+
+void main()
+{
+    gl_Position = ((_19.projection * _19.view) * _19.model) * vec4(aPos, 1.0);
+    outColor = aColor;
+    outCoord = aCoord;
+}
+

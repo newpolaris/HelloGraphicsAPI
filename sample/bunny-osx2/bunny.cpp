@@ -5,9 +5,10 @@
 #include <el_math.h>
 #include <graphics_data.h>
 #include <graphics_texture.h>
-
 #include <graphics_platform.h>
 #include <graphics_driver.h>
+#include <graphics_input_layout.h>
+#include <graphics_pipeline.h>
 #include <native_window_helper.h>
 
 #include "mesh.h"
@@ -21,55 +22,69 @@ namespace el {
     }
 
     const char vertexShaderSrc[] = R"""(
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+    
 #include <metal_stdlib>
-#pragma clang diagnostic ignored "-Wparentheses-equality"
-using namespace metal;
-struct xlatMtlShaderInput {
-  float3 vPosition [[attribute(0)]];
-  float3 vNormal [[attribute(1)]];
-};
-struct xlatMtlShaderOutput {
-  float4 gl_Position [[position]];
-  float3 color;
-};
-struct xlatMtlShaderUniform {
-  float uScale;
-  float3 uTranslate;
-  float4 uOrientation;
-  float4x4 uProject;
-};
-vertex xlatMtlShaderOutput xlatMtlMain (xlatMtlShaderInput _mtl_i [[stage_in]], constant xlatMtlShaderUniform& _mtl_u [[buffer(0)]])
-{
-  xlatMtlShaderOutput _mtl_o;
-  _mtl_o.color = ((_mtl_i.vNormal * 0.5) + float3(0.5, 0.5, 0.5));
-  float3 b_1 = 0;
-  b_1 = (((_mtl_u.uOrientation.yzx * _mtl_i.vPosition.zxy) - (_mtl_u.uOrientation.zxy * _mtl_i.vPosition.yzx)) + (_mtl_u.uOrientation.w * _mtl_i.vPosition));
-  float4 tmpvar_2 = 0;
-  tmpvar_2.w = 1.0;
-  tmpvar_2.xyz = (((_mtl_i.vPosition + 
-    (2.0 * ((_mtl_u.uOrientation.yzx * b_1.zxy) - (_mtl_u.uOrientation.zxy * b_1.yzx)))
-  ) * _mtl_u.uScale) + _mtl_u.uTranslate);
-  _mtl_o.gl_Position = (_mtl_u.uProject * tmpvar_2);
-  return _mtl_o;
-}
-    )""";
+#include <simd/simd.h>
+    
+    using namespace metal;
+    
+    struct transforms
+    {
+        float uScale;
+        float3 uTranslate;
+        float4 uOrientation;
+        float4x4 uProject;
+    };
+    
+    struct main0_out
+    {
+        float3 color [[user(locn0)]];
+        float4 gl_Position [[position]];
+    };
+    
+    struct main0_in
+    {
+        float3 vPosition [[attribute(0)]];
+        float3 vNormal [[attribute(1)]];
+        float2 vTexcoord [[attribute(2)]];
+    };
+    
+    float3 rotate_position(thread const float4& quat, thread const float3& v)
+    {
+        return v + (cross(quat.xyz, cross(quat.xyz, v) + (v * quat.w)) * 2.0);
+    }
+    
+    vertex main0_out main0(main0_in in [[stage_in]], constant transforms& _56 [[buffer(0)]])
+    {
+        main0_out out = {};
+        out.color = (in.vNormal * 0.5) + float3(0.5);
+        float4 param = _56.uOrientation;
+        float3 param_1 = in.vPosition;
+        // out.gl_Position = _56.uProject * float4((rotate_position(param, param_1) * _56.uScale) + _56.uTranslate, 1.0);
+        out.gl_Position = float4(param_1, 1.0);
+        return out;
+    }
+)""";
     
     const char fragmentShaderSrc[] = R"""(
 #include <metal_stdlib>
 using namespace metal;
 
-struct xlatMtlShaderOutput {
+struct main0_out
+{
+    float3 color [[user(locn0)]];
     float4 gl_Position [[position]];
-    float3 color;
 };
     
 fragment half4 main0(
-   RasterizerData in [[stage_in]]
+   main0_out in [[stage_in]])
 {
-    return half4(in.color, 1.0);
+    return half4(float4(in.color, 1.0));
 }
-    )""";
-}
+)""";
+    
+} // namespace el {
 
 int main()
 {
@@ -78,9 +93,9 @@ int main()
 		"rabbit.obj",
 		"wolf.obj",
     };
-    Geometry geometry;
+    el::Geometry geometry;
     for (uint32_t i = 0; i < el::countof(objfiles); i++)
-        EL_ASSERT(LoadMesh(&geometry, el::getResourcePath() + objfiles[i]));
+        EL_ASSERT(LoadMesh(&geometry, EL_DEFINE_RESOURCE_PATH + objfiles[i]));
     
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -104,8 +119,8 @@ int main()
     params.flags.clear = el::GraphicsTargetBufferFlagBitColor;
     params.clearColor = el::math::float4(0.2f, 0.4f, 0.6f, 1.0f);
 
-    auto vertexBuffer = driver->createVertexBuffer(geometry.getVertexData(), sizeof(Vertex) * geometry.getVertexCount());
-    auto indexBuffer = driver->createIndexBuffer(geometry.getIndexData(), sizeof(uint32_t), geometry.getIndexCount());
+    auto vertexBuffer = driver->createVertexBuffer(geometry.getVertexData(), sizeof(el::Vertex) * geometry.getVertexCount());
+    auto indexBuffer = driver->createIndexBuffer(geometry.getIndexData(), geometry.getIndexCount()*sizeof(uint32_t), sizeof(uint32_t));
 
 #if 0
     GraphicsDataDesc vertices_buffer_desc;
@@ -123,19 +138,18 @@ int main()
     indices_buffer_desc.setNumElements(geometry.getIndexCount());
 
     index_buffer = device->createBuffer(indices_buffer_desc);
-
-    GraphicsInputLayoutDesc input_layout_desc;
-    input_layout_desc.setAttributes(Vertex::getAttributeDescription());
-    input_layout_desc.setBindings(Vertex::getBindingDescription());
-    input_layout = device->createInputLayout(input_layout_desc);
 #endif
+
+    el::GraphicsInputLayoutDesc layoutDesc;
+    layoutDesc.setAttributes(el::Vertex::getAttributeDescription());
+    layoutDesc.setBindings(el::Vertex::getBindingDescription());
 
     auto program = driver->createProgram(el::vertexShaderSrc, el::fragmentShaderSrc);
     auto defaultTarget = driver->createDefaultRenderTarget();
-    
-    el::PipelineState pipelineState {
-        program,
-    };
+
+    el::PipelineState pipelineState;
+    pipelineState.program = program;
+    pipelineState.inputLayout = layoutDesc;
     
     struct DrawCommands
     {
@@ -156,10 +170,16 @@ int main()
 #endif
             driver->beginFrame();
             driver->beginRenderPass(defaultTarget, params);
-            driver->setVertexBuffer(vertexBuffer, 0);
-            driver->setFragmentTexture(texture, 0);
             driver->setPipelineState(pipelineState);
-            driver->draw(el::GraphicsPrimitiveTypeTriangle, 3, 0);
+
+            const auto& mesh = geometry.meshes[0];
+
+            driver->setVertexBuffer(vertexBuffer, 0, mesh.vertexOffset);
+            driver->draw(el::GraphicsPrimitiveTypeTriangle, 
+                         indexBuffer,
+                         mesh.indexCount,
+                         mesh.indexOffset);
+
             driver->endRenderPass();
             driver->commit();
             
@@ -169,7 +189,6 @@ int main()
     }
     program = nullptr;
     vertexBuffer = nullptr;
-    texture = nullptr;
 
     driver->cleanup();
     delete driver;

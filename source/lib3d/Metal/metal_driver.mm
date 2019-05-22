@@ -4,6 +4,7 @@
 #include "metal_context.h"
 #include <graphics_data.h>
 #include <graphics_texture.h>
+#include <graphics_pipeline.h>
 
 _EL_NAME_BEGIN
 
@@ -84,6 +85,28 @@ void MetalDriver::cleanup()
 
 void MetalDriver::makeCurrent()
 {
+    MTLVertexDescriptor *desc = [MTLVertexDescriptor new];
+    
+    // Positions.
+    desc.attributes[0].format = MTLVertexFormatFloat3;
+    desc.attributes[0].offset = 0;
+    desc.attributes[0].bufferIndex = 0;
+    
+    // Normals.
+    desc.attributes[1].format = MTLVertexFormatFloat3;
+    desc.attributes[1].offset = 12;
+    desc.attributes[1].bufferIndex = 0;
+    
+    // Texture coordinates.
+    desc.attributes[2].format = MTLVertexFormatHalf2;
+    desc.attributes[2].offset = 24;
+    desc.attributes[2].bufferIndex = 0;
+    
+    // Single interleaved buffer.
+    desc.layouts[0].stride = 28;
+    desc.layouts[0].stepRate = 1;
+    desc.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
+    
 }
 
 void MetalDriver::beginFrame()
@@ -142,13 +165,33 @@ void MetalDriver::beginRenderPass(const MetalRenderTargetPtr& rt, const RenderPa
     // mContext->depthStencilState.invalidate();
     // mContext->cullModeState.invalidate();
 }
+
 void MetalDriver::setPipelineState(const PipelineState& state)
 {
+    MTLVertexDescriptor *vertex = [MTLVertexDescriptor vertexDescriptor];
+    
+    const auto& inputLayout = state.inputLayout;
+    const auto& bindings = inputLayout.getBindings();
+    for (uint32_t i = 0; i < bindings.size(); i++)
+    {
+        vertex.layouts[i].stepFunction = asMetalVertexStepFunction(bindings[i].getInputRate());
+        vertex.layouts[i].stride = bindings[i].getStride();
+    }
+    
+    const auto& attributes = inputLayout.getAttributes();
+    for (uint32_t i = 0; i < attributes.size(); i++)
+    {
+        vertex.attributes[i].bufferIndex = attributes[i].getBinding();
+        vertex.attributes[i].format = asMetalVertexFormat(attributes[i].getFormat());
+        vertex.attributes[i].offset = attributes[i].getOffset();
+    }
+    
     MetalPipelineDesc pipelineDesc {
         state.program->vertexFunction,
         state.program->fragmentFunction,
+        vertex,
         _context->currentColorFormats,
-        _context->currentDepthFormat
+        _context->currentDepthFormat,
     };
 
     id<MTLRenderPipelineState> pipeline = aquirePipeline(_context, pipelineDesc);
@@ -160,8 +203,7 @@ void MetalDriver::setPipelineState(const PipelineState& state)
     // }
 }
 
-
-void MetalDriver::setVertexBuffer(const MetalBufferPtr& vertex, uint32_t slot)
+void MetalDriver::setVertexBuffer(const MetalBufferPtr& vertex, uint32_t slot, uint32_t offset)
 {
     [_context->currentRenderEncoder setVertexBuffer:vertex->buffer offset:0 atIndex:slot];
 }
@@ -186,6 +228,29 @@ void MetalDriver::draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, ui
     [_context->currentRenderEncoder drawPrimitives:metalPrimitive
                                        vertexStart:vertexOffset
                                        vertexCount:vertexCount];
+}
+
+MTLIndexType asMetalIndexType(size_t elementSize)
+{
+    switch (elementSize)
+    {
+    case 2: return MTLIndexTypeUInt16;
+    case 4: return MTLIndexTypeUInt32;
+    default:
+        EL_ASSERT(false);
+        return MTLIndexType(0);
+    }
+}
+
+void MetalDriver::draw(GraphicsPrimitiveType primitive, const MetalBufferPtr& indexBuffer, uint32_t indexCount, uint32_t offset)
+{
+    auto metalPrimitive = asMetalPrimitiveType(primitive);
+    auto indexType = asMetalIndexType(indexBuffer->getDesc().getElementSize());
+    [_context->currentRenderEncoder drawIndexedPrimitives:metalPrimitive
+                                               indexCount:indexCount
+                                                indexType:indexType
+                                              indexBuffer:indexBuffer->buffer
+                                        indexBufferOffset:offset];
 }
 
 void MetalDriver::endRenderPass()
@@ -235,12 +300,29 @@ MetalTexturePtr MetalDriver::createTexture(const GraphicsTextureDesc &desc)
     }
 }
 
+MetalBufferPtr MetalDriver::createIndexBuffer(const void* stream, size_t streamsize, size_t elementSize)
+{
+    GraphicsDataDesc desc;
+    desc.setStream((const el::stream_t*)stream);
+    desc.setElementSize(elementSize);
+    desc.setNumElements(streamsize/elementSize);
+    desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
+    
+    auto buffer = std::make_shared<MetalBuffer>();
+    if (!buffer) return nullptr;
+    if (!buffer->create(_context->device, desc))
+        return nullptr;
+    return buffer;
+
+}
+
 MetalBufferPtr MetalDriver::createVertexBuffer(const void *stream, size_t streamsize)
 {
     GraphicsDataDesc desc;
     desc.setStream((const el::stream_t*)stream);
     desc.setElementSize(sizeof(char));
     desc.setNumElements(streamsize);
+    desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
     
     auto buffer = std::make_shared<MetalBuffer>();
     if (!buffer) return nullptr;

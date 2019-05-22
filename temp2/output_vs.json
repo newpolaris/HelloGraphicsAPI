@@ -1,0 +1,73 @@
+{
+  "language": "msl",
+  "profile_version": 0,
+  "vs": {
+    "file": "output_vs",
+    "inputs": [
+      {
+        "id": 33,
+        "name": "aPos",
+        "location": 0,
+        "semantic": "POSITION",
+        "semantic_index": 0,
+        "type": "float3"
+      },
+      {
+        "id": 45,
+        "name": "aColor",
+        "location": 10,
+        "semantic": "COLOR",
+        "semantic_index": 0,
+        "type": "float4"
+      },
+      {
+        "id": 51,
+        "name": "aCoord",
+        "location": 2,
+        "semantic": "TEXCOORD",
+        "semantic_index": 0,
+        "type": "float2"
+      }
+    ],
+    "outputs": [
+      {
+        "id": 43,
+        "name": "outColor",
+        "location": 10
+      },
+      {
+        "id": 49,
+        "name": "outCoord",
+        "location": 2
+      }
+    ],
+    "uniform_buffers": [
+      {
+        "id": 19,
+        "name": "matrices",
+        "set": 0,
+        "block_size": 192,
+        "members": [
+          {
+            "name": "projection",
+            "type": "mat4",
+            "offset": 0,
+            "size": 64
+          },
+          {
+            "name": "view",
+            "type": "mat4",
+            "offset": 64,
+            "size": 64
+          },
+          {
+            "name": "model",
+            "type": "mat4",
+            "offset": 128,
+            "size": 64
+          }
+        ]
+      }
+    ]
+  }
+}

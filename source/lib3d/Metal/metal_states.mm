@@ -13,7 +13,8 @@ id<MTLRenderPipelineState> createPipeline(id<MTLDevice> device, const MetalPipel
     descriptor.depthAttachmentPixelFormat = desc.depthFormat;
     descriptor.vertexFunction = desc.vertexFunction;
     descriptor.fragmentFunction = desc.fragmentFunction;
-    
+    descriptor.vertexDescriptor = desc.vertexDescriptor;
+
     NSError* error = nullptr;
     id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:descriptor
                                                                                  error:&error];

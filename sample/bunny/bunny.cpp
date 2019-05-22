@@ -87,7 +87,7 @@ void main()
     const std::string getResourcePath()
     {
     #if EL_PLAT_IOS
-        return[NSBundle.mainBundle.resourcePath stringByAppendingString : @"/data / "].UTF8String;
+        return [NSBundle.mainBundle.resourcePath stringByAppendingString : @"/data / "].UTF8String;
     #elif EL_PLAT_ANDROID
         return "";
     #else
@@ -290,13 +290,13 @@ int bunny_run()
             context[i]->setUniform("uProject", project);
             context[i]->setViewport(Viewport(0, 0, width, height));
             context[i]->setIndexBuffer(index_buffer);
+            context[i]->setVertexBuffer("vPosition", vertex_buffer, sizeof(Vertex), offsetof(Vertex, x));
+            context[i]->setVertexBuffer("vNormal", vertex_buffer, sizeof(Vertex), offsetof(Vertex, nx));
+            context[i]->setVertexBuffer("vTexcoord", vertex_buffer, sizeof(Vertex), offsetof(Vertex, tu));
             for (auto& draw : draws)
             {
                 const auto& mesh = geometry.meshes[draw.meshIndex];
                 const uint32_t vertexOffsetInByte = mesh.vertexOffset * sizeof(Vertex);
-                context[i]->setVertexBuffer("vPosition", vertex_buffer, sizeof(Vertex), offsetof(Vertex, x));
-                context[i]->setVertexBuffer("vNormal", vertex_buffer, sizeof(Vertex), offsetof(Vertex, nx));
-                context[i]->setVertexBuffer("vTexcoord", vertex_buffer, sizeof(Vertex), offsetof(Vertex, tu));
 
                 context[i]->setUniform("uScale", draw.scale);
                 context[i]->setUniform("uTranslate", draw.translate);

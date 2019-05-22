@@ -10,6 +10,7 @@ namespace el {
     {
         id<MTLFunction> vertexFunction;
         id<MTLFunction> fragmentFunction;
+        MTLVertexDescriptor *vertexDescriptor;
         MetalPixelFormats colorFormats;
         MetalPixelFormat depthFormat;
 

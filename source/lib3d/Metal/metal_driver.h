@@ -25,11 +25,13 @@ namespace el {
         void endRenderPass() override;
         
         void setPipelineState(const PipelineState& state) override;
-        void setVertexBuffer(const MetalBufferPtr& buffer, uint32_t slot) override;
+        void setVertexBuffer(const MetalBufferPtr& buffer, uint32_t slot, uint32_t offset) override;
         void setFragmentTexture(const MetalTexturePtr& texture, uint32_t slot) override;
         void draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, uint32_t vertexOffset) override;
+        void draw(GraphicsPrimitiveType primitive, const MetalBufferPtr& indexBuffer, uint32_t indexCount, uint32_t offset) override;
         
         MetalTexturePtr createTexture(const GraphicsTextureDesc &desc) override;
+        MetalBufferPtr createIndexBuffer(const void* stream, size_t streamsize, size_t elementSize) override;
         MetalBufferPtr createVertexBuffer(const void* stream, size_t streamsize) override;
         MetalProgramPtr createProgram(const char* vertexShaderSrc, const char* fragmentShaderSrc) override;
         MetalRenderTargetPtr createDefaultRenderTarget() override;

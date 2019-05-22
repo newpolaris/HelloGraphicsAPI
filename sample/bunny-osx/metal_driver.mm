@@ -63,7 +63,7 @@ void MetalDriver::endFrame()
 }
 
 void MetalDriver::beginRenderPass(const MetalRenderTarget& rt, const PassDescriptor& passDesc, const std::string& label)
-{
+{    
     EL_ASSERT(!_context->renderCommandEncoder);
     
     mtlpp::RenderPassDescriptor desc;

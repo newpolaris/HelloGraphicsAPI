@@ -1,0 +1,42 @@
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+
+#include <metal_stdlib>
+#include <simd/simd.h>
+
+using namespace metal;
+
+struct transforms
+{
+    float uScale;
+    float3 uTranslate;
+    float4 uOrientation;
+    float4x4 uProject;
+};
+
+struct main0_out
+{
+    float3 color [[user(locn0)]];
+    float4 gl_Position [[position]];
+};
+
+struct main0_in
+{
+    float3 vNormal [[attribute(0)]];
+    float3 vPosition [[attribute(1)]];
+};
+
+float3 rotate_position(thread const float4& quat, thread const float3& v)
+{
+    return v + (cross(quat.xyz, cross(quat.xyz, v) + (v * quat.w)) * 2.0);
+}
+
+vertex main0_out main0(main0_in in [[stage_in]], constant transforms& _56 [[buffer(0)]])
+{
+    main0_out out = {};
+    out.color = (in.vNormal * 0.5) + float3(0.5);
+    float4 param = _56.uOrientation;
+    float3 param_1 = in.vPosition;
+    out.gl_Position = _56.uProject * float4((rotate_position(param, param_1) * _56.uScale) + _56.uTranslate, 1.0);
+    return out;
+}
+

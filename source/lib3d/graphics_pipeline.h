@@ -3,7 +3,18 @@
     
 #include <graphics_types.h>
 
+// temp
+#include <graphics_input_layout.h>
+
 namespace el {
+    
+    typedef std::shared_ptr<struct MetalProgram> MetalProgramPtr;
+    
+    struct PipelineState
+    {
+        MetalProgramPtr program;
+        GraphicsInputLayoutDesc inputLayout;
+    };
     
     class GraphicsPipelineDesc
     {

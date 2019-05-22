@@ -21,6 +21,9 @@ namespace el {
         void setInputRate(GraphicsInputRate rate);
         GraphicsInputRate getInputRate() const;
 
+        bool operator==(const GraphicsInputBinding& other) const;
+        bool operator<(const GraphicsInputBinding& other) const;
+        
     private:
 
         uint32_t _binding;
@@ -49,6 +52,9 @@ namespace el {
 
         void setOffset(uint32_t offset);
         uint32_t getOffset() const;
+        
+        bool operator==(const GraphicsInputAttribute& other) const;
+        bool operator<(const GraphicsInputAttribute& other) const;
 
     private:
 
@@ -74,6 +80,9 @@ namespace el {
         void setBindings(GraphicsInputBindings bindings);
         const GraphicsInputBindings& getBindings() const;
 
+        bool operator==(const GraphicsInputLayoutDesc& other) const;
+        bool operator<(const GraphicsInputLayoutDesc& other) const;
+        
     private:
 
         GraphicsInputAttributes _attributes;

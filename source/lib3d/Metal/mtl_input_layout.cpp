@@ -34,7 +34,7 @@ bool MTLInputLayout::create(const GraphicsInputLayoutDesc& desc)
         attributes[i].SetOffset(source[i].getOffset());
     }
 
-    _desc = std::move(desc);
+    _desc = desc;
 
     return true;
 }

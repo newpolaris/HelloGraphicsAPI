@@ -30,6 +30,8 @@ namespace el
     MTLTextureUsage asMetalTextureUsage(GraphicsTextureUsageFlags flags);
     MTLResourceOptions asMetalTextureResourceOptions(GraphicsTextureUsageFlags flags);
     MTLPrimitiveType asMetalPrimitiveType(GraphicsPrimitiveType type);
+    MTLVertexStepFunction asMetalVertexStepFunction(GraphicsInputRate func);
+    MTLVertexFormat asMetalVertexFormat(GraphicsVertexFormat format);
 }
 
 #endif // __METLA_TYPES_H__

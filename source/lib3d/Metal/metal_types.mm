@@ -432,7 +432,7 @@ MTLStencilOperation asStencilOperation(GraphicsStencilOp func)
     }
 }
 
-MTLVertexFormat asVertexFormat(GraphicsVertexFormat format)
+MTLVertexFormat asMetalVertexFormat(GraphicsVertexFormat format)
 {
     switch (format)
     {
@@ -532,7 +532,7 @@ MTLVertexFormat asVertexFormat(GraphicsVertexFormat format)
     }
 }
 
-MTLVertexStepFunction asVertexStepFunction(GraphicsInputRate func)
+MTLVertexStepFunction asMetalVertexStepFunction(GraphicsInputRate func)
 {
     switch (func)
     {
