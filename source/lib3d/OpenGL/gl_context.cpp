@@ -151,10 +151,6 @@ void GLContext::setCullFaceEnable(bool enable)
 
 void GLContext::beginRendering()
 {
-    // TODO:
-    // glClearColor(0.5f, 0.5f, 0.5f, 1.f);
-    // TODO:
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GLContext::endRendering()
