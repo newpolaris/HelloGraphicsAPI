@@ -66,7 +66,11 @@ namespace el
             vec4(A v) : x(v), y(v), z(v), w(v) {} 
 
             template <typename A, typename B, typename C, typename D>
-            vec4(A x, B y, C z, D w) : x(x), y(y), z(z), w(w) {}
+            vec4(A x, B y, C z, D w) : 
+                x(static_cast<T>(x)),
+                y(static_cast<T>(y)),
+                z(static_cast<T>(z)),
+                w(static_cast<T>(w)) {}
 
             const T& operator[](size_t i) const {
                 return v[i];
@@ -77,9 +81,9 @@ namespace el
             }
 
             union {
-                float v[4];
-                struct { float x, y, z, w; };
-                struct { float r, g, b, a; };
+                T v[4];
+                struct { T x, y, z, w; };
+                struct { T r, g, b, a; };
             };
         };
 

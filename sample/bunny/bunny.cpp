@@ -110,6 +110,79 @@ void main()
 
 } // namespace el {
 
+namespace el { 
+namespace math {
+
+    struct mat4
+    {
+        enum zero {};
+        enum identity {};
+
+        typedef vec4<float> row_type;
+        typedef vec4<float> col_type;
+
+        static const int numRows = 4;
+        static const int numCols = 4;
+
+        col_type _data[numRows];
+
+        mat4();
+        explicit mat4(zero);
+
+        template <
+            typename A, typename B, typename C, typename D,
+            typename E, typename F, typename G, typename H,
+            typename I, typename J, typename K, typename L,
+            typename M, typename N, typename O, typename P>
+        explicit mat4(A m00, B m01, C m02, D m03,
+                      E m10, F m11, G m12, H m13,
+                      I m20, J m21, K m22, L m23,
+                      M m30, N m31, O m32, P m33);
+
+        const row_type& operator[](size_t row) const
+        {
+            EL_ASSERT(row < numRows);
+            return _data[row];
+        }
+
+        row_type& operator[](size_t row)
+        {
+            EL_ASSERT(row < numRows);
+            return _data[row];
+        }
+
+    };
+
+
+    mat4::mat4()
+    {
+    }
+
+    mat4::mat4(zero)
+    {
+        for (int i = 0; i < 4; i++)
+            _data[i] = row_type(0, 0, 0, 0);
+    }
+
+    template <
+        typename A, typename B, typename C, typename D,
+        typename E, typename F, typename G, typename H,
+        typename I, typename J, typename K, typename L,
+        typename M, typename N, typename O, typename P>
+    mat4::mat4(A m00, B m01, C m02, D m03,
+               E m10, F m11, G m12, H m13,
+               I m20, J m21, K m22, L m23,
+               M m30, N m31, O m32, P m33)
+    {
+        _data[0] = row_type(m00, m01, m02, m03);
+        _data[1] = row_type(m10, m11, m12, m13);
+        _data[2] = row_type(m20, m21, m22, m23);
+        _data[3] = row_type(m30, m31, m32, m33);
+    }
+
+}
+}
+
 int bunny_run()
 {
     using namespace el;
@@ -162,7 +235,7 @@ int bunny_run()
 
         GraphicsShaderDesc vertex_desc;
         vertex_desc.setStageFlag(GraphicsShaderStageVertexBit);
-        vertex_desc.setShaderCode(vertex_shader_text.get());
+        vertex_desc.setShaderCode(vertex_shader_text);
 
         vertex_shader = device->createShader(vertex_desc);
         EL_ASSERT(vertex_shader);
@@ -173,7 +246,7 @@ int bunny_run()
 
         GraphicsShaderDesc fragment_desc;
         fragment_desc.setStageFlag(GraphicsShaderStageFragmentBit);
-        fragment_desc.setShaderCode(frag_shader_text.get());
+        fragment_desc.setShaderCode(frag_shader_text);
 
         fragment_shader = device->createShader(fragment_desc);
         EL_ASSERT(fragment_shader);
@@ -283,6 +356,11 @@ int bunny_run()
             profile[i].start();
 
             context[i]->beginRendering();
+
+            // TODO:
+            glClearColor(0.5f, 0.5f, 0.5f, 1.f);
+            // TODO:
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             mat4x4 project;
             const float aspect = static_cast<float>(width) / height;
