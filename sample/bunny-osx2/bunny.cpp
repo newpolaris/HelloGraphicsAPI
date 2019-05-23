@@ -94,6 +94,12 @@ fragment half4 main0(
 
 } // namespace el {
 
+// rendererUpdateUniforms(
+//        this,
+//        _render->m_uniformBuffer[draw.m_uniformIdx],
+//        draw.m_uniformBegin,
+//        draw.m_uniformEnd);
+
 int main()
 {
     const std::string objfiles[] = {
@@ -156,7 +162,7 @@ int main()
     const float fFar = 1000.f;
     std::default_random_engine eng(10);
     std::uniform_real_distribution<float> urd(0, 1);
-    const uint32_t draw_count = 100;
+    const uint32_t draw_count = 2000;
     std::vector<el::MeshDraw> draws(draw_count);
     for (uint32_t i = 0; i < draw_count; i++) {
         vec3 axis;
@@ -166,9 +172,9 @@ int main()
 
         const float angle = el::radians(urd(eng) * 90.f);
 
-        draws[i].translate[0] = urd(eng) * 3.0f - 1.25f;
-        draws[i].translate[1] = urd(eng) * 3.0f - 1.25f;
-        draws[i].translate[2] = -5.0f - fNear;
+        draws[i].translate[0] = urd(eng) * 20.0f - 10.f;
+        draws[i].translate[1] = urd(eng) * 20.0f - 10.f;
+        draws[i].translate[2] = urd(eng) * -20.0f - fNear;
         draws[i].scale = urd(eng) + 0.5f;
         quat orient;
         quat_rotate(orient, angle, axis);
@@ -231,7 +237,7 @@ int main()
                 transform.uTranslate = draw.translate;
                 transform.uOrientation = draw.orientation;
                 driver->updateUniformBuffer(uniformTrans, &transform);
-                driver->setUniform(uniformTrans, 1);
+                // driver->setUniform(uniformTrans, 1);
                 driver->setVertexBuffer(vertexBuffer, 0, mesh.vertexOffset);
                 driver->draw(el::GraphicsPrimitiveTypeTriangle, indexBuffer, mesh.indexCount, mesh.indexOffset);
 
