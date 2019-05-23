@@ -58,6 +58,23 @@ namespace el {
         GraphicsDataDesc desc;
         id<MTLBuffer> buffer;
     };
+    
+    struct MetalUniformBuffer final : public GraphicsData
+    {
+        MetalUniformBuffer();
+        ~MetalUniformBuffer();
+        
+        bool create(id<MTLDevice> device, const GraphicsDataDesc &desc);
+        void destroy();
+        
+        void update(const stream_t* stream);
+        void update(const stream_t* stream, size_t offset, size_t length);
+        
+        const GraphicsDataDesc &getDesc() const override;
+        
+        GraphicsDataDesc desc;
+        id<MTLBuffer> buffer;
+    };
 
     struct MetalTexture final : public GraphicsTexture
     {

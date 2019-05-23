@@ -153,7 +153,6 @@ namespace math {
 
     };
 
-
     mat4::mat4()
     {
     }

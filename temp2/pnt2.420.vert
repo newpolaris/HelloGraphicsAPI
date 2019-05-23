@@ -7,7 +7,7 @@ layout(location = 0) out vec3 color;
 
 layout(std140) uniform transforms
 {
-    vec2 uScale;
+    float uScale;
     vec3 uTranslate;
     vec4 uOrientation;
     mat4 uProject;
@@ -21,5 +21,5 @@ vec3 rotate_position(vec4 quat, vec3 v)
 void main()
 {
     color = vNormal * 0.5 + vec3(0.5);
-    gl_Position = uProject * vec4(rotate_position(uOrientation, vPosition) * uScale.x + uTranslate, 1.0);
+    gl_Position = uProject * vec4(rotate_position(uOrientation, vPosition) * uScale + uTranslate, 1.0);
 }

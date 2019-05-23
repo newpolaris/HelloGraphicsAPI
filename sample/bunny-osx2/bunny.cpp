@@ -33,8 +33,8 @@ namespace el {
     struct transforms
     {
         float uScale;
-        float3 uTranslate;
-        float4 uOrientation;
+        packed_float3 uTranslate;
+        packed_float4 uOrientation;
         float4x4 uProject;
     };
     
@@ -56,14 +56,13 @@ namespace el {
         return v + (cross(quat.xyz, cross(quat.xyz, v) + (v * quat.w)) * 2.0);
     }
     
-    vertex main0_out main0(main0_in in [[stage_in]], constant transforms& _56 [[buffer(0)]])
+    vertex main0_out main0(main0_in in [[stage_in]], constant transforms& _56 [[buffer(1)]])
     {
         main0_out out = {};
         out.color = (in.vNormal * 0.5) + float3(0.5);
         float4 param = _56.uOrientation;
         float3 param_1 = in.vPosition;
-        // out.gl_Position = _56.uProject * float4((rotate_position(param, param_1) * _56.uScale) + _56.uTranslate, 1.0);
-        out.gl_Position = float4(param_1, 1.0);
+        out.gl_Position = _56.uProject * float4((rotate_position(param, param_1) * _56.uScale) + _56.uTranslate, 1.0);
         return out;
     }
 )""";
@@ -128,8 +127,8 @@ int main()
     params.flags.clear = el::GraphicsTargetBufferFlagBitColor;
     params.clearColor = el::math::float4(0.2f, 0.4f, 0.6f, 1.0f);
 
-    auto vertexBuffer = driver->createVertexBuffer(geometry.getVertexData(), sizeof(el::Vertex) * geometry.getVertexCount());
-    auto indexBuffer = driver->createIndexBuffer(geometry.getIndexData(), geometry.getIndexCount()*sizeof(uint32_t), sizeof(uint32_t));
+    auto vertexBuffer = driver->createVertexBuffer(geometry.getVertexData(), geometry.getVertexCount(), sizeof(el::Vertex));
+    auto indexBuffer = driver->createIndexBuffer(geometry.getIndexData(), geometry.getIndexCount(), sizeof(uint32_t));
 
 #if 0
     GraphicsDataDesc vertices_buffer_desc;
@@ -157,7 +156,7 @@ int main()
     const float fFar = 1000.f;
     std::default_random_engine eng(10);
     std::uniform_real_distribution<float> urd(0, 1);
-    const uint32_t draw_count = 2000;
+    const uint32_t draw_count = 100;
     std::vector<el::MeshDraw> draws(draw_count);
     for (uint32_t i = 0; i < draw_count; i++) {
         vec3 axis;
@@ -167,11 +166,13 @@ int main()
 
         const float angle = el::radians(urd(eng) * 90.f);
 
-        draws[i].translate[0] = urd(eng) * 20.f - 10.f;
-        draws[i].translate[1] = urd(eng) * 20.f - 10.f;
-        draws[i].translate[2] = urd(eng) * -20.f - fNear;
+        draws[i].translate[0] = urd(eng) * 3.0f - 1.25f;
+        draws[i].translate[1] = urd(eng) * 3.0f - 1.25f;
+        draws[i].translate[2] = -5.0f - fNear;
         draws[i].scale = urd(eng) + 0.5f;
-        quat_rotate(draws[i].orientation, angle, axis); 
+        quat orient;
+        quat_rotate(orient, angle, axis);
+        draws[i].orientation = el::math::float4(orient[0], orient[1], orient[2], orient[3]);
         draws[i].meshIndex = static_cast<uint32_t>(urd(eng) * geometry.meshes.size());
     }
 
@@ -188,13 +189,14 @@ int main()
         uint32_t vertexOffset;
     };
     
+    // column major;
     mat4x4 adjust;
     mat4x4_identity(adjust);
-    adjust[2][2] = 0.5;
-    adjust[2][3] = 0.5;
+    adjust[2][2] = 0.5f;
+    adjust[3][2] = 0.5f;
     
     el::transforms transform;
-    auto uniformTrans = driver->createUniform(sizeof(transform));
+    auto uniformTrans = driver->createUniformBuffer(sizeof(transform));
     
     while (true)
     {
@@ -210,11 +212,8 @@ int main()
         const float aspect = static_cast<float>(w) / h;
         mat4x4 project;
         mat4x4_perspective(project, el::radians(70.f), aspect, fNear, fFar);
-        mat4x4 adjusted;
-        
         mat4x4_mul(transform.uProject, adjust, project);
         
-        // context[i]->setUniform("uProject", project);
         // context[i]->setViewport(Viewport(0, 0, width, height));
 
 #if __has_feature(objc_arc)
@@ -224,19 +223,19 @@ int main()
             driver->beginRenderPass(defaultTarget, params);
             driver->setPipelineState(pipelineState);
 
-            const auto& mesh = geometry.meshes[0];
 
-            // const auto& mesh = geometry.meshes[draw.meshIndex];
-            // context[i]->setUniform("uScale", draw.scale);
-            // context[i]->setUniform("uTranslate", draw.translate);
-            // context[i]->setUniform("uOrientation", draw.orientation);
-            driver->setUniform(0, uniformTrans);
-            driver->setVertexBuffer(vertexBuffer, 0, mesh.vertexOffset);
-            driver->draw(el::GraphicsPrimitiveTypeTriangle, 
-                         indexBuffer,
-                         mesh.indexCount,
-                         mesh.indexOffset);
+            for (auto& draw : draws)
+            {
+                const auto& mesh = geometry.meshes[draw.meshIndex];
+                transform.uScale = draw.scale;
+                transform.uTranslate = draw.translate;
+                transform.uOrientation = draw.orientation;
+                driver->updateUniformBuffer(uniformTrans, &transform);
+                driver->setUniform(uniformTrans, 1);
+                driver->setVertexBuffer(vertexBuffer, 0, mesh.vertexOffset);
+                driver->draw(el::GraphicsPrimitiveTypeTriangle, indexBuffer, mesh.indexCount, mesh.indexOffset);
 
+            }
             driver->endRenderPass();
             driver->commit();
             

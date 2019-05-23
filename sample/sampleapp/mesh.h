@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <linmath.h>
+#include <el_math.h>
 #include <graphics_types.h>
 #include <graphics_input_layout.h>
 
@@ -40,9 +41,9 @@ namespace el {
 
     struct MeshDraw
     {
-        vec3 translate;
         float scale;
-        quat orientation;
+        el::math::float3 translate;
+        el::math::float4 orientation;
         uint32_t meshIndex;
     };
 

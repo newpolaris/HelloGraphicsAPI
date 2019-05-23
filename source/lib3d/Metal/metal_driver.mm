@@ -44,6 +44,7 @@ bool MetalDriver::setup(void *nativeSurface)
     _context->layer = (__bridge CAMetalLayer*)nativeSurface;
     _context->layer.device = device;
     
+    
     return true;
 }
 
@@ -85,28 +86,6 @@ void MetalDriver::cleanup()
 
 void MetalDriver::makeCurrent()
 {
-    MTLVertexDescriptor *desc = [MTLVertexDescriptor new];
-    
-    // Positions.
-    desc.attributes[0].format = MTLVertexFormatFloat3;
-    desc.attributes[0].offset = 0;
-    desc.attributes[0].bufferIndex = 0;
-    
-    // Normals.
-    desc.attributes[1].format = MTLVertexFormatFloat3;
-    desc.attributes[1].offset = 12;
-    desc.attributes[1].bufferIndex = 0;
-    
-    // Texture coordinates.
-    desc.attributes[2].format = MTLVertexFormatHalf2;
-    desc.attributes[2].offset = 24;
-    desc.attributes[2].bufferIndex = 0;
-    
-    // Single interleaved buffer.
-    desc.layouts[0].stride = 28;
-    desc.layouts[0].stepRate = 1;
-    desc.layouts[0].stepFunction = MTLVertexStepFunctionPerVertex;
-    
 }
 
 void MetalDriver::beginFrame()
@@ -205,7 +184,10 @@ void MetalDriver::setPipelineState(const PipelineState& state)
 
 void MetalDriver::setVertexBuffer(const MetalBufferPtr& vertex, uint32_t slot, uint32_t offset)
 {
-    [_context->currentRenderEncoder setVertexBuffer:vertex->buffer offset:0 atIndex:slot];
+    const auto offsetBytes = offset * vertex->getDesc().getElementSize();
+    [_context->currentRenderEncoder setVertexBuffer:vertex->buffer
+                                             offset:offsetBytes
+                                            atIndex:slot];
 }
 
 void MetalDriver::setFragmentTexture(const MetalTexturePtr& texture, uint32_t slot)
@@ -244,13 +226,14 @@ MTLIndexType asMetalIndexType(size_t elementSize)
 
 void MetalDriver::draw(GraphicsPrimitiveType primitive, const MetalBufferPtr& indexBuffer, uint32_t indexCount, uint32_t offset)
 {
+    const uint32_t bufferOffset = offset * indexBuffer->getDesc().getElementSize();
     auto metalPrimitive = asMetalPrimitiveType(primitive);
     auto indexType = asMetalIndexType(indexBuffer->getDesc().getElementSize());
     [_context->currentRenderEncoder drawIndexedPrimitives:metalPrimitive
                                                indexCount:indexCount
                                                 indexType:indexType
                                               indexBuffer:indexBuffer->buffer
-                                        indexBufferOffset:offset];
+                                        indexBufferOffset:bufferOffset];
 }
 
 void MetalDriver::endRenderPass()
@@ -300,12 +283,12 @@ MetalTexturePtr MetalDriver::createTexture(const GraphicsTextureDesc &desc)
     }
 }
 
-MetalBufferPtr MetalDriver::createIndexBuffer(const void* stream, size_t streamsize, size_t elementSize)
+MetalBufferPtr MetalDriver::createIndexBuffer(const void* stream, size_t count, size_t elementSize)
 {
     GraphicsDataDesc desc;
     desc.setStream((const el::stream_t*)stream);
     desc.setElementSize(elementSize);
-    desc.setNumElements(streamsize/elementSize);
+    desc.setNumElements(count);
     desc.setDataType(GraphicsDataTypeStorageIndexBuffer);
     
     auto buffer = std::make_shared<MetalBuffer>();
@@ -316,12 +299,12 @@ MetalBufferPtr MetalDriver::createIndexBuffer(const void* stream, size_t streams
 
 }
 
-MetalBufferPtr MetalDriver::createVertexBuffer(const void *stream, size_t streamsize)
+MetalBufferPtr MetalDriver::createVertexBuffer(const void *stream, size_t count, size_t elementsize)
 {
     GraphicsDataDesc desc;
     desc.setStream((const el::stream_t*)stream);
-    desc.setElementSize(sizeof(char));
-    desc.setNumElements(streamsize);
+    desc.setElementSize(elementsize);
+    desc.setNumElements(count);
     desc.setDataType(GraphicsDataTypeStorageVertexBuffer);
     
     auto buffer = std::make_shared<MetalBuffer>();
@@ -329,6 +312,36 @@ MetalBufferPtr MetalDriver::createVertexBuffer(const void *stream, size_t stream
     if (!buffer->create(_context->device, desc))
         return nullptr;
     return buffer;
+}
+
+MetalUniformBufferPtr MetalDriver::createUniformBuffer(size_t streamsize)
+{
+    GraphicsDataDesc desc;
+    desc.setStream(nullptr);
+    desc.setElementSize(sizeof(char));
+    desc.setNumElements(streamsize);
+    desc.setDataType(GraphicsDataTypeUniformBuffer);
+    
+    auto buffer = std::make_shared<MetalUniformBuffer>();
+    if (!buffer) return nullptr;
+    if (!buffer->create(_context->device, desc))
+        return nullptr;
+    return buffer;
+}
+
+void MetalDriver::updateUniformBuffer(const MetalUniformBufferPtr& uniform, const void* stream)
+{
+    uniform->update((const stream_t*)stream);
+}
+
+void MetalDriver::setUniform(const MetalUniformBufferPtr& uniform, uint32_t slot)
+{
+    // PerRenderableUib must have an alignment of 256 to be compatible with all versions of GLES.
+    
+    EL_ASSERT(uniform->buffer != nil);
+    [_context->currentRenderEncoder setVertexBuffer:uniform->buffer
+                                             offset:0
+                                            atIndex:slot];
 }
 
 _EL_NAME_END

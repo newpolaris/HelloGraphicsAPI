@@ -1,0 +1,74 @@
+{
+  "language": "msl",
+  "profile_version": 0,
+  "vs": {
+    "file": "pnt_vs",
+    "inputs": [
+      {
+        "id": 40,
+        "name": "vNormal",
+        "location": 1,
+        "semantic": "NORMAL",
+        "semantic_index": 0,
+        "type": "float3"
+      },
+      {
+        "id": 63,
+        "name": "vPosition",
+        "location": 0,
+        "semantic": "POSITION",
+        "semantic_index": 0,
+        "type": "float3"
+      },
+      {
+        "id": 90,
+        "name": "vTexcoord",
+        "location": 2,
+        "semantic": "TEXCOORD",
+        "semantic_index": 0,
+        "type": "float2"
+      }
+    ],
+    "outputs": [
+      {
+        "id": 38,
+        "name": "color",
+        "location": 0
+      }
+    ],
+    "uniform_buffers": [
+      {
+        "id": 57,
+        "name": "transforms",
+        "set": 0,
+        "block_size": 112,
+        "members": [
+          {
+            "name": "uScale",
+            "type": "float2",
+            "offset": 0,
+            "size": 8
+          },
+          {
+            "name": "uTranslate",
+            "type": "float3",
+            "offset": 16,
+            "size": 16
+          },
+          {
+            "name": "uOrientation",
+            "type": "float4",
+            "offset": 32,
+            "size": 16
+          },
+          {
+            "name": "uProject",
+            "type": "mat4",
+            "offset": 48,
+            "size": 64
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -152,12 +152,13 @@ bool MetalBuffer::create(id<MTLDevice> device, const GraphicsDataDesc& desc)
 {
     // auto resourceOptions = asResourceOptions(desc.getUsage());
 
-    buffer  = [device newBufferWithBytes:desc.getStream()
-                                  length:desc.getStreamSize()
-                                 options:MTLResourceStorageModeShared];
+    buffer = [device newBufferWithBytes:desc.getStream()
+                                 length:desc.getStreamSize()
+                                options:MTLResourceStorageModeShared];
     if (buffer == nil)
         return false;
-
+    buffer.label = @"vertex/index-buffer";
+    
     this->desc = desc;
     return true;
 }
@@ -166,6 +167,47 @@ void MetalBuffer::destroy()
 {
     [buffer release];
     buffer = nil;
+}
+
+MetalUniformBuffer::MetalUniformBuffer() :
+    buffer(nil)
+{
+}
+
+MetalUniformBuffer::~MetalUniformBuffer()
+{
+    destroy();
+}
+
+const GraphicsDataDesc& MetalUniformBuffer::getDesc() const
+{
+    return desc;
+}
+
+bool MetalUniformBuffer::create(id<MTLDevice> device, const GraphicsDataDesc& desc)
+{
+    MTLResourceOptions options = MTLCPUCacheModeWriteCombined | MTLResourceStorageModeShared;
+    buffer = [device newBufferWithLength:desc.getStreamSize()
+                                 options:options];
+    buffer.label = @"uniform-buffer";
+    if (buffer == nil)
+        return false;
+    
+    this->desc = desc;
+    return true;
+}
+
+void MetalUniformBuffer::destroy()
+{
+    [buffer release];
+    buffer = nil;
+}
+
+
+void MetalUniformBuffer::update(const stream_t* stream)
+{
+    char *contents = (char *)[buffer contents];
+    memcpy(contents, stream, desc.getStreamSize());
 }
 
 MetalTexture::MetalTexture() :

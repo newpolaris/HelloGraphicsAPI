@@ -3,7 +3,7 @@
 #if EL_BUILD_METAL
 
 #include <el_debug.h>
-#include <Metal/mtl_types.h>
+#include "mtl_types.h"
 
 using namespace el;
 using namespace mtlpp;

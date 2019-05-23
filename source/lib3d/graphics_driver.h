@@ -9,6 +9,7 @@ namespace el {
     typedef std::shared_ptr<struct MetalProgram> MetalProgramPtr;
     typedef std::shared_ptr<struct MetalRenderTarget> MetalRenderTargetPtr;
     typedef std::shared_ptr<struct MetalBuffer> MetalBufferPtr;
+    typedef std::shared_ptr<struct MetalUniformBuffer> MetalUniformBufferPtr;
     typedef std::shared_ptr<struct MetalTexture> MetalTexturePtr;
     
     struct PipelineState;
@@ -33,12 +34,15 @@ namespace el {
         virtual void setFragmentTexture(const MetalTexturePtr& texture, uint32_t slot) = 0;
         virtual void draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, uint32_t vertexOffset) = 0;
         virtual void draw(GraphicsPrimitiveType primitive, const MetalBufferPtr& indexBuffer, uint32_t indexCount, uint32_t offset) = 0;
-        
         virtual MetalTexturePtr createTexture(const GraphicsTextureDesc &desc) = 0;
-        virtual MetalBufferPtr createIndexBuffer(const void* stream, size_t streamsize, size_t elementSize) = 0;
-        virtual MetalBufferPtr createVertexBuffer(const void* stream, size_t streamsize) = 0;
+        virtual MetalBufferPtr createIndexBuffer(const void* stream, size_t count, size_t elementsize) = 0;
+        virtual MetalBufferPtr createVertexBuffer(const void* stream, size_t count, size_t elementsize) = 0;
+        virtual MetalUniformBufferPtr createUniformBuffer(size_t streamsize) = 0;
         virtual MetalProgramPtr createProgram(const char* vertexShaderSrc, const char* fragmentShaderSrc) = 0;
         virtual MetalRenderTargetPtr createDefaultRenderTarget() = 0;
+        
+        virtual void updateUniformBuffer(const MetalUniformBufferPtr& uniform, const void* stream) = 0;
+        virtual void setUniform(const MetalUniformBufferPtr& uniform, uint32_t slot) = 0;
     };
 
 }

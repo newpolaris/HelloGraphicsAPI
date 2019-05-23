@@ -3,7 +3,7 @@
 #if EL_BUILD_METAL
 
 #include <el_debug.h>
-#include <Metal/mtl_device.h>
+#include "mtl_device.h"
 
 using namespace el;
 
