@@ -29,6 +29,7 @@ namespace el {
         void endRenderPass() override;
         
         void setPipelineState(const PipelineState& state) override;
+        void setVertexBytes(const void* stream, size_t size, uint32_t slot) override;
         void setVertexBuffer(const MetalBufferPtr& buffer, uint32_t slot, uint32_t offset) override;
         void setFragmentTexture(const MetalTexturePtr& texture, uint32_t slot) override;
         void draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, uint32_t vertexOffset) override;

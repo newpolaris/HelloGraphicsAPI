@@ -30,6 +30,7 @@ namespace el {
         virtual void endRenderPass() = 0;
         
         virtual void setPipelineState(const PipelineState& state) = 0;
+        virtual void setVertexBytes(const void* stream, size_t size, uint32_t slot) = 0;
         virtual void setVertexBuffer(const MetalBufferPtr& buffer, uint32_t slot, uint32_t offset = 0) = 0;
         virtual void setFragmentTexture(const MetalTexturePtr& texture, uint32_t slot) = 0;
         virtual void draw(GraphicsPrimitiveType primitive, uint32_t vertexCount, uint32_t vertexOffset) = 0;

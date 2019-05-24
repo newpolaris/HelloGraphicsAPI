@@ -236,7 +236,7 @@ int main()
                 transform.uScale = draw.scale;
                 transform.uTranslate = draw.translate;
                 transform.uOrientation = draw.orientation;
-                driver->updateUniformBuffer(uniformTrans, &transform);
+                driver->setVertexBytes(&transform, sizeof(transform), 1);
                 // driver->setUniform(uniformTrans, 1);
                 driver->setVertexBuffer(vertexBuffer, 0, mesh.vertexOffset);
                 driver->draw(el::GraphicsPrimitiveTypeTriangle, indexBuffer, mesh.indexCount, mesh.indexOffset);

@@ -182,6 +182,11 @@ void MetalDriver::setPipelineState(const PipelineState& state)
     // }
 }
 
+void MetalDriver::setVertexBytes(const void* stream, size_t size, uint32_t slot)
+{
+    [_context->currentRenderEncoder setVertexBytes:stream length:size atIndex:slot];
+}
+
 void MetalDriver::setVertexBuffer(const MetalBufferPtr& vertex, uint32_t slot, uint32_t offset)
 {
     const auto offsetBytes = offset * vertex->getDesc().getElementSize();
