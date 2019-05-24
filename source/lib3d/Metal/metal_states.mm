@@ -7,13 +7,31 @@ _EL_NAME_BEGIN
 
 id<MTLRenderPipelineState> createPipeline(id<MTLDevice> device, const MetalPipelineDesc &desc) 
 {
+    MTLVertexDescriptor *vertex = [MTLVertexDescriptor vertexDescriptor];
+    
+    const auto& inputLayout = desc.inputLayout;
+    const auto& bindings = inputLayout.getBindings();
+    for (uint32_t i = 0; i < bindings.size(); i++)
+    {
+        vertex.layouts[i].stepFunction = asMetalVertexStepFunction(bindings[i].getInputRate());
+        vertex.layouts[i].stride = bindings[i].getStride();
+    }
+    
+    const auto& attributes = inputLayout.getAttributes();
+    for (uint32_t i = 0; i < attributes.size(); i++)
+    {
+        vertex.attributes[i].bufferIndex = attributes[i].getBinding();
+        vertex.attributes[i].format = asMetalVertexFormat(attributes[i].getFormat());
+        vertex.attributes[i].offset = attributes[i].getOffset();
+    }
+    
     MTLRenderPipelineDescriptor* descriptor = [MTLRenderPipelineDescriptor new];
     for (auto i = 0u; i < desc.colorFormats.size(); i++)
         descriptor.colorAttachments[i].pixelFormat = desc.colorFormats[i];
     descriptor.depthAttachmentPixelFormat = desc.depthFormat;
     descriptor.vertexFunction = desc.vertexFunction;
     descriptor.fragmentFunction = desc.fragmentFunction;
-    descriptor.vertexDescriptor = desc.vertexDescriptor;
+    descriptor.vertexDescriptor = vertex;
 
     NSError* error = nullptr;
     id<MTLRenderPipelineState> pipeline = [device newRenderPipelineStateWithDescriptor:descriptor

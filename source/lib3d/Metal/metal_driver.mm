@@ -147,28 +147,10 @@ void MetalDriver::beginRenderPass(const MetalRenderTargetPtr& rt, const RenderPa
 
 void MetalDriver::setPipelineState(const PipelineState& state)
 {
-    MTLVertexDescriptor *vertex = [MTLVertexDescriptor vertexDescriptor];
-    
-    const auto& inputLayout = state.inputLayout;
-    const auto& bindings = inputLayout.getBindings();
-    for (uint32_t i = 0; i < bindings.size(); i++)
-    {
-        vertex.layouts[i].stepFunction = asMetalVertexStepFunction(bindings[i].getInputRate());
-        vertex.layouts[i].stride = bindings[i].getStride();
-    }
-    
-    const auto& attributes = inputLayout.getAttributes();
-    for (uint32_t i = 0; i < attributes.size(); i++)
-    {
-        vertex.attributes[i].bufferIndex = attributes[i].getBinding();
-        vertex.attributes[i].format = asMetalVertexFormat(attributes[i].getFormat());
-        vertex.attributes[i].offset = attributes[i].getOffset();
-    }
-    
     MetalPipelineDesc pipelineDesc {
         state.program->vertexFunction,
         state.program->fragmentFunction,
-        vertex,
+        state.inputLayout,
         _context->currentColorFormats,
         _context->currentDepthFormat,
     };

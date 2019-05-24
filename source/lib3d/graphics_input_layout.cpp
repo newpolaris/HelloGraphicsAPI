@@ -176,6 +176,20 @@ const GraphicsInputBindings& GraphicsInputLayoutDesc::getBindings() const
     return _bindings;
 }
 
+bool GraphicsInputLayoutDesc::operator==(const GraphicsInputLayoutDesc& other) const
+{
+    const auto& a = std::tie(_attributes, _bindings);
+    const auto& b = std::tie(other._attributes, other._bindings);
+    return a == b;
+}
+
+bool GraphicsInputLayoutDesc::operator<(const GraphicsInputLayoutDesc& other) const
+{
+    const auto& a = std::tie(_attributes, _bindings);
+    const auto& b = std::tie(other._attributes, other._bindings);
+    return a < b;
+}
+
 el::GraphicsInputLayout::GraphicsInputLayout()
 {
 }

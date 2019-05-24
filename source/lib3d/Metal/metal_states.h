@@ -3,6 +3,7 @@
 
 #include <tuple>
 #include "metal_types.h"
+#include <graphics_input_layout.h>
 
 namespace el {
 
@@ -10,14 +11,14 @@ namespace el {
     {
         id<MTLFunction> vertexFunction;
         id<MTLFunction> fragmentFunction;
-        MTLVertexDescriptor *vertexDescriptor;
+        GraphicsInputLayoutDesc inputLayout;
         MetalPixelFormats colorFormats;
         MetalPixelFormat depthFormat;
 
         bool operator<(const MetalPipelineDesc &desc) const
         {
-            const auto &a = std::tie(vertexFunction, fragmentFunction, colorFormats, depthFormat);
-            const auto &b = std::tie(desc.vertexFunction, desc.fragmentFunction, desc.colorFormats, desc.depthFormat);
+            const auto &a = std::tie(vertexFunction, fragmentFunction, colorFormats, depthFormat, inputLayout);
+            const auto &b = std::tie(desc.vertexFunction, desc.fragmentFunction, desc.colorFormats, desc.depthFormat, inputLayout);
             return a < b;
         }
     };

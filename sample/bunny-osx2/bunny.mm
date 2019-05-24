@@ -12,6 +12,11 @@
 #include <graphics_pipeline.h>
 #include <native_window_helper.h>
 
+#include <Metal/Metal.h>
+#include <metal/metal_driver.h>
+#include <metal/metal_context.h>
+#include <linmath.h>
+
 #include "mesh.h"
 
 namespace el {
@@ -35,7 +40,6 @@ namespace el {
         float uScale;
         packed_float3 uTranslate;
         packed_float4 uOrientation;
-        float4x4 uProject;
     };
     
     struct main0_out
@@ -56,13 +60,13 @@ namespace el {
         return v + (cross(quat.xyz, cross(quat.xyz, v) + (v * quat.w)) * 2.0);
     }
     
-    vertex main0_out main0(main0_in in [[stage_in]], constant transforms& _56 [[buffer(1)]])
+    vertex main0_out main0(main0_in in [[stage_in]], constant transforms* _56 [[buffer(1)]], constant float4x4& uProject [[buffer(2)]])
     {
         main0_out out = {};
         out.color = (in.vNormal * 0.5) + float3(0.5);
-        float4 param = _56.uOrientation;
+        float4 param = _56[0].uOrientation;
         float3 param_1 = in.vPosition;
-        out.gl_Position = _56.uProject * float4((rotate_position(param, param_1) * _56.uScale) + _56.uTranslate, 1.0);
+        out.gl_Position = uProject * float4((rotate_position(param, param_1) * _56[0].uScale) + _56[0].uTranslate, 1.0);
         return out;
     }
 )""";
@@ -84,12 +88,12 @@ fragment half4 main0(
 }
 )""";
     
-    struct transforms
+    
+    struct alignas(256) transforms
     {
         float uScale;
         math::float3 uTranslate;
         math::float4 uOrientation;
-        mat4x4 uProject;
     };
 
 } // namespace el {
@@ -162,7 +166,7 @@ int main()
     const float fFar = 1000.f;
     std::default_random_engine eng(10);
     std::uniform_real_distribution<float> urd(0, 1);
-    const uint32_t draw_count = 2000;
+    const uint32_t draw_count = 1000;
     std::vector<el::MeshDraw> draws(draw_count);
     for (uint32_t i = 0; i < draw_count; i++) {
         vec3 axis;
@@ -200,9 +204,24 @@ int main()
     mat4x4_identity(adjust);
     adjust[2][2] = 0.5f;
     adjust[3][2] = 0.5f;
+
+    id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+    id<MTLBuffer> uniform = [device newBufferWithLength:sizeof(el::transforms)*draws.size()
+                                                options:MTLResourceStorageModeShared];
     
-    el::transforms transform;
-    auto uniformTrans = driver->createUniformBuffer(sizeof(transform));
+    el::transforms* pointer = (el::transforms*)uniform.contents;
+    for (auto& draw : draws)
+    {
+        pointer->uScale = draw.scale;
+        pointer->uTranslate = draw.translate;
+        pointer->uOrientation = draw.orientation;
+        pointer += 1;
+    }
+    // [uniform didModifyRange:NSRang]
+    
+    using namespace el;
+    el::MetalDriver* metal = (el::MetalDriver*)driver;
+    el::MetalContext* context = metal->_context;
     
     while (true)
     {
@@ -216,31 +235,49 @@ int main()
         SDL_GetWindowSize(window, &w, &h);
 
         const float aspect = static_cast<float>(w) / h;
-        mat4x4 project;
+        mat4x4 project, uProject;
         mat4x4_perspective(project, el::radians(70.f), aspect, fNear, fFar);
-        mat4x4_mul(transform.uProject, adjust, project);
+        mat4x4_mul(uProject, adjust, project);
         
         // context[i]->setViewport(Viewport(0, 0, width, height));
-
+#if 0
+        MTLIndirectCommandBufferDescriptor *indirectDesc = [[MTLIndirectCommandBufferDescriptor new] autorelease];
+        indirectDesc.commandTypes = MTLIndirectCommandTypeDrawIndexed;
+        indirectDesc.maxVertexBufferBindCount = 3;
+        indirectDesc.maxFragmentBufferBindCount = 1;
+        id<MTLIndirectCommandBuffer> _indirectCommandBuffer = [device newIndirectCommandBufferWithDescriptor:indirectDesc
+                                                                               maxCommandCount:3000
+                                                                                       options:0];
+        
+        //  Encode a draw command for each object drawn in the indirect command buffer.
+        for (int objIndex = 0; objIndex < draws.size(); objIndex++)
+        {
+            id<MTLIndirectRenderCommand> ICBCommand =
+            [_indirectCommandBuffer indirectRenderCommandAtIndex:objIndex];
+            
+            [ICBCommand drawPrimitives:MTLPrimitiveTypeTriangle
+                           vertexStart:0
+                           vertexCount:vertexCount
+                         instanceCount:1
+                          baseInstance:objIndex];
+        }
+#endif
+        
 #if __has_feature(objc_arc)
         @autoreleasepool {
 #endif
             driver->beginFrame();
             driver->beginRenderPass(defaultTarget, params);
             driver->setPipelineState(pipelineState);
-
-
-            for (auto& draw : draws)
+            [context->currentRenderEncoder setVertexBytes:uProject length:sizeof(uProject) atIndex:2];
+            [context->currentRenderEncoder setVertexBuffer:uniform offset:0 atIndex:1];
+            driver->setVertexBuffer(vertexBuffer, 0, 0);
+            for (uint32_t i = 0; i < draws.size(); i++)
             {
-                const auto& mesh = geometry.meshes[draw.meshIndex];
-                transform.uScale = draw.scale;
-                transform.uTranslate = draw.translate;
-                transform.uOrientation = draw.orientation;
-                driver->setVertexBytes(&transform, sizeof(transform), 1);
-                // driver->setUniform(uniformTrans, 1);
-                driver->setVertexBuffer(vertexBuffer, 0, mesh.vertexOffset);
+                const auto& mesh = geometry.meshes[draws[i].meshIndex];
+                [context->currentRenderEncoder setVertexBufferOffset:i*sizeof(transforms) atIndex:1];
+                [context->currentRenderEncoder setVertexBufferOffset:mesh.vertexOffset*sizeof(el::Vertex) atIndex:0];
                 driver->draw(el::GraphicsPrimitiveTypeTriangle, indexBuffer, mesh.indexCount, mesh.indexOffset);
-
             }
             driver->endRenderPass();
             driver->commit();

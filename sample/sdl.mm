@@ -196,8 +196,6 @@ bool execute(NSView* view)
     auto device = mtlpp::Device::CreateSystemDefaultDevice();
     auto commandQueue = device.NewCommandQueue();
     
-
-    
     const auto screenFormat = GraphicsPixelFormatBGRA8Unorm;
     const auto depthFormat = GraphicsPixelFormatDepth32Float;
     
