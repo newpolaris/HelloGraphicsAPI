@@ -61,17 +61,18 @@ namespace el {
         return v + (cross(quat.xyz, cross(quat.xyz, v) + (v * quat.w)) * 2.0);
     }
     
-    vertex main0_out main0(main0_in in [[stage_in]],
+    vertex main0_out main0(main0_in input [[stage_in]],
                            constant transforms* _56 [[buffer(1)]],
                            constant float4x4& uProject [[buffer(2)]],
                            ushort iid [[instance_id]])
     {
-        main0_out out = {};
-        out.color = (in.vNormal * 0.5) + float3(0.5);
-        float4 param = _56[iid].uOrientation;
-        float3 param_1 = in.vPosition;
-        out.gl_Position = uProject * float4((rotate_position(param, param_1) * _56[iid].uScale) + _56[iid].uTranslate, 1.0);
-        return out;
+        main0_out output = {};
+        output.color = (input.vNormal * 0.5) + float3(0.5);
+        constant transforms& trans = _56[0];
+        float4 param = trans.uOrientation;
+        float3 param_1 = input.vPosition;
+        output.gl_Position = uProject * float4((rotate_position(param, param_1) * trans.uScale) + trans.uTranslate, 1.0);
+        return output;
     }
 )""";
     
@@ -170,7 +171,7 @@ int main()
     const float fFar = 1000.f;
     std::default_random_engine eng(10);
     std::uniform_real_distribution<float> urd(0, 1);
-    const uint32_t draw_count = 200;
+    const uint32_t draw_count = 2000;
     std::vector<el::MeshDraw> draws(draw_count);
     for (uint32_t i = 0; i < draw_count; i++) {
         vec3 axis;
@@ -293,34 +294,22 @@ int main()
             [context->currentRenderEncoder setVertexBuffer:uniform offset:0 atIndex:1];
             driver->setVertexBuffer(vertexBuffer, 0, 0);
             
+            [context->currentRenderEncoder setCullMode:MTLCullModeFront];
+            
+#if 0
             [context->currentRenderEncoder useResource:vertexBuffer->buffer usage:MTLResourceUsageRead];
             [context->currentRenderEncoder useResource:indexBuffer->buffer usage:MTLResourceUsageRead];
             [context->currentRenderEncoder useResource:uniform usage:MTLResourceUsageRead];
             
-            // for (uint32_t i = 0; i < draws.size(); i++)
+            [context->currentRenderEncoder executeCommandsInBuffer:_indirectCommandBuffer
+                                                         withRange:NSMakeRange(0, draws.size())];
+#else
+            for (uint32_t i = 0; i < draws.size(); i++)
             {
-                //const auto& mesh = geometry.meshes[draws[i].meshIndex];
-                // [context->currentRenderEncoder setVertexBufferOffset:i*sizeof(transforms) atIndex:1];
-                [context->currentRenderEncoder executeCommandsInBuffer:_indirectCommandBuffer
-                                                             withRange:NSMakeRange(0, draws.size())];
-#if 0
-                 
-                [context->currentRenderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
-                                                           indexType:MTLIndexTypeUInt32
-                                                         indexBuffer:indexBuffer->buffer
-                                                   indexBufferOffset:0
-                                                      indirectBuffer:indirect
-                                                indirectBufferOffset:i*sizeof(MTLDrawIndexedPrimitivesIndirectArguments)];
-#endif
-#if 0
-                [context->currentRenderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
-                                                          indexCount:mesh.indexCount
-                                                           indexType:MTLIndexTypeUInt32
-                                                         indexBuffer:indexBuffer->buffer
-                                                   indexBufferOffset:mesh.indexOffset * indexBuffer->getDesc().getElementSize()
-                                                       instanceCount:1];
-#endif
-#if 0
+                const auto& mesh = geometry.meshes[draws[i].meshIndex];
+                [context->currentRenderEncoder setVertexBufferOffset:i*sizeof(transforms) atIndex:1];
+
+    #if 1
                 [context->currentRenderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                                                           indexCount:mesh.indexCount
                                                            indexType:MTLIndexTypeUInt32
@@ -329,14 +318,15 @@ int main()
                                                        instanceCount:1
                                                           baseVertex:mesh.vertexOffset
                                                         baseInstance:i];
-#endif
-#if 0
+    #endif
+    #if 0
                 driver->draw(el::GraphicsPrimitiveTypeTriangle,
                                     indexBuffer,
                                     mesh.indexCount,
                                     mesh.indexOffset);
-#endif
+    #endif
             }
+#endif
             driver->endRenderPass();
             driver->commit();
             
