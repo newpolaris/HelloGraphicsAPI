@@ -18,12 +18,17 @@ include(UsebackportedModules)
 include(CreateLaunchers)
 include(MSVCMultipleProcessCompile) # /MP
 
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+option(SUPPORT_OPENGL "Support legacy openGL" ON)
+option(SUPPORT_METAL "Support apple metal" ON)
 
-option(BUILD_OPENGL "Legacy OpenGL" ON)
-if(APPLE)
-    option(BUILD_METAL "Apple Metal" ON)
+if(SUPPORT_OPENGL)
+    set(BUILD_OPENGL TRUE)
 endif()
+if(APPLE)
+    set(BUILD_METAL ${SUPPORT_METAL})
+endif()
+
+add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/lib3d")
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/libplatform")
