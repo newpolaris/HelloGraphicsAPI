@@ -115,6 +115,7 @@ MTLPixelFormat asMetalPixelFormat(GraphicsPixelFormat format)
         return MTLPixelFormatRGBA32Sint;
     case GraphicsPixelFormatRGBA32Float:
         return MTLPixelFormatRGBA32Float;
+#if EL_PLAT_OSX
     case GraphicsPixelFormatBC1_RGBA:
         return MTLPixelFormatBC1_RGBA;
     case GraphicsPixelFormatBC1_RGBA_sRGB:
@@ -143,24 +144,26 @@ MTLPixelFormat asMetalPixelFormat(GraphicsPixelFormat format)
         return MTLPixelFormatBC7_RGBAUnorm;
     case GraphicsPixelFormatBC7_RGBAUnorm_sRGB:
         return MTLPixelFormatBC7_RGBAUnorm_sRGB;
+    case GraphicsPixelFormatDepth16Unorm:
+        return MTLPixelFormatDepth16Unorm;
+    case GraphicsPixelFormatDepth24Unorm_Stencil8:
+        return MTLPixelFormatDepth24Unorm_Stencil8;
+    case GraphicsPixelFormatX24_Stencil8:
+        return MTLPixelFormatX24_Stencil8;
+#endif
     case GraphicsPixelFormatGBGR422:
         return MTLPixelFormatGBGR422;
     case GraphicsPixelFormatBGRG422:
         return MTLPixelFormatBGRG422;
-    case GraphicsPixelFormatDepth16Unorm:
-        return MTLPixelFormatDepth16Unorm;
     case GraphicsPixelFormatDepth32Float:
         return MTLPixelFormatDepth32Float;
     case GraphicsPixelFormatStencil8:
         return MTLPixelFormatStencil8;
-    case GraphicsPixelFormatDepth24Unorm_Stencil8:
-        return MTLPixelFormatDepth24Unorm_Stencil8;
     case GraphicsPixelFormatDepth32Float_Stencil8:
         return MTLPixelFormatDepth32Float_Stencil8;
     case GraphicsPixelFormatX32_Stencil8:
         return MTLPixelFormatX32_Stencil8;
-    case GraphicsPixelFormatX24_Stencil8:
-        return MTLPixelFormatX24_Stencil8;
+
  #if EL_PLAT_IOS
     case GraphicsPixelFormatR8Unorm_sRGB:
         return MTLPixelFormatR8Unorm_sRGB;
@@ -350,16 +353,19 @@ MTLSamplerAddressMode asSamplerAddressMode(GraphicsSamplerAddressMode mode)
             return MTLSamplerAddressModeMirrorRepeat;
         case GraphicsSamplerAddressModeClampToEdge:
             return MTLSamplerAddressModeClampToEdge;
+#if !EL_PLAT_IOS
         case GraphicsSamplerAddressModeClampToBorder:
             return MTLSamplerAddressModeClampToBorderColor;
         case GraphicsSamplerAddressModeMirrorClampToEdge:
             return MTLSamplerAddressModeMirrorClampToEdge;
+#endif
         default:
             EL_ASSERT(false);
             return MTLSamplerAddressMode(0);
     }
 }
 
+#if !EL_PLAT_IOS
 MTLSamplerBorderColor asSamplerBorderColor(GraphicsBorderColor color)
 {
     switch (color)
@@ -379,6 +385,7 @@ MTLSamplerBorderColor asSamplerBorderColor(GraphicsBorderColor color)
             return MTLSamplerBorderColor(0);
     }
 }
+#endif
 
 MTLCompareFunction asCompareFunction(GraphicsCompareOp func)
 {
@@ -597,6 +604,13 @@ GraphicsPixelFormat asGraphicsPixelFormat(MTLPixelFormat format)
     case MTLPixelFormatRGBA32Uint:
     case MTLPixelFormatRGBA32Sint:
     case MTLPixelFormatRGBA32Float:
+    case MTLPixelFormatGBGR422:
+    case MTLPixelFormatBGRG422:
+    case MTLPixelFormatDepth32Float:
+    case MTLPixelFormatDepth32Float_Stencil8:
+    case MTLPixelFormatX32_Stencil8:
+    case MTLPixelFormatStencil8:
+#if EL_PLAT_OSX
     case MTLPixelFormatBC1_RGBA:
     case MTLPixelFormatBC1_RGBA_sRGB:
     case MTLPixelFormatBC2_RGBA:
@@ -609,18 +623,10 @@ GraphicsPixelFormat asGraphicsPixelFormat(MTLPixelFormat format)
     case MTLPixelFormatBC5_RGSnorm:
     case MTLPixelFormatBC6H_RGBFloat:
     case MTLPixelFormatBC6H_RGBUfloat:
-    case MTLPixelFormatBC7_RGBAUnorm:
-    case MTLPixelFormatBC7_RGBAUnorm_sRGB:
-    case MTLPixelFormatGBGR422:
-    case MTLPixelFormatBGRG422:
-    case MTLPixelFormatDepth16Unorm:
-    case MTLPixelFormatDepth32Float:
-    case MTLPixelFormatStencil8:
-    case MTLPixelFormatDepth24Unorm_Stencil8:
-    case MTLPixelFormatDepth32Float_Stencil8:
-    case MTLPixelFormatX32_Stencil8:
+
     case MTLPixelFormatX24_Stencil8:
- #if EL_PLAT_IOS
+#endif
+#if EL_PLAT_IOS
     case MTLPixelFormatR8Unorm_sRGB:
     case MTLPixelFormatRG8Unorm_sRGB:
     case MTLPixelFormatB5G6R5Unorm:
