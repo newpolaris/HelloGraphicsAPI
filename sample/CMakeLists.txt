@@ -74,6 +74,7 @@ function(buildSample SAMPLE_NAME)
     set_target_properties(${SAMPLE_NAME} PROPERTIES FOLDER "sample")
 endfunction(buildSample)
 
+buildSample("uniform")
 buildSample("sharing")
 buildSample("image")
 buildSample("bunny")
