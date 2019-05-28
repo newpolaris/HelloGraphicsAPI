@@ -6,7 +6,8 @@
         "__config": "cpp",
         "iostream": "cpp",
         "__locale": "cpp",
-        "locale": "cpp"
+        "locale": "cpp",
+        "string_view": "cpp"
     },
     "vim.hlsearch": true,
 }

@@ -50,9 +50,9 @@ if(BUILD_METAL)
 endif()
 
 target_link_libraries(${LIB_NAME} PRIVATE glad)
-target_link_libraries(${LIB_NAME} PRIVATE mtlpp)
+# target_link_libraries(${LIB_NAME} PRIVATE mtlpp)
 
 target_include_directories(${LIB_NAME} PRIVATE ${glad_SOURCE_DIR}/include)
-target_include_directories(${LIB_NAME} PRIVATE ${mtlpp_SOURCE_DIR})
+# target_include_directories(${LIB_NAME} PRIVATE ${mtlpp_SOURCE_DIR})
 
 set_target_properties(${LIB_NAME} PROPERTIES FOLDER "core")

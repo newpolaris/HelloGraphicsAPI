@@ -1,7 +1,7 @@
 #include <graphics_device.h>
 
 #include <el_platform.h>
-#include <openGL/gl_device.h>
+#include <OpenGL/gl_device.h>
 // #include <metal/mtl_device.h>
 
 using namespace el;
