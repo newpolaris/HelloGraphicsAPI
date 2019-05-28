@@ -62,8 +62,8 @@ namespace el {
     }
     
     vertex main0_out main0(main0_in input [[stage_in]],
-                           constant transforms* _56 [[buffer(1)]],
-                           constant float4x4& uProject [[buffer(2)]],
+                           constant transforms* _56 [[buffer(0)]],
+                           constant float4x4& uProject [[buffer(1)]],
                            ushort iid [[instance_id]])
     {
         main0_out output = {};
@@ -93,8 +93,14 @@ fragment half4 main0(
 }
 )""";
     
+// __declspec(align(16))
     
-    struct alignas(256) transforms
+#if EL_PLAT_IOS
+    struct alignas(16)
+#else
+    struct alignas(256)
+#endif
+    transforms
     {
         float uScale;
         math::float3 uTranslate;
@@ -290,8 +296,8 @@ int main()
             driver->beginFrame();
             driver->beginRenderPass(defaultTarget, params);
             driver->setPipelineState(pipelineState);
-            [context->currentRenderEncoder setVertexBytes:uProject length:sizeof(uProject) atIndex:2];
-            [context->currentRenderEncoder setVertexBuffer:uniform offset:0 atIndex:1];
+            [context->currentRenderEncoder setVertexBytes:uProject length:sizeof(uProject) atIndex:1];
+            [context->currentRenderEncoder setVertexBuffer:uniform offset:0 atIndex:0];
             driver->setVertexBuffer(vertexBuffer, 0, 0);
             
             [context->currentRenderEncoder setCullMode:MTLCullModeFront];
