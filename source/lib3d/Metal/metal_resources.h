@@ -4,6 +4,7 @@
 #include "metal_types.h"
 #include <graphics_data.h>
 #include <graphics_texture.h>
+#include <graphics_sampler.h>
 
 namespace el {
 
@@ -88,6 +89,20 @@ namespace el {
         
         GraphicsTextureDesc desc;
         id<MTLTexture> texture;
+    };
+
+    struct MetalSampler final : public GraphicsSampler
+    {
+        MetalSampler();
+        ~MetalSampler();
+
+        bool create(id<MTLDevice> device, const GraphicsSamplerDesc &desc);
+        void destroy();
+        
+        const GraphicsSamplerDesc &getDesc() const override;
+        
+        GraphicsSamplerDesc desc;
+        id<MTLSamplerState> sampler;
     };
     
 } // namespace el

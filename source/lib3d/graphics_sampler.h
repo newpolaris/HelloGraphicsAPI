@@ -50,7 +50,7 @@ namespace el {
         GraphicsSampler();
         virtual ~GraphicsSampler();
 
-        virtual const GraphicsSamplerDesc& getSamplerDesc() const = 0;
+        virtual const GraphicsSamplerDesc& getDesc() const = 0;
     };
 
 } // namespace el {

@@ -26,6 +26,22 @@ namespace el {
     id<MTLRenderPipelineState> aquirePipeline(MetalContext* context, const MetalPipelineDesc &desc);
     void cleanupPipeline(MetalContext* context);
 
+#if 0
+    struct MetalSampler final : public GraphicsSampler
+    {
+        MetalSampler();
+        ~MetalSampler();
+        
+        bool create(id<MTLDevice> device, const GraphicsSamplerDesc &desc);
+        void destroy();
+        
+        const GraphicsSamplerDesc &getDesc() const override;
+        
+        GraphicsSamplerDesc desc;
+        id<MTLSamplerState> sampler;
+    };
+#endif
+
 } // namespace el {
 
 #endif // __METAL_STATES_H__

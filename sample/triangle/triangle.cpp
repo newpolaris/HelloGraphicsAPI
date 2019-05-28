@@ -8,6 +8,7 @@
 
 #include <graphics_platform.h>
 #include <graphics_driver.h>
+#include <graphics_pipeline.h>
 #include <native_window_helper.h>
 
 namespace el {
@@ -105,7 +106,7 @@ int main()
     params.flags.clear = el::GraphicsTargetBufferFlagBitColor;
     params.clearColor = el::math::float4(0.2f, 0.4f, 0.6f, 1.0f);
     
-    auto vertexBuffer = driver->createVertexBuffer(el::vertexData, sizeof(el::vertexData));
+    auto vertexBuffer = driver->createVertexBuffer(el::vertexData, 3, sizeof(float)*5);
     auto program = driver->createProgram(el::vertexShaderSrc, el::fragmentShaderSrc);
     
     el::GraphicsTextureDesc textureDesc;
@@ -120,9 +121,8 @@ int main()
     
     auto defaultTarget = driver->createDefaultRenderTarget();
     
-    el::PipelineState pipelineState {
-        program,
-    };
+    el::PipelineState pipelineState {};
+    pipelineState.program = program;
     
     struct DrawCommands
     {

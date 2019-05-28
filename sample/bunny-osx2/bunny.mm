@@ -12,13 +12,14 @@
 #include <graphics_pipeline.h>
 #include <native_window_helper.h>
 
-#include <Metal/Metal.h>
-#include <metal/metal_driver.h>
-#include <metal/metal_context.h>
 #include <linmath.h>
-#include <metal/metal_resources.h>
+#include <Metal/metal.h>
+#include <Metal/metal_driver.h>
+#include <Metal/metal_context.h>
+#include <Metal/metal_resources.h>
 
 #include "mesh.h"
+
 
 namespace el {
 
@@ -122,7 +123,7 @@ int main()
     
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window* window = SDL_CreateWindow("triangle-sample",
+    SDL_Window* window = SDL_CreateWindow("bunny-sample",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
             1280, 768,
@@ -204,10 +205,15 @@ int main()
     adjust[2][2] = 0.5f;
     adjust[3][2] = 0.5f;
 
+    const auto uniformSize = sizeof(el::transforms)*draws.size();
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
-    id<MTLBuffer> uniform = [device newBufferWithLength:sizeof(el::transforms)*draws.size()
-                                                options:MTLResourceStorageModeShared];
-    
+#if EL_PLAT_OSX
+    MTLResourceOptions uniformOptions = MTLResourceStorageModeManaged;
+#else
+    MTLResourceOptions uniformOptions = MTLResourceStorageModeShared;
+#endif
+    id<MTLBuffer> uniform = [device newBufferWithLength:uniformSize
+                                                options:uniformOptions];
     el::transforms* pointer = (el::transforms*)uniform.contents;
     for (auto& draw : draws)
     {
@@ -216,55 +222,14 @@ int main()
         pointer->uOrientation = draw.orientation;
         pointer += 1;
     }
-    // [uniform didModifyRange:NSRang]
-    
+#if EL_PLAT_OSX
+    [uniform didModifyRange:NSRange{0, uniformSize}];
+#endif
+
     using namespace el;
     el::MetalDriver* metal = (el::MetalDriver*)driver;
     el::MetalContext* context = metal->_context;
-    
-#if 1
-    MTLIndirectCommandBufferDescriptor *indirectDesc = [[MTLIndirectCommandBufferDescriptor new] autorelease];
-    indirectDesc.commandTypes = MTLIndirectCommandTypeDrawIndexed;
-    indirectDesc.maxVertexBufferBindCount = 0;
-    indirectDesc.maxFragmentBufferBindCount = 0;
-    id<MTLIndirectCommandBuffer> _indirectCommandBuffer = [device newIndirectCommandBufferWithDescriptor:indirectDesc
-                                                                                         maxCommandCount:3000
-                                                                                                 options:0];
-    
-    //  Encode a draw command for each object drawn in the indirect command buffer.
-    for (int objIndex = 0; objIndex < draws.size(); objIndex++)
-    {
-         const auto& mesh = geometry.meshes[draws[objIndex].meshIndex];
-        
-        id<MTLIndirectRenderCommand> ICBCommand = [_indirectCommandBuffer indirectRenderCommandAtIndex:objIndex];
-        
-        [ICBCommand drawIndexedPrimitives:MTLPrimitiveTypeTriangle
-                               indexCount:mesh.indexCount
-                                indexType:MTLIndexTypeUInt32
-                              indexBuffer:indexBuffer->buffer
-                        indexBufferOffset:mesh.indexOffset * indexBuffer->getDesc().getElementSize()
-                            instanceCount:1
-                               baseVertex:mesh.vertexOffset
-                             baseInstance:objIndex];
-    }
-#endif
-#if 1
-    id<MTLBuffer> indirect = [device newBufferWithLength:sizeof(MTLDrawIndexedPrimitivesIndirectArguments)*draws.size()
-                                                 options:MTLResourceStorageModeShared];
-    auto arguments = (MTLDrawIndexedPrimitivesIndirectArguments*)indirect.contents;
-    for (auto i = 0; i < draws.size(); i++)
-    {
-        const auto& mesh = geometry.meshes[draws[i].meshIndex];
-        
-        arguments->indexCount = mesh.indexCount;
-        arguments->instanceCount = 1;
-        arguments->indexStart = mesh.indexOffset;
-        arguments->baseVertex = mesh.vertexOffset;
-        arguments->baseInstance = i;
-        arguments++;
-    }
-#endif
-    
+
     while (true)
     {
         bool isQuit = false;
@@ -281,8 +246,8 @@ int main()
         mat4x4_perspective(project, el::radians(70.f), aspect, fNear, fFar);
         mat4x4_mul(uProject, adjust, project);
         
-        // context[i]->setViewport(Viewport(0, 0, width, height));
-
+        MTLViewport viewport { 0.0, 0.0, static_cast<double>(w), static_cast<double>(h), 0.0, 1.0 };
+        [context->currentRenderEncoder setViewport:viewport];
         
 #if __has_feature(objc_arc)
         @autoreleasepool {
@@ -293,32 +258,20 @@ int main()
             [context->currentRenderEncoder setVertexBytes:uProject length:sizeof(uProject) atIndex:2];
             [context->currentRenderEncoder setVertexBuffer:uniform offset:0 atIndex:1];
             driver->setVertexBuffer(vertexBuffer, 0, 0);
-            
             [context->currentRenderEncoder setCullMode:MTLCullModeFront];
-            
-#if 0
-            [context->currentRenderEncoder useResource:vertexBuffer->buffer usage:MTLResourceUsageRead];
-            [context->currentRenderEncoder useResource:indexBuffer->buffer usage:MTLResourceUsageRead];
-            [context->currentRenderEncoder useResource:uniform usage:MTLResourceUsageRead];
-            
-            [context->currentRenderEncoder executeCommandsInBuffer:_indirectCommandBuffer
-                                                         withRange:NSMakeRange(0, draws.size())];
-#else
             for (uint32_t i = 0; i < draws.size(); i++)
             {
                 const auto& mesh = geometry.meshes[draws[i].meshIndex];
+                const uint32_t indexOffset = mesh.indexOffset * indexBuffer->getDesc().getElementSize();
                 [context->currentRenderEncoder setVertexBufferOffset:i*sizeof(transforms) atIndex:1];
-
-    #if 1
                 [context->currentRenderEncoder drawIndexedPrimitives:MTLPrimitiveTypeTriangle
                                                           indexCount:mesh.indexCount
                                                            indexType:MTLIndexTypeUInt32
                                                          indexBuffer:indexBuffer->buffer
-                                                   indexBufferOffset:mesh.indexOffset * indexBuffer->getDesc().getElementSize()
+                                                   indexBufferOffset:indexOffset
                                                        instanceCount:1
                                                           baseVertex:mesh.vertexOffset
                                                         baseInstance:i];
-    #endif
     #if 0
                 driver->draw(el::GraphicsPrimitiveTypeTriangle,
                                     indexBuffer,
@@ -326,7 +279,6 @@ int main()
                                     mesh.indexOffset);
     #endif
             }
-#endif
             driver->endRenderPass();
             driver->commit();
             

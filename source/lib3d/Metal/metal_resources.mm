@@ -5,6 +5,12 @@
 
 _EL_NAME_BEGIN
 
+uint32_t asAlignmentSize(uint32_t size, uint32_t alignment)
+{
+    EL_ASSERT((int32_t)size >= 0);
+    return ((size + alignment - 1) / alignment) * alignment;
+}
+
 MetalProgram::MetalProgram() :
     vertexFunction(nil),
     fragmentFunction(nil)
@@ -219,7 +225,7 @@ MetalTexture::MetalTexture() :
  {
      destroy();
  }
-    
+
 bool MetalTexture::create(id<MTLDevice> device, const GraphicsTextureDesc &desc)
 {
     if (device == nil) return false;
@@ -245,18 +251,10 @@ bool MetalTexture::create(id<MTLDevice> device, const GraphicsTextureDesc &desc)
 
     if (desc.getStream())
     {
-        const int alignment = (int)desc.getPixelAlignment();
-        uint32_t bytesPerRow = desc.getWidth() * asTexelSize(desc.getPixelFormat());
-        // TODO:
-        bytesPerRow = ((bytesPerRow + alignment - 1) / alignment) * alignment;
-        
-        // TODO:
-        if ((desc.getStreamSize() % bytesPerRow) != 0)
-        {
-            
-            return false;
-        }
-    
+        const auto alignment = (uint32_t)desc.getPixelAlignment();
+        uint32_t bytesPerPixel = asTexelSize(desc.getPixelFormat());
+        uint32_t bytesPerRow = asAlignmentSize(desc.getWidth() * bytesPerPixel, alignment);
+
         auto region = MTLRegionMake2D( 0, 0, textureDesc.width, textureDesc.height );
         [texture replaceRegion:region mipmapLevel:0 withBytes:desc.getStream() bytesPerRow:bytesPerRow];
     }
@@ -271,6 +269,71 @@ void MetalTexture::destroy()
 }
     
 const GraphicsTextureDesc &MetalTexture::getDesc() const
+{
+    return desc;
+}
+
+/*
+    Default values for metal
+
+    MTLSamplerMinMagFilterNearest.
+    MTLSamplerMinMagFilterNearest.
+    MTLSamplerMipFilterNotMipmapped.
+    MTLSamplerAddressModeClampToEdge.
+    MTLSamplerAddressModeClampToEdge.
+    MTLSamplerAddressModeClampToEdge.
+*/
+
+MetalSampler::MetalSampler() :
+    sampler(nil)
+{
+}
+
+MetalSampler::~MetalSampler()
+{
+    destroy();
+}
+
+bool MetalSampler::create(id<MTLDevice> device, const GraphicsSamplerDesc &desc)
+{
+    if (device == nil) return false;
+
+    MTLSamplerDescriptor *samplerDesc = [[MTLSamplerDescriptor new] autorelease];
+    
+    samplerDesc.minFilter = asSamplerMinMagFilter(desc.getMinFilter());
+    samplerDesc.magFilter = asSamplerMinMagFilter(desc.getMagFilter());
+    samplerDesc.mipFilter = asSamplerMipFilter(desc.getSamplerMipmapMode());
+    samplerDesc.maxAnisotropy = (uint32_t)desc.getAnisotropyLevel();
+    samplerDesc.sAddressMode = asSamplerAddressMode(desc.getAddressModeU());
+    samplerDesc.tAddressMode = asSamplerAddressMode(desc.getAddressModeV());
+    samplerDesc.tAddressMode = asSamplerAddressMode(desc.getAddressModeW());
+
+    // TODO:
+#if EL_PLAT_OSX
+    // SetBorderColor(SamplerBorderColor borderColor);
+#endif
+    // SetNormalizedCoordinates(bool normalizedCoordinates);
+    // SetLodMinClamp(float lodMinClamp);
+    // SetLodMaxClamp(float lodMaxClamp);
+    // SetCompareFunction(CompareFunction compareFunction);
+    // SetLabel(const ns::String& label);
+
+    sampler = [device newSamplerStateWithDescriptor:samplerDesc];
+    
+    if (sampler == nil)
+        return false;
+
+	this->desc = desc;
+    return true;
+}
+
+void MetalSampler::destroy()
+{
+    [sampler release];
+    sampler = nil;
+}
+    
+const GraphicsSamplerDesc &MetalSampler::getDesc() const
 {
     return desc;
 }

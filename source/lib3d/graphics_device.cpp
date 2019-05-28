@@ -2,7 +2,7 @@
 
 #include <el_platform.h>
 #include <openGL/gl_device.h>
-#include <metal/mtl_device.h>
+// #include <metal/mtl_device.h>
 
 using namespace el;
 
@@ -37,7 +37,7 @@ GraphicsDevicePtr el::createDevice(const GraphicsDeviceDesc& desc)
         if (device->create(desc))
             return device;
     }
-#if EL_PLAT_APPLE
+#if 0
     else if (desc.getType() == GraphicsDeviceTypeMetal)
     {
         auto device = std::make_shared<MTLDevice>();

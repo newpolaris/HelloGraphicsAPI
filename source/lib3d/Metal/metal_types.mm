@@ -360,6 +360,7 @@ MTLSamplerAddressMode asSamplerAddressMode(GraphicsSamplerAddressMode mode)
     }
 }
 
+#if EL_PLAT_OSX
 MTLSamplerBorderColor asSamplerBorderColor(GraphicsBorderColor color)
 {
     switch (color)
@@ -379,6 +380,7 @@ MTLSamplerBorderColor asSamplerBorderColor(GraphicsBorderColor color)
             return MTLSamplerBorderColor(0);
     }
 }
+#endif
 
 MTLCompareFunction asCompareFunction(GraphicsCompareOp func)
 {
@@ -677,7 +679,7 @@ GraphicsPixelFormat asGraphicsPixelFormat(MTLPixelFormat format)
     case MTLPixelFormatASTC_10x10_LDR:
     case MTLPixelFormatASTC_12x10_LDR:
     case MTLPixelFormatASTC_12x12_LDR:
-#endif // #if EL_PLAT_IOS
+#endif // EL_PLAT_IOS
     default:
         EL_ASSERT(false);
         return GraphicsPixelFormatInvalid;
@@ -698,6 +700,5 @@ MTLPrimitiveType asMetalPrimitiveType(GraphicsPrimitiveType type)
             return MTLPrimitiveType(0);
     }
 }
-
 
 _EL_NAME_END

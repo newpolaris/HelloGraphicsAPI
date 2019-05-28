@@ -2,7 +2,7 @@
 #define __METLA_TYPES_H__
 
 #include <vector>
-#include <Metal/Metal.h>
+#include <Metal/metal.h>
 #include <QuartzCore/CAMetalLayer.h>
 #include <el_debug.h>
 #include <el_platform.h>
@@ -33,6 +33,9 @@ namespace el
     MTLPrimitiveType asMetalPrimitiveType(GraphicsPrimitiveType type);
     MTLVertexStepFunction asMetalVertexStepFunction(GraphicsInputRate func);
     MTLVertexFormat asMetalVertexFormat(GraphicsVertexFormat format);
+    MTLSamplerMinMagFilter asSamplerMinMagFilter(GraphicsFilter filter);
+    MTLSamplerMipFilter asSamplerMipFilter(GraphicsSamplerMipmapMode mode);
+    MTLSamplerAddressMode asSamplerAddressMode(GraphicsSamplerAddressMode mode);
 }
 
 #endif // __METLA_TYPES_H__

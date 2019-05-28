@@ -1,5 +1,4 @@
 #include "metal_states.h"
-#include <map>
 #include <el_debug.h>
 #include "metal_context.h"
 
@@ -69,5 +68,72 @@ void cleanupPipeline(MetalContext* context)
 #endif
     context->pipelineCache.clear();
 }
+
+#if 0
+/*
+ Default values for metal
+ 
+ MTLSamplerMinMagFilterNearest.
+ MTLSamplerMinMagFilterNearest.
+ MTLSamplerMipFilterNotMipmapped.
+ MTLSamplerAddressModeClampToEdge.
+ MTLSamplerAddressModeClampToEdge.
+ MTLSamplerAddressModeClampToEdge.
+ */
+
+MetalSampler::MetalSampler() :
+sampler(nil)
+{
+}
+
+MetalSampler::~MetalSampler()
+{
+    destroy();
+}
+
+bool MetalSampler::create(id<MTLDevice> device, const GraphicsSamplerDesc &desc)
+{
+    if (device == nil) return false;
+    
+    MTLSamplerDescriptor *samplerDesc = [[MTLSamplerDescriptor new] autorelease];
+    
+    samplerDesc.minFilter = asSamplerMinMagFilter(desc.getMinFilter());
+    samplerDesc.magFilter = asSamplerMinMagFilter(desc.getMagFilter());
+    samplerDesc.mipFilter = asSamplerMipFilter(desc.getSamplerMipmapMode());
+    samplerDesc.maxAnisotropy = (uint32_t)desc.getAnisotropyLevel();
+    samplerDesc.sAddressMode = asSamplerAddressMode(desc.getAddressModeU());
+    samplerDesc.tAddressMode = asSamplerAddressMode(desc.getAddressModeV());
+    samplerDesc.tAddressMode = asSamplerAddressMode(desc.getAddressModeW());
+    
+    // TODO:
+#if EL_PLAT_OSX
+    // SetBorderColor(SamplerBorderColor borderColor);
+#endif
+    // SetNormalizedCoordinates(bool normalizedCoordinates);
+    // SetLodMinClamp(float lodMinClamp);
+    // SetLodMaxClamp(float lodMaxClamp);
+    // SetCompareFunction(CompareFunction compareFunction);
+    // SetLabel(const ns::String& label);
+    
+    sampler = [device newSamplerStateWithDescriptor:samplerDesc];
+    
+    if (sampler == nil)
+        return false;
+    
+    this->desc = desc;
+    return true;
+}
+
+void MetalSampler::destroy()
+{
+    [sampler release];
+    sampler = nil;
+}
+
+const GraphicsSamplerDesc &MetalSampler::getDesc() const
+{
+    return desc;
+}
+#endif
 
 _EL_NAME_END
