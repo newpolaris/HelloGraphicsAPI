@@ -4,6 +4,7 @@
 #include <vector>
 #include <Metal/metal.h>
 #include <QuartzCore/CAMetalLayer.h>
+#include <el_predefine.h>
 #include <el_debug.h>
 #include <el_platform.h>
 #include <el_math.h>

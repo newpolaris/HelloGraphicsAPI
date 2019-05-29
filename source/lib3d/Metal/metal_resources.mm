@@ -40,7 +40,7 @@ bool MetalProgram::create(id<MTLDevice> device, const char* vertex, const char* 
             error:&error];
 
         if (!library) {
-            auto description = [error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding];
+            const char* description = [error.localizedDescription cStringUsingEncoding:NSUTF8StringEncoding];
             EL_TRACE("Fail to create MTLPipelineState\n%s", description);
             el::debug_break();
             return false;

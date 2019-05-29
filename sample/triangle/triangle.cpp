@@ -14,7 +14,7 @@
 namespace el {
     
     const char vertexShaderSrc[] = R"""(
-#include <metal_stdlib>
+    #include <metal_stdlib>
     using namespace metal;
     
     typedef struct
@@ -115,7 +115,8 @@ int main()
     textureDesc.setStream((el::stream_t*)el::_pixels);
     textureDesc.setStreamSize(16*16);
     textureDesc.setPixelFormat(el::GraphicsPixelFormatR8Unorm);
-    textureDesc.setTextureUsage(el::GraphicsTextureUsageSampledBit | el::GraphicsTextureUsageUploadableBit);
+    textureDesc.setTextureUsage(el::GraphicsTextureUsageSampledBit |
+                                el::GraphicsTextureUsageUploadableBit);
     auto texture = driver->createTexture(textureDesc);
     EL_ASSERT(texture);
     
