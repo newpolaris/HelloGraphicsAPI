@@ -63,8 +63,8 @@ namespace el {
     }
     
     vertex main0_out main0(main0_in input [[stage_in]],
-                           constant transforms* _56 [[buffer(0)]],
-                           constant float4x4& uProject [[buffer(1)]],
+                           constant transforms* _56 [[buffer(1)]],
+                           constant float4x4& uProject [[buffer(2)]],
                            ushort iid [[instance_id]])
     {
         main0_out output = {};
@@ -261,10 +261,10 @@ int main()
             driver->beginFrame();
             driver->beginRenderPass(defaultTarget, params);
             driver->setPipelineState(pipelineState);
-            [context->currentRenderEncoder setVertexBytes:uProject length:sizeof(uProject) atIndex:1];
-            [context->currentRenderEncoder setVertexBuffer:uniform offset:0 atIndex:0];
+            [context->currentRenderEncoder setVertexBytes:uProject length:sizeof(uProject) atIndex:2];
+            [context->currentRenderEncoder setVertexBuffer:uniform offset:0 atIndex:1];
             driver->setVertexBuffer(vertexBuffer, 0, 0);
-            [context->currentRenderEncoder setCullMode:MTLCullModeFront];
+            [context->currentRenderEncoder setCullMode:MTLCullModeBack];
             for (uint32_t i = 0; i < draws.size(); i++)
             {
                 const auto& mesh = geometry.meshes[draws[i].meshIndex];
