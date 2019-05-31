@@ -1,7 +1,7 @@
 #ifndef __METAL_DRIVER_H__
 #define __METAL_DRIVER_H__
 
-#include <graphics_driver.h>
+#include <el/graphics_driver.h>
 #include "metal_types.h"
 
 namespace el {

@@ -1,5 +1,5 @@
 #include "gl_buffer.h"
-#include <el_debug.h>
+#include <el/debug.h>
 #include "gl_types.h"
 
 using namespace el;

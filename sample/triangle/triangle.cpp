@@ -1,14 +1,14 @@
 #include <cmath>
 #include <SDL.h>
-#include <el_debug.h>
-#include <el_utility.h>
-#include <el_math.h>
-#include <graphics_data.h>
-#include <graphics_texture.h>
+#include <el/debug.h>
+#include <el/utility.h>
+#include <el/math.h>
+#include <el/graphics_data.h>
+#include <el/graphics_texture.h>
 
-#include <graphics_platform.h>
-#include <graphics_driver.h>
-#include <graphics_pipeline.h>
+#include <el/graphics_platform.h>
+#include <el/graphics_driver.h>
+#include <el/graphics_pipeline.h>
 #include <native_window_helper.h>
 
 namespace el {

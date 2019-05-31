@@ -1,4 +1,4 @@
-#include <graphics_program.h>
+#include <el/graphics_program.h>
 
 using namespace el;
 

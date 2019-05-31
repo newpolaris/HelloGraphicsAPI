@@ -1,4 +1,4 @@
-#include <graphics_pipeline.h>
+#include <el/graphics_pipeline.h>
 
 using namespace el;
 

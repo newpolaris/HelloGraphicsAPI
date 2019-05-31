@@ -4,11 +4,11 @@
 #include <vector>
 #include <Metal/metal.h>
 #include <QuartzCore/CAMetalLayer.h>
-#include <el_predefine.h>
-#include <el_debug.h>
-#include <el_platform.h>
-#include <el_math.h>
-#include <graphics_types.h>
+#include <el/predefines.h>
+#include <el/debug.h>
+#include <el/platform.h>
+#include <el/math.h>
+#include <el/graphics_types.h>
 
 namespace el 
 {

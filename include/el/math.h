@@ -1,7 +1,7 @@
 #ifndef __MATH_TYPES_H__
 #define __MATH_TYPES_H__
 
-#include <el_debug.h>
+#include <el/debug.h>
 
 namespace el
 {

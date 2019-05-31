@@ -1,9 +1,9 @@
 #ifndef __GRAPHICS_CONTEXT_H__
 #define __GRAPHICS_CONTEXT_H__
 
-#include <graphics_types.h>
+#include <el/graphics_types.h>
 #include <linmath.h>
-#include <el_debug.h>
+#include <el/debug.h>
 
 namespace el {
 

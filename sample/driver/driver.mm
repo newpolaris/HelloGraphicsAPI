@@ -1,6 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <el_debug.h>
+#include <el/debug.h>
 
 #if EL_PLAT_WINDOWS
 #define GLFW_EXPOSE_NATIVE_WIN32

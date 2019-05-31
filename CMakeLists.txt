@@ -30,8 +30,7 @@ endif()
 
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/lib3d")
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/libplatform")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 add_subdirectory(source)
 add_subdirectory(sample)

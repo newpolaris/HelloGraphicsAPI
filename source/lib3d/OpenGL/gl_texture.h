@@ -1,8 +1,8 @@
 #ifndef __GL_TEXTURE_H__
 #define __GL_TEXTURE_H__
 
-#include <graphics_types.h>
-#include <graphics_texture.h>
+#include <el/graphics_types.h>
+#include <el/graphics_texture.h>
 #include "gl_headers.h"
 #include "gl_types.h"
 

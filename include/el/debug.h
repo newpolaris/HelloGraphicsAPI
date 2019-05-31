@@ -1,8 +1,8 @@
 #ifndef __EL_DEBUG_H__
 #define __EL_DEBUG_H__
 
-#include <el_predefine.h>
-#include <el_platform.h>
+#include <el/predefines.h>
+#include <el/platform.h>
 
 #include <cassert>
 

@@ -6,9 +6,9 @@
 #include <vector>
 #include <cstdint>
 #include <string>
-#include <el_predefine.h>
-#include <el_types.h>
-#include <el_math.h>
+#include <el/predefines.h>
+#include <el/types.h>
+#include <el/math.h>
 
 namespace el {
 

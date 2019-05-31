@@ -1,10 +1,10 @@
 #ifndef __GRAPHICS_PIPELINE_H__
 #define __GRAPHICS_PIPELINE_H__
     
-#include <graphics_types.h>
+#include <el/graphics_types.h>
 
 // temp
-#include <graphics_input_layout.h>
+#include <el/graphics_input_layout.h>
 
 namespace el {
     

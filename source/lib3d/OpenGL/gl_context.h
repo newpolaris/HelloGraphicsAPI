@@ -1,16 +1,16 @@
 #ifndef __GL_CONTEXT_H__
 #define __GL_CONTEXT_H__
 
-#include <el_predefine.h>
+#include <el/predefines.h>
 
 #if EL_BUILD_OPENGL
 
-#include <graphics_context.h>
+#include <el/graphics_context.h>
 #include "gl_types.h"
 
 namespace el {
 
-    class GLContext final: public GraphicsContext
+    class GLContext final : public GraphicsContext
     {
     public:
 

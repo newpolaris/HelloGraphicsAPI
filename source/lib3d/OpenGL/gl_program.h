@@ -1,8 +1,8 @@
 #ifndef __GL_PROGRAM_H__
 #define __GL_PROGRAM_H__
 
-#include <graphics_types.h>
-#include <graphics_program.h>
+#include <el/graphics_types.h>
+#include <el/graphics_program.h>
 #include "gl_types.h"
 #include <linmath.h>
 #include <string>

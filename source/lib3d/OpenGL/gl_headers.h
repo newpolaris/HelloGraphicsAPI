@@ -1,8 +1,8 @@
 #ifndef __GL_HEADERS_H__
 #define __GL_HEADERS_H__
 
-#include <el_predefine.h>
-#include <el_platform.h>
+#include <el/predefines.h>
+#include <el/platform.h>
 
 #if EL_PLAT_IOS
 #include <OpenGLES/ES2/gl.h>

@@ -1,6 +1,6 @@
 #include "gl_program.h"
 
-#include <el_debug.h>
+#include <el/debug.h>
 #include "gl_headers.h"
 #include "gl_shader.h"
 #include "gl_texture.h"

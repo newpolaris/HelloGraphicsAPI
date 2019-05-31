@@ -2,8 +2,8 @@
 #define __GL_TYPES_H__
 
 #include "gl_headers.h"
-#include <graphics_types.h>
-#include <el_debug.h>
+#include <el/graphics_types.h>
+#include <el/debug.h>
 
 namespace el {
 

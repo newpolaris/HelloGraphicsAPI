@@ -1,7 +1,7 @@
 #ifndef __GRAPHICS_PLATFORM_H__
 #define __GRAPHICS_PLATFORM_H__
 
-#include <graphics_types.h>
+#include <el/graphics_types.h>
 
 namespace el {
     class Driver;

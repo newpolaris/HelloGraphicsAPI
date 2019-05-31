@@ -1,7 +1,7 @@
 #include "gl_context.h"
 #if EL_BUILD_OPENGL
 
-#include <graphics_data.h>
+#include <el/graphics_data.h>
 #include "gl_headers.h"
 #include "gl_types.h"
 #include "gl_buffer.h"

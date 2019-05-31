@@ -3,9 +3,9 @@
 #include <cstdint>
 #include <vector>
 #include <linmath.h>
-#include <el_math.h>
-#include <graphics_types.h>
-#include <graphics_input_layout.h>
+#include <el/math.h>
+#include <el/graphics_types.h>
+#include <el/graphics_input_layout.h>
 
 namespace el {
 

@@ -2,9 +2,9 @@
 #include "metal_states.h"
 #include "metal_resources.h"
 #include "metal_context.h"
-#include <graphics_data.h>
-#include <graphics_texture.h>
-#include <graphics_pipeline.h>
+#include <el/graphics_data.h>
+#include <el/graphics_texture.h>
+#include <el/graphics_pipeline.h>
 
 _EL_NAME_BEGIN
 

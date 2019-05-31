@@ -1,5 +1,5 @@
 #include "metal_states.h"
-#include <el_debug.h>
+#include <el/debug.h>
 #include "metal_context.h"
 
 _EL_NAME_BEGIN

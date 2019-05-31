@@ -3,7 +3,7 @@
 
 #include <tuple>
 #include "metal_types.h"
-#include <graphics_input_layout.h>
+#include <el/graphics_input_layout.h>
 
 namespace el {
 

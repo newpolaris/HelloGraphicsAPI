@@ -1,7 +1,7 @@
 #include "gl_shader.h"
 
-#include <el_predefine.h>
-#include <el_debug.h>
+#include <el/predefines.h>
+#include <el/debug.h>
 #include "gl_types.h"
 #include "gl_headers.h"
 

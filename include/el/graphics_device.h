@@ -1,7 +1,7 @@
 #ifndef __GRAPHICS_DEVICE_H__
 #define __GRAPHICS_DEVICE_H__
 
-#include <graphics_types.h>
+#include <el/graphics_types.h>
 
 namespace el {
 	class GraphicsDeviceDesc final

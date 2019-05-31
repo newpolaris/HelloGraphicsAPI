@@ -1,7 +1,7 @@
 #ifndef __GL_DEVICE_H__
 #define __GL_DEVICE_H__
 
-#include <graphics_device.h>
+#include <el/graphics_device.h>
 
 namespace el {
 

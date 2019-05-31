@@ -1,7 +1,7 @@
 #include <SDL.h>
 #include <SDL_syswm.h>
 #include <QuartzCore/CAMetalLayer.h>
-#include <el_platform.h>
+#include <el/platform.h>
 #if EL_PLAT_OSX
 #include <Cocoa/Cocoa.h>
 #else

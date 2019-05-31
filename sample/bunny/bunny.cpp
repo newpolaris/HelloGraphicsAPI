@@ -1,5 +1,5 @@
-#include <el_predefine.h>
-#include <el_debug.h>
+#include <el/predefine.h>
+#include <el/debug.h>
 #include <OpenGL/gl_headers.h>
 
 #include <GLFW/glfw3.h>
@@ -15,23 +15,23 @@
 #include <getopt.h>
 #include <linmath.h>
 
-#include <graphics_device.h>
-#include <graphics_context.h>
-#include <graphics_texture.h>
-#include <graphics_types.h>
-#include <graphics_shader.h>
-#include <graphics_program.h>
-#include <graphics_texture.h>
-#include <graphics_data.h>
-#include <graphics_input_layout.h>
+#include <el/graphics_device.h>
+#include <el/graphics_context.h>
+#include <el/graphics_texture.h>
+#include <el/graphics_types.h>
+#include <el/graphics_shader.h>
+#include <el/graphics_program.h>
+#include <el/graphics_texture.h>
+#include <el/graphics_data.h>
+#include <el/graphics_input_layout.h>
 #include "graphics_window.h"
 
 #include <cstdio>
 #include <cmath>
 #include <random>
 
-#include <el_utility.h>
-#include <el_image.h>
+#include <el/utility.h>
+#include <el/image.h>
 #include <memory>
 #include <linmath.h>
 
@@ -103,7 +103,7 @@ void main()
 
     GLFWwindow* _get(const GraphicsWindowPtr& ptr)
     {
-        auto glfw = std::static_pointer_cast<GraphicsWindowGLFW>(ptr);
+        auto glfw = std::static_pointer_cast<el/graphicsWindowGLFW>(ptr);
         if (glfw == nullptr)
             return nullptr;
         return glfw->_window;

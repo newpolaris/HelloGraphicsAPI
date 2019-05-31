@@ -1,9 +1,9 @@
-#include <el_debug.h>
+#include <el/debug.h>
 
 #include <string>
 #include <sstream>
 #include <stdarg.h>
-#include <el_predefine.h>
+#include <el/predefines.h>
 
 #if EL_PLAT_WINDOWS
 extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _str);

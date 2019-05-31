@@ -1,4 +1,4 @@
-#include <el_image.h>
+#include <el/image.h>
 #include <stb/stb_image.h>
 #include <string>
 

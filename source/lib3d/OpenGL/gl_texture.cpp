@@ -1,6 +1,6 @@
 #include "gl_texture.h"
 
-#include <el_debug.h>
+#include <el/debug.h>
 
 using namespace el;
 

@@ -2,7 +2,7 @@
 #define __GRAPHICS_WINDOW_H__
 
 #include <GLFW/glfw3.h>
-#include <graphics_types.h>
+#include <el/graphics_types.h>
 #include <string>
 
 struct GLFWwindow;

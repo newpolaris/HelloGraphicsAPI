@@ -1,8 +1,8 @@
 #ifndef __GL_BUFFER_H__
 #define __GL_BUFFER_H__
 
-#include <graphics_data.h>
-#include <graphics_types.h>
+#include <el/graphics_data.h>
+#include <el/graphics_types.h>
 #include "gl_types.h"
 #include "gl_headers.h"
 

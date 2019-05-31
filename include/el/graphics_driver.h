@@ -1,7 +1,7 @@
 #ifndef __PLATFORM_DRIVER_H__
 #define __PLATFORM_DRIVER_H__
 
-#include <graphics_types.h>
+#include <el/graphics_types.h>
 
 namespace el {
 

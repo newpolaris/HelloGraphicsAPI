@@ -1,5 +1,5 @@
-#include <graphics_types.h>
-#include <el_debug.h>
+#include <el/graphics_types.h>
+#include <el/debug.h>
 
 _EL_NAME_BEGIN
 

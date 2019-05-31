@@ -1,5 +1,5 @@
-#include <el_predefine.h>
-#include <el_debug.h>
+#include <el/predefine.h>
+#include <el/debug.h>
 
 #include <OpenGL/gl_headers.h>
 #include <GLFW/glfw3.h>
@@ -15,19 +15,19 @@
 #include <getopt.h>
 #include <linmath.h>
 
-#include <graphics_device.h>
-#include <graphics_context.h>
-#include <graphics_texture.h>
-#include <graphics_types.h>
-#include <graphics_shader.h>
-#include <graphics_program.h>
-#include <graphics_texture.h>
-#include <graphics_data.h>
+#include <el/graphics_device.h>
+#include <el/graphics_context.h>
+#include <el/graphics_texture.h>
+#include <el/graphics_types.h>
+#include <el/graphics_shader.h>
+#include <el/graphics_program.h>
+#include <el/graphics_texture.h>
+#include <el/graphics_data.h>
 
 #include <cstdio>
 
-#include <el_utility.h>
-#include <el_image.h>
+#include <el/utility.h>
+#include <el/image.h>
 #include <objparser.h>
 #include <meshoptimizer.h>
 

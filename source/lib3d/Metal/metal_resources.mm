@@ -1,5 +1,5 @@
 #include "metal_resources.h"
-#include <el_debug.h>
+#include <el/debug.h>
 #include <initializer_list>
 #include "metal_context.h"
 

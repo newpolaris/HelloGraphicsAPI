@@ -1,8 +1,8 @@
 #ifndef __GL_SHADER_H__
 #define __GL_SHADER_H__
 
-#include <graphics_types.h>
-#include <graphics_shader.h>
+#include <el/graphics_types.h>
+#include <el/graphics_shader.h>
 #include "gl_headers.h"
 
 namespace el {

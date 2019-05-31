@@ -4,9 +4,25 @@ set(LIB_NAME lib3d)
 
 include_directories(${GLFW_SOURCE_DIR}/deps)
 
+set(HEADER_PATH ${CMAKE_SOURCE_DIR}/include/el)
 set(SOURCE_PATH ${CMAKE_SOURCE_DIR}/source/lib3d)
 
-file(GLOB RENDERER_CORE_HEADER "*.h")
+set(RENDERER_CORE_HEADER
+    ${HEADER_PATH}/graphics_context.h
+    ${HEADER_PATH}/graphics_data.h
+    ${HEADER_PATH}/graphics_depth_stencil.h
+    ${HEADER_PATH}/graphics_device.h
+    ${HEADER_PATH}/graphics_driver.h
+    ${HEADER_PATH}/graphics_framebuffer.h
+    ${HEADER_PATH}/graphics_input_layout.h
+    ${HEADER_PATH}/graphics_pipeline.h
+    ${HEADER_PATH}/graphics_platform.h
+    ${HEADER_PATH}/graphics_program.h
+    ${HEADER_PATH}/graphics_sampler.h
+    ${HEADER_PATH}/graphics_shader.h
+    ${HEADER_PATH}/graphics_texture.h
+    ${HEADER_PATH}/graphics_types.h)
+
 file(GLOB RENDERER_CORE_SOURCE "*.cpp")
 set(RENDERER_CORE ${RENDERER_CORE_HEADER} ${RENDERER_CORE_SOURCE})
 source_group("Common" FILES ${RENDERER_CORE})
@@ -50,9 +66,7 @@ if(BUILD_METAL)
 endif()
 
 target_link_libraries(${LIB_NAME} PRIVATE glad)
-# target_link_libraries(${LIB_NAME} PRIVATE mtlpp)
 
 target_include_directories(${LIB_NAME} PRIVATE ${glad_SOURCE_DIR}/include)
-# target_include_directories(${LIB_NAME} PRIVATE ${mtlpp_SOURCE_DIR})
 
 set_target_properties(${LIB_NAME} PROPERTIES FOLDER "core")

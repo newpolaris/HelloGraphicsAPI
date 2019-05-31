@@ -2,9 +2,9 @@
 #define __METAL_RESOURCES_H__
 
 #include "metal_types.h"
-#include <graphics_data.h>
-#include <graphics_texture.h>
-#include <graphics_sampler.h>
+#include <el/graphics_data.h>
+#include <el/graphics_texture.h>
+#include <el/graphics_sampler.h>
 
 namespace el {
 

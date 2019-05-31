@@ -1,7 +1,7 @@
 #ifndef __METAL_PLATFORM_H__
 #define __METAL_PLATFORM_H__
 
-#include <graphics_platform.h>
+#include <el/graphics_platform.h>
 
 namespace el {
 

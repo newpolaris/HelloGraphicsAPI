@@ -1,4 +1,4 @@
-#include "graphics_shader.h"
+#include <el/graphics_shader.h>
 
 using namespace el;
 
