@@ -22,6 +22,7 @@ namespace el {
         GraphicsInputRate getInputRate() const;
 
         bool operator==(const GraphicsInputBinding& other) const;
+        bool operator!=(const GraphicsInputBinding& other) const;
         bool operator<(const GraphicsInputBinding& other) const;
         
     private:

@@ -1,7 +1,7 @@
 #include <el/graphics_input_layout.h>
 #include <tuple>
 
-using namespace el;
+namespace el {
 
 GraphicsInputBinding::GraphicsInputBinding() :
     _binding(0u),
@@ -135,6 +135,11 @@ bool GraphicsInputAttribute::operator==(const GraphicsInputAttribute& other) con
     return a == b;
 }
 
+bool GraphicsInputBinding::operator!=(const GraphicsInputBinding& other) const
+{
+    return !operator==(other);
+}
+
 bool GraphicsInputAttribute::operator<(const GraphicsInputAttribute& other) const
 {
     const auto& a = std::tie(_binding, _name, _location, _format, _offset);
@@ -197,3 +202,5 @@ el::GraphicsInputLayout::GraphicsInputLayout()
 el::GraphicsInputLayout::~GraphicsInputLayout()
 {
 }
+
+} // namespace el

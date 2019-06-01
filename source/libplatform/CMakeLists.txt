@@ -16,7 +16,7 @@ set(PLATFORM_CORE_LIST
     ${HEADER_PATH}/platform.h
     ${HEADER_PATH}/utility.h
     ${SOURCE_PATH}/utility.cpp
-    ${HEADER_PATH}/math.h)
+    ${HEADER_PATH}/math_types.h)
 
 set(PLATFORM_CORE ${PLATFORM_CORE_LIST})
 source_group("Core" FILES ${PLATFORM_CORE_LIST})

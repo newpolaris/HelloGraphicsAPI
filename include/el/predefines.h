@@ -21,7 +21,7 @@
 #ifndef EL_BUILD_OPENGL_ES3
 #define EL_BUILD_OPENGL_ES3 0
 #endif
-// target: 4.3 over; not supported by osx (4.1)
+// target: 4.3 over; not supported by osx (< 4.1)
 #ifndef EL_BUILD_OPENGL_CORE
 #define EL_BUILD_OPENGL_CORE 0
 #endif
