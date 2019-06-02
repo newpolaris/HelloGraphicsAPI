@@ -23,7 +23,7 @@
 //
 //========================================================================
 
-#include <el/predefine.h>
+#include <el/predefines.h>
 #include <el/debug.h>
 
 #include <glad/glad.h>

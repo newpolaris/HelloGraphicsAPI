@@ -1,8 +1,11 @@
-#include "wgl_platform_driver.h"
+#include "platform_driver_wgl.h"
 
-#if EL_PLAT_WINDOWS
+#include <el/debug.h>
+#include "wgl_context.h"
 
-#include "wglcontext.h"
+#define ERROR_INVALID_VERSION_ARB 0x2095
+#define ERROR_INVALID_PROFILE_ARB 0x2096
+#define ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB 0x2054
 
 el::PlatformDriverWGL::PlatformDriverWGL() :
     _hdc(NULL),
@@ -119,5 +122,3 @@ void el::PlatformDriverWGL::swapBuffer()
 {
     SwapBuffers(_hdc);
 }
-
-#endif // EL_PLAT_WINDOWS

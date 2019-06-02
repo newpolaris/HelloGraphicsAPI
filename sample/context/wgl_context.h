@@ -1,6 +1,8 @@
 #ifndef __WGL_CONTEXT_H__
 #define __WGL_CONTEXT_H__
 
+#include <Windows.h>
+
 #define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
 #define WGL_CONTEXT_MINOR_VERSION_ARB 0x2092
 #define WGL_CONTEXT_FLAGS_ARB 0x2094
@@ -12,6 +14,9 @@
 
 namespace el
 {
+    bool initGL();
+    bool initGLExtention();
+
     typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC)(int);
     typedef BOOL (WINAPI * PFNWGLGETPIXELFORMATATTRIBIVARBPROC)(HDC,int,int,UINT,const int*,int*);
     typedef const char* (WINAPI * PFNWGLGETEXTENSIONSSTRINGEXTPROC)(void);

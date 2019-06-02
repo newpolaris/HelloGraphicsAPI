@@ -1,4 +1,4 @@
-#include <el/predefine.h>
+#include <el/predefines.h>
 #include <el/debug.h>
 #include <OpenGL/gl_headers.h>
 
@@ -103,7 +103,7 @@ void main()
 
     GLFWwindow* _get(const GraphicsWindowPtr& ptr)
     {
-        auto glfw = std::static_pointer_cast<el/graphicsWindowGLFW>(ptr);
+        auto glfw = std::static_pointer_cast<GraphicsWindowGLFW>(ptr);
         if (glfw == nullptr)
             return nullptr;
         return glfw->_window;
@@ -113,8 +113,6 @@ void main()
 
 int bunny_run()
 {
-    test();
-
     using namespace el;
 
     GraphicsWindowPtr windows[2];

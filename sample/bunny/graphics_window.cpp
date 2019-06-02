@@ -9,7 +9,7 @@ GraphicsWindowPtr el::createWindow(const GraphicsWindowDesc& desc)
     GraphicsWindowType windowType = desc.getWindowType();
     if (windowType == GraphicsWindowTypeGLFW)
     {
-        auto window = std::make_shared<el/graphicsWindowGLFW>();
+        auto window = std::make_shared<GraphicsWindowGLFW>();
         if (window->setup(desc))
             return window;
         return nullptr;
@@ -208,7 +208,7 @@ void GraphicsWindowGLFW::keyCallback(GLFWwindow* window, int key, int scancode, 
 
 void GraphicsWindowGLFW::sizeCallback(GLFWwindow* window, int width, int height)
 {
-    auto glfw = static_cast<el/graphicsWindowGLFW*>(glfwGetWindowUserPointer(window));
+    auto glfw = static_cast<GraphicsWindowGLFW*>(glfwGetWindowUserPointer(window));
     EL_ASSERT(glfw);
     glfw->setWidth(uint32_t(width));
     glfw->setHeight(uint32_t(width));
