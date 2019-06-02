@@ -5,6 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "(lldb) Launch cow",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/sample/cow/cow",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "lldb"
+        },
+        {
             "name": "(lldb) Launch mtl",
             "type": "cppdbg",
             "request": "launch",

@@ -91,5 +91,6 @@ if(APPLE)
     buildSample("driver")
     buildSampleAppChild(triangle)
     buildSampleAppChild(bunny-osx2)
+    buildSampleAppChild(cow)
 endif()
 

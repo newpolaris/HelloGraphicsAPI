@@ -8,7 +8,7 @@
 #include <string>
 #include <el/predefines.h>
 #include <el/types.h>
-#include <el/math.h>
+#include <el/math_types.h>
 
 namespace el {
 

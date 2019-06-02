@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include <linmath.h>
-#include <el/math.h>
+#include <el/math_types.h>
 #include <el/graphics_types.h>
 #include <el/graphics_input_layout.h>
 

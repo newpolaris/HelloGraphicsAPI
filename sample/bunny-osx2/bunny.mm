@@ -3,7 +3,7 @@
 #include <SDL.h>
 #include <el/debug.h>
 #include <el/utility.h>
-#include <el/math.h>
+#include <el/math_types.h>
 #include <el/graphics_data.h>
 #include <el/graphics_texture.h>
 #include <el/graphics_platform.h>
@@ -138,7 +138,7 @@ int main()
     EL_ASSERT(window != nullptr);
 
     void *view = ::getNativeWindow(window);
-    void *nativeSurface = setupMetalLayer(view);
+    void *nativeSurface = ::setupMetalLayer(view);
     
     auto platform = el::DefaultPlatform::create(el::GraphicsDeviceTypeMetal);
     auto driver = platform->createDriver(nullptr);

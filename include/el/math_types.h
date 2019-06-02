@@ -4,6 +4,7 @@
 #include <el/debug.h>
 
 namespace el {
+namespace math {
     
 template <typename T>
 struct vec2
@@ -171,6 +172,7 @@ inline mat4::mat4(A m00, B m01, C m02, D m03,
     _data[3] = col_type(m30, m31, m32, m33);
 }
 
+} // namespace math
 } // namespace el
 
 #endif //__EL_MATH_TYPES_H__

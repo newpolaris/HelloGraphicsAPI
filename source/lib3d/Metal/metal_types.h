@@ -7,7 +7,7 @@
 #include <el/predefines.h>
 #include <el/debug.h>
 #include <el/platform.h>
-#include <el/math.h>
+#include <el/math_types.h>
 #include <el/graphics_types.h>
 
 namespace el 
