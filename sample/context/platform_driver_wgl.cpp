@@ -3,10 +3,6 @@
 #include <el/debug.h>
 #include "wgl_context.h"
 
-#define ERROR_INVALID_VERSION_ARB 0x2095
-#define ERROR_INVALID_PROFILE_ARB 0x2096
-#define ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB 0x2054
-
 el::PlatformDriverWGL::PlatformDriverWGL() :
     _hdc(NULL),
     _context(NULL),
