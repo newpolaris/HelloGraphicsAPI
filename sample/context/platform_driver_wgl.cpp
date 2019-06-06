@@ -1,8 +1,7 @@
-#include "wgl_platform_driver.h"
+#include "platform_driver_wgl.h"
 
-#if EL_PLAT_WINDOWS
-
-#include "wglcontext.h"
+#include <el/debug.h>
+#include "wgl_context.h"
 
 el::PlatformDriverWGL::PlatformDriverWGL() :
     _hdc(NULL),
@@ -119,5 +118,3 @@ void el::PlatformDriverWGL::swapBuffer()
 {
     SwapBuffers(_hdc);
 }
-
-#endif // EL_PLAT_WINDOWS

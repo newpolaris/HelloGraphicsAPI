@@ -1,9 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <el_debug.h>
-#include <graphics_device.h>
-#include <graphics_program.h>
-#include <graphics_shader.h>
+#include <el/debug.h>
+#include <el/graphics_device.h>
+#include <el/graphics_program.h>
+#include <el/graphics_shader.h>
 
 #pragma comment(lib, "Opengl32.lib")
 

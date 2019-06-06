@@ -1,10 +1,8 @@
-#include "wglcontext.h"
+#include "wgl_context.h"
 
-#if EL_PLAT_WINDOWS
-
-#define ERROR_INVALID_VERSION_ARB 0x2095
-#define ERROR_INVALID_PROFILE_ARB 0x2096
-#define ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB 0x2054
+#include <mutex>
+#include <glad/glad.h>
+#include <el/debug.h>
 
 namespace {
 
@@ -95,5 +93,3 @@ bool el::initGL()
     gladLoadGL();
     return true;
 }
-
-#endif // EL_PLAT_WINDOWS

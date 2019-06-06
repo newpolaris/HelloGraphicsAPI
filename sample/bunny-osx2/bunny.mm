@@ -118,15 +118,6 @@ fragment half4 main0(
 
 int main()
 {
-    const std::string objfiles[] = {
-		"kitten.obj",
-		"rabbit.obj",
-		"wolf.obj",
-    };
-    el::Geometry geometry;
-    for (uint32_t i = 0; i < el::countof(objfiles); i++)
-        EL_ASSERT(LoadMesh(&geometry, EL_DEFINE_RESOURCE_PATH + objfiles[i]));
-    
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_Window* window = SDL_CreateWindow("bunny-sample",
@@ -148,6 +139,15 @@ int main()
     el::RenderPassParms params {};
     params.flags.clear = el::GraphicsTargetBufferFlagBitColor;
     params.clearColor = el::math::float4(0.2f, 0.4f, 0.6f, 1.0f);
+
+    const std::string objfiles[] = {
+		"kitten.obj",
+		"rabbit.obj",
+		"wolf.obj",
+    };
+    el::Geometry geometry;
+    for (uint32_t i = 0; i < el::countof(objfiles); i++)
+        EL_ASSERT(LoadMesh(&geometry, EL_DEFINE_RESOURCE_PATH + objfiles[i]));
 
     auto vertexBuffer = driver->createVertexBuffer(geometry.getVertexData(), geometry.getVertexCount(), sizeof(el::Vertex));
     auto indexBuffer = driver->createIndexBuffer(geometry.getIndexData(), geometry.getIndexCount(), sizeof(uint32_t));

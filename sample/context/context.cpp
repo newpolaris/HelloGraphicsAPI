@@ -1,3 +1,4 @@
+#include <windows.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -9,8 +10,9 @@
 #include <condition_variable>
 #include <mutex>
 
-#include <debug.h>
-#include <platform.h>
+#include <el/debug.h>
+#include <el/platform.h>
+#include "platform_driver_wgl.h"
 
 #if EL_PLAT_WINDOWS
 #define GLFW_EXPOSE_NATIVE_WIN32
@@ -59,7 +61,7 @@ bool TestWindow(el::Event* ev)
     windowHandle = glfwGetWin32Window(window);
 #endif
 
-    el::PlatformDriver driver;
+    el::PlatformDriverWGL driver;
     EL_ASSERT(driver.create(windowHandle));
     EL_TRACE("%s\n%s\n%s\n%s\n",
         glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine

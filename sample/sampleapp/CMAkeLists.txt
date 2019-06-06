@@ -6,8 +6,14 @@ set(SOURCE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 set(SAMPLE_APP_LIST
     ${HEADER_PATH}/mesh.h
     ${SOURCE_PATH}/mesh.cpp
-    ${HEADER_PATH}/native_window_helper.h
-    ${SOURCE_PATH}/native_window_helper.mm)
+    ${HEADER_PATH}/native_window_helper.h)
+
+if(APPLE)
+    list(APPEND SAMPLE_APP_LIST ${SOURCE_PATH}/native_window_helper_cocoa.mm)
+endif()
+if(WIN32)
+    list(APPEND SAMPLE_APP_LIST ${SOURCE_PATH}/native_window_helper_windows.cpp)
+endif()
 
 source_group("SampleApp" FILES ${SAMPLE_APP_LIST})
 
@@ -22,15 +28,16 @@ target_link_libraries(${PROJECT_NAME} PRIVATE "lib3d")
 target_link_libraries(${PROJECT_NAME} PRIVATE "libplatform")
 target_link_libraries(${PROJECT_NAME} PRIVATE "objparser")
 target_link_libraries(${PROJECT_NAME} PRIVATE "meshoptimizer")
-target_link_libraries(${PROJECT_NAME} PUBLIC "SDL2")
+target_link_libraries(${PROJECT_NAME} PUBLIC "SDL2-static")
 
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework AppKit")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Cocoa")
 endif()
-if(APPLE AND BUILD_METAL)
+if(BUILD_METAL)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Metal")
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework QuartzCore")
 endif()
-target_include_directories(${PROJECT_NAME} PUBLIC "${SDL2_SOURCE_DIR}")
+target_include_directories(${PROJECT_NAME} PUBLIC "${SDL2-static_SOURCE_DIR}")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES FOLDER "sample-app")

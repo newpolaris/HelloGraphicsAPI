@@ -2,6 +2,7 @@
 #define __PLATFORM_DRIVER_WGL_H__
 
 #include "platform_driver.h"
+#include <Windows.h>
 
 namespace el 
 {

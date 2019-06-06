@@ -1,4 +1,4 @@
-#include <el/predefine.h>
+#include <el/predefines.h>
 #include <el/debug.h>
 
 #include <OpenGL/gl_headers.h>

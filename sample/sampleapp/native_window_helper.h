@@ -1,9 +1,15 @@
 #ifndef __NATIVE_WINDOW_HELPER_H__
 #define __NATIVE_WINDOW_HELPER_H__
 
-#include <SDL.h>
+struct SDL_Window;
 
-void *setupMetalLayer(void *nativeView);
-void *getNativeWindow(SDL_Window *window);
+extern "C" void* getNativeWindow(SDL_Window *window);
 
-#endif // #define __NATIVE_WINDOW_HELPER_H__
+#if defined(__APPLE__)
+// Add a backing CAMetalLayer to the NSView and return the layer.
+extern "C" void* setupMetalLayer(void* nativeView);
+// Resize the backing CAMetalLayer's drawable to match the new view's size. Returns the layer.
+extern "C" void* resizeMetalLayer(void* natviewView);
+#endif 
+
+#endif // __NATIVE_WINDOW_HELPER_H__
