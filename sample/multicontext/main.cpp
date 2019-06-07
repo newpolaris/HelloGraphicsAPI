@@ -18,7 +18,7 @@
 #include <el/debug.h>
 #include <el/platform.h>
 
-#include "platform_driver_wgl.h"
+#include "platform_wgl.h"
 
 #if EL_PLAT_WINDOWS
 #define GLFW_EXPOSE_NATIVE_WIN32
@@ -31,31 +31,31 @@
 #include <stdio.h>
 #include <memory>
 
-namespace el
-{
-    class Event {
-    public:
+namespace el {
 
-        void set()
-        {
-            std::lock_guard<std::mutex> guard(_mutex);
-            _flag = true;
-            _condition.notify_one();
-        }
+class Event {
+public:
 
-        void wait()
-        {
-            std::unique_lock<std::mutex> guard(_mutex);
-            _condition.wait(guard, [this]{ return _flag;});
-            _flag = false;
-        }
+    void set()
+    {
+        std::lock_guard<std::mutex> guard(_mutex);
+        _flag = true;
+        _condition.notify_one();
+    }
 
-    private:
+    void wait()
+    {
+        std::unique_lock<std::mutex> guard(_mutex);
+        _condition.wait(guard, [this]{ return _flag;});
+        _flag = false;
+    }
 
-        bool _flag = false;
-        std::condition_variable _condition;
-        std::mutex _mutex;
-    };
+private:
+
+    bool _flag = false;
+    std::condition_variable _condition;
+    std::mutex _mutex;
+};
 
 }
 
@@ -72,10 +72,16 @@ bool TestWindow(el::Event* ev)
     windowHandle = glfwGetCocoaWindow(window); // NSWindow
 #endif
 
+    el::PlatformWGL driver[2];
+    EL_ASSERT(driver[0].create(windowHandle));
+    EL_TRACE("%s\n%s\n%s\n%s\n",
+        glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine
+        glGetString(GL_VERSION),   // e.g. 3.2 INTEL-8.0.61
+        glGetString(GL_VENDOR),    // e.g. NVIDIA Corporation
+        glGetString(GL_SHADING_LANGUAGE_VERSION)  // e.g. 4.60 NVIDIA or 1.50 NVIDIA via Cg compiler
+    );
 
-
-    el::PlatformDriverWGL driver;
-    EL_ASSERT(driver.create(windowHandle));
+    EL_ASSERT(driver[1].create(windowHandle));
     EL_TRACE("%s\n%s\n%s\n%s\n",
         glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine
         glGetString(GL_VERSION),   // e.g. 3.2 INTEL-8.0.61
@@ -85,9 +91,14 @@ bool TestWindow(el::Event* ev)
 
     while (!glfwWindowShouldClose(window))
     {
+        driver[0].makeCurrent();
+        glClearColor(0.5f, 1.0f, 0.5f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        driver[0].swapBuffer();
+        driver[1].makeCurrent();
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        driver.swapBuffer();
+        driver[1].swapBuffer();
         glfwPollEvents();
     }
     glfwDestroyWindow(window);

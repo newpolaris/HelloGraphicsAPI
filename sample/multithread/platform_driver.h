@@ -9,6 +9,7 @@ namespace el
         virtual bool create(void* window) = 0;
         virtual void destroy() = 0;
         virtual void swapBuffer() = 0;
+        virtual bool makeCurrent() = 0;
     };
 
 }

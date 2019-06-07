@@ -50,8 +50,30 @@ namespace el
 
 }
 
-bool TestWindow(el::Event* ev)
+bool TestWindow()
 {
+    return true;
+}
+
+void waits(GLFWwindow* window, el::PlatformDriverWGL* driver, el::Event* ev)
+{
+    ev->wait();
+    
+    while (!glfwWindowShouldClose(window))
+    {
+        EL_ASSERT(driver->makeCurrent());
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        driver->swapBuffer();
+        glfwPollEvents();
+    }
+}
+
+bool TestApp()
+{
+    if (!glfwInit())
+        return false;
+
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     GLFWwindow* window = glfwCreateWindow(1024, 768, "Window Sample", nullptr, nullptr);
 
@@ -70,34 +92,21 @@ bool TestWindow(el::Event* ev)
         glGetString(GL_SHADING_LANGUAGE_VERSION)  // e.g. 4.60 NVIDIA or 1.50 NVIDIA via Cg compiler
     );
 
+    el::Event ev;
+    std::thread t(waits, window, &driver, &ev);
+    std::chrono::seconds duration(2);
+    std::this_thread::sleep_for(duration);
+    ev.set();
+
     while (!glfwWindowShouldClose(window))
     {
+        EL_ASSERT(driver.makeCurrent());
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         driver.swapBuffer();
         glfwPollEvents();
     }
     glfwDestroyWindow(window);
-    return true;
-}
-
-void waits(el::Event* ev)
-{
-    ev->wait();
-    TestWindow(nullptr);
-}
-
-bool TestApp()
-{
-    if (!glfwInit())
-        return false;
-
-    el::Event ev;
-    std::thread t(waits, &ev);
-    std::chrono::seconds duration(2);
-    std::this_thread::sleep_for(duration);
-    ev.set();
-    TestWindow(nullptr);
     t.join();
 
     return true;

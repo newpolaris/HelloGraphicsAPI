@@ -14,6 +14,7 @@ namespace el
         virtual bool create(void* window) override;
         virtual void destroy() override;
         virtual void swapBuffer() override;
+        virtual bool makeCurrent() override;
 
     private:
 

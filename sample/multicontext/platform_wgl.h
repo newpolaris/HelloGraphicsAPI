@@ -7,13 +7,14 @@
 namespace el 
 {
 
-    struct PlatformDriverWGL : public PlatformDriver
+    struct PlatformWGL : public PlatformDriver
     {
-        PlatformDriverWGL();
+        PlatformWGL();
 
         virtual bool create(void* window) override;
         virtual void destroy() override;
         virtual void swapBuffer() override;
+        virtual void makeCurrent() override;
 
     private:
 

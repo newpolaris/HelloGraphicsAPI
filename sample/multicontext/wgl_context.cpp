@@ -32,19 +32,19 @@ namespace {
 
 namespace el
 {
-    PFN_wglGetProcAddress wglGetProcAddress;
-    PFN_wglMakeCurrent wglMakeCurrent;
-    PFN_wglCreateContext wglCreateContext;
-    PFN_wglDeleteContext wglDeleteContext;
-    PFN_wglGetCurrentDC wglGetCurrentDC;
-    PFN_wglGetCurrentContext wglGetCurrentContext;
-    PFN_wglShareLists wglShareLists;
+    PFNWGLGETPROCADDRESSPROC wglGetProcAddress;
+    PFNWGLMAKECURRENTPROC wglMakeCurrent;
+    PFNWGLCREATECONTEXTPROC wglCreateContext;
+    PFNWGLDELETECONTEXTPROC wglDeleteContext;
+    PFNWGLGETCURRENTDCPROC wglGetCurrentDC;
+    PFNWGLGETCURRENTCONTEXTPROC wglGetCurrentContext;
+    PFNWGLSHARELISTSPROC wglShareLists;
 
     // This mutex protect g_library_refcount below.
     static std::mutex g_library_mutex;
 }
 
-bool el::initGLExtention()
+bool el::initializeWGL()
 {
     std::lock_guard<std::mutex> lock(g_library_mutex);
     static bool isInitGLExtention = false;
@@ -59,20 +59,13 @@ bool el::initGLExtention()
         return false;
     }
 
-    wglGetProcAddress = (PFN_wglGetProcAddress)
-        GetProcAddress(instance, "wglGetProcAddress");
-    wglMakeCurrent = (PFN_wglMakeCurrent)
-        GetProcAddress(instance, "wglMakeCurrent");
-    wglCreateContext = (PFN_wglCreateContext)
-        GetProcAddress(instance, "wglCreateContext");
-    wglDeleteContext = (PFN_wglDeleteContext)
-        GetProcAddress(instance, "wglDeleteContext");
-    wglGetCurrentDC = (PFN_wglGetCurrentDC)
-        GetProcAddress(instance, "wglGetCurrentDC");
-    wglGetCurrentContext = (PFN_wglGetCurrentContext)
-        GetProcAddress(instance, "wglGetCurrentContext");
-    wglShareLists = (PFN_wglShareLists)
-        GetProcAddress(instance, "wglShareLists");
+    wglGetProcAddress = (PFNWGLGETPROCADDRESSPROC)GetProcAddress(instance, "wglGetProcAddress");
+    wglMakeCurrent = (PFNWGLMAKECURRENTPROC)GetProcAddress(instance, "wglMakeCurrent");
+    wglCreateContext = (PFNWGLCREATECONTEXTPROC)GetProcAddress(instance, "wglCreateContext");
+    wglDeleteContext = (PFNWGLDELETECONTEXTPROC)GetProcAddress(instance, "wglDeleteContext");
+    wglGetCurrentDC = (PFNWGLGETCURRENTDCPROC)GetProcAddress(instance, "wglGetCurrentDC");
+    wglGetCurrentContext = (PFNWGLGETCURRENTCONTEXTPROC)GetProcAddress(instance, "wglGetCurrentContext");
+    wglShareLists = (PFNWGLSHARELISTSPROC)GetProcAddress(instance, "wglShareLists");
 
     if (instance)
         FreeLibrary(instance);
@@ -81,7 +74,7 @@ bool el::initGLExtention()
     return true;
 }
 
-bool el::initGL()
+bool el::loadGLFunctions()
 {
     std::lock_guard<std::mutex> lock(g_library_mutex);
     static bool isInitGL = false;
