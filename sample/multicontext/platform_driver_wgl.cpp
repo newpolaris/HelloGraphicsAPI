@@ -1,6 +1,12 @@
 #include "platform_driver_wgl.h"
 
 #include <el/debug.h>
+#include <glad/glad.h>
+
+#include <Windows.h>
+#include <GL/GL.h>
+
+#include "wglext.h"
 #include "wgl_context.h"
 
 #define ERROR_INVALID_VERSION_ARB 0x2095
