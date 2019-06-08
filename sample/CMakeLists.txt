@@ -40,20 +40,19 @@ function(buildSample SAMPLE_NAME)
     project(${SAMPLE_NAME})
     file(GLOB HEADER_LIST ${SAMPLE_NAME}/*.h ${SAMPLE_NAME}/*.hpp)
     file(GLOB SOURCE_LIST ${SAMPLE_NAME}/*.cpp ${SAMPLE_NAME}/*.mm)
-    source_group(${SAMPLE_NAME} FILES ${HEADER_LIST})
-    source_group(${SAMPLE_NAME} FILES ${SOURCE_LIST})
+    source_group("sources" FILES ${HEADER_LIST} ${SOURCE_LIST})
 
     set(SHADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_NAME})
-    file(GLOB SHADER_HEADERS "${SHADER_DIR}/*.h")
     file(GLOB SHADERS "${SHADER_DIR}/*.vert" "${SHADER_DIR}/*.frag" "${SHADER_DIR}/*.comp" "${SHADER_DIR}/*.geom" "${SHADER_DIR}/*.tesc" "${SHADER_DIR}/*.tese" "${SHADER_DIR}/*.mesh")
-    source_group("shaders" FILES ${SHADERS} ${SHADER_HEADERS})
+    source_group("shaders" FILES ${SHADERS})
 
-    add_executable(${SAMPLE_NAME} ${HEADER_LIST} ${SOURCE_LIST} ${SHADERS} ${SHADER_HEADERS})
+    add_executable(${SAMPLE_NAME} ${HEADER_LIST} ${SOURCE_LIST} ${SHADERS})
 
     target_compile_definitions(${SAMPLE_NAME} PRIVATE -DEL_DEFINE_SAMPLE_PATH=\"${SAMPLE_FOLDER}/\")
     target_compile_definitions(${SAMPLE_NAME} PRIVATE -DEL_DEFINE_RESOURCE_PATH=\"${CMAKE_SOURCE_DIR}/resource/\")
 
     target_include_directories(${SAMPLE_NAME} PRIVATE "${COMMON_FOLDER}")
+    target_include_directories(${SAMPLE_NAME} PRIVATE "")
 
     target_link_libraries(${SAMPLE_NAME} PRIVATE "lib3d")
     target_link_libraries(${SAMPLE_NAME} PRIVATE "libplatform")
@@ -81,12 +80,19 @@ buildSample("bunny")
 if(WIN32)
     buildSample("window")
     buildSample("context")
+    buildSample("multicontext")
+    buildSample("multithread")
+    buildSample("render-thread")
 endif()
+
 add_subdirectory(sampleapp)
+
 if(APPLE)
     buildSample("osx-window")
 endif()
+
 buildSampleAppChild(bunny2)
+
 if(APPLE)
     buildSample("driver")
     buildSampleAppChild(triangle)
@@ -94,3 +100,4 @@ if(APPLE)
     buildSampleAppChild(cow)
 endif()
 
+add_subdirectory(llvm-casting)

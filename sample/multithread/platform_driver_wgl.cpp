@@ -7,6 +7,28 @@
 #define ERROR_INVALID_PROFILE_ARB 0x2096
 #define ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB 0x2054
 
+    void reportLastWindowsError() {
+        LPSTR lpMessageBuffer = nullptr;
+        DWORD dwError = GetLastError();
+
+        if (dwError == 0) {
+            return;
+        }
+        FormatMessage(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            nullptr,
+            dwError,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            lpMessageBuffer,
+            0, nullptr
+        );
+
+        EL_TRACE("Windows error code: %ld . %s\n", dwError, lpMessageBuffer);
+        LocalFree(lpMessageBuffer);
+    }
+
 el::PlatformDriverWGL::PlatformDriverWGL() :
     _hdc(NULL),
     _context(NULL),
@@ -121,4 +143,12 @@ void el::PlatformDriverWGL::destroy()
 void el::PlatformDriverWGL::swapBuffer()
 {
     SwapBuffers(_hdc);
+}
+
+bool el::PlatformDriverWGL::makeCurrent()
+{
+    if (wglMakeCurrent(_hdc, _context))
+        return true;
+    reportLastWindowsError();
+    return false;
 }

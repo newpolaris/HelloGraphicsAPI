@@ -1,23 +1,28 @@
-#include "platform_driver_wgl.h"
+#include "platform_wgl.h"
 
+#include <mutex>
 #include <el/debug.h>
-#include "wgl_context.h"
+#include <glad/glad.h>
 
-#define ERROR_INVALID_VERSION_ARB 0x2095
-#define ERROR_INVALID_PROFILE_ARB 0x2096
-#define ERROR_INCOMPATIBLE_DEVICE_CONTEXTS_ARB 0x2054
+#include <Windows.h>
+#include <GL/GL.h>
 
-el::PlatformDriverWGL::PlatformDriverWGL() :
+#include "wgl.h"
+#include "wglext.h"
+
+#pragma comment(lib, "opengl32.lib")
+
+namespace el {
+
+PlatformWGL::PlatformWGL() :
     _hdc(NULL),
     _context(NULL),
     _hwnd(NULL)
 {
 }
 
-bool el::PlatformDriverWGL::create(void* window)
+bool PlatformWGL::create(void* window)
 {
-    EL_ASSERT(el::initGLExtention());
-
     PIXELFORMATDESCRIPTOR pfd = {
         sizeof(PIXELFORMATDESCRIPTOR),
         1,
@@ -96,11 +101,19 @@ bool el::PlatformDriverWGL::create(void* window)
         destroy();
         return false;
     }
-    EL_ASSERT(initGL());
+
+    static std::mutex g_library_mutex;
+    static bool isLoadGL = false;
+
+    std::lock_guard<std::mutex> lock(g_library_mutex);
+    if (isLoadGL)
+        return true;
+    gladLoadGL();
+
     return true;
 }
 
-void el::PlatformDriverWGL::destroy()
+void PlatformWGL::destroy()
 {
     // NOTE: 
     // if you make two consecutive wlgMakeCurrent(NULL, NULL) calls,
@@ -118,7 +131,18 @@ void el::PlatformDriverWGL::destroy()
     _hwnd = NULL;
 }
 
-void el::PlatformDriverWGL::swapBuffer()
+void PlatformWGL::swapBuffer()
 {
     SwapBuffers(_hdc);
 }
+
+void PlatformWGL::makeCurrent()
+{
+    if (!wglMakeCurrent(_hdc, _context)) {
+        // reportLastWindowsError();
+        return;
+    }
+    return;
+}
+
+} // namespace el
