@@ -298,6 +298,7 @@ static void makeContextCurrentWGL(_GLFWwindow* window)
             _glfwPlatformSetTls(&_glfw.contextSlot, window);
         else
         {
+            const DWORD error = GetLastError();
             _glfwInputErrorWin32(GLFW_PLATFORM_ERROR,
                                  "WGL: Failed to make context current");
             _glfwPlatformSetTls(&_glfw.contextSlot, NULL);
@@ -333,7 +334,9 @@ static void swapBuffersWGL(_GLFWwindow* window)
         }
     }
 
-    SwapBuffers(window->context.wgl.dc);
+    if (SwapBuffers(window->context.wgl.dc))
+        return;
+    DWORD dwError = GetLastError();
 }
 
 static void swapIntervalWGL(int interval)

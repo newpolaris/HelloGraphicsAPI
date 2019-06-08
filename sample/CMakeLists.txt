@@ -52,6 +52,7 @@ function(buildSample SAMPLE_NAME)
     target_compile_definitions(${SAMPLE_NAME} PRIVATE -DEL_DEFINE_RESOURCE_PATH=\"${CMAKE_SOURCE_DIR}/resource/\")
 
     target_include_directories(${SAMPLE_NAME} PRIVATE "${COMMON_FOLDER}")
+    target_include_directories(${SAMPLE_NAME} PRIVATE "")
 
     target_link_libraries(${SAMPLE_NAME} PRIVATE "lib3d")
     target_link_libraries(${SAMPLE_NAME} PRIVATE "libplatform")
