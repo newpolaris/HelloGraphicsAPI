@@ -1,13 +1,13 @@
-#ifndef __EL_PLATFORM_WGL_H__
-#define __EL_PLATFORM_WGL_H__
+#ifndef __EL_PLATFORM_NSGL_H__
+#define __EL_PLATFORM_NSGL_H__
 
 #include "platform.h"
 
 namespace el {
 
-struct PlatformWGL : public Platform
+struct PlatformNSGL : public Platform
 {
-    PlatformWGL();
+    PlatformNSGL();
 
     virtual bool create(void* window) override;
     virtual void destroy() override;
@@ -16,9 +16,10 @@ struct PlatformWGL : public Platform
 
 private:
 
-    struct PlatformCocoaGLImpl* _impl;
+    struct PlatformNSGLImpl* _impl;
+
 };
 
 } // namespace el
 
-#endif // __EL_PLATFORM_WGL_H__
+#endif // __EL_PLATFORM_NSGL_H__

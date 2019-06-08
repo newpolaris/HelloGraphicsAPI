@@ -3,7 +3,9 @@
  * 
  * one window switches two opengl context
  */
+#if defined(_WIN32)
 #include <windows.h>
+#endif
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -18,15 +20,16 @@
 #include <el/debug.h>
 #include <el/platform.h>
 
-#include "platform_wgl.h"
-
 #if EL_PLAT_WINDOWS
+#include "platform_wgl.h"
 #define GLFW_EXPOSE_NATIVE_WIN32
 #elif EL_PLAT_OSX
+#include "platform_nsgl.h"
 #define GLFW_EXPOSE_NATIVE_COCOA
 #endif
 
 #include <GLFW/glfw3native.h>
+#include "platform.h"
 
 #include <stdio.h>
 #include <memory>
@@ -72,7 +75,7 @@ bool TestWindow(el::Event* ev)
     windowHandle = glfwGetCocoaWindow(window); // NSWindow
 #endif
 
-    el::PlatformWGL driver[2];
+    el::PlatformNSGL driver[2];
     EL_ASSERT(driver[0].create(windowHandle));
     EL_TRACE("%s\n%s\n%s\n%s\n",
         glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine

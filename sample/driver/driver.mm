@@ -51,7 +51,6 @@ bool executeSample()
     NSView* view = [nsWindow contentView];
     
     [nsOpenGLContext setView:view];
-    
     [nsOpenGLContext makeCurrentContext];
     
     gladLoadGL();

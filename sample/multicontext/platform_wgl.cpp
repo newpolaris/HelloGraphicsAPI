@@ -14,11 +14,24 @@
 
 namespace el {
 
-PlatformWGL::PlatformWGL() :
-    _hdc(NULL),
-    _context(NULL),
-    _hwnd(NULL)
+struct PlatformCocoaGLImpl 
 {
+    HDC hdc;
+    HWND hwnd;
+    HGLRC context;
+};
+
+PlatformWGL::PlatformWGL() :
+    _impl(new PlatformCocoaGLImpl)
+{
+    _impl->hdc = NULL;
+    _impl->hwnd = NULL;
+    _impl->context = nullptr;
+}
+
+PlatformWGL::~PlatformWGL()
+{
+    destroy();
 }
 
 bool PlatformWGL::create(void* window)
@@ -42,22 +55,22 @@ bool PlatformWGL::create(void* window)
         0, 0, 0
     };
 
-    _hwnd = reinterpret_cast<HWND>(window);
-    _hdc = ::GetDC(_hwnd);
+    _impl->hwnd = reinterpret_cast<HWND>(window);
+    HDC hdc = _impl->hdc = ::GetDC(_impl->hwnd);
 
-    int pixelFormat = ChoosePixelFormat(_hdc, &pfd);
+    int pixelFormat = ChoosePixelFormat(hdc, &pfd);
     if (!pixelFormat)
         return false;
-    if (!DescribePixelFormat(_hdc, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd))
+    if (!DescribePixelFormat(hdc, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd))
         return false;
-    if (!SetPixelFormat(_hdc, pixelFormat, &pfd))
+    if (!SetPixelFormat(hdc, pixelFormat, &pfd))
         return false;
 
-    HGLRC dummyContext = wglCreateContext(_hdc);
+    HGLRC dummyContext = wglCreateContext(hdc);
     if (!dummyContext)
         return false;
 
-    if (!wglMakeCurrent(_hdc, dummyContext))
+    if (!wglMakeCurrent(hdc, dummyContext))
     {
         wglDeleteContext(dummyContext);
         destroy();
@@ -77,18 +90,18 @@ bool PlatformWGL::create(void* window)
             0, 0
         };
 
-        _context = wglCreateContextAttribs(_hdc, nullptr, attribs);
+        _impl->context = wglCreateContextAttribs(hdc, nullptr, attribs);
     }
     else
     {
-        _context = wglCreateContext(_hdc);
+        _impl->context = wglCreateContext(hdc);
     }
 
     wglMakeCurrent(NULL, NULL);
     wglDeleteContext(dummyContext);
     dummyContext = nullptr;
 
-    if (!_context || !wglMakeCurrent(_hdc, _context)) {
+    if (!_context || !wglMakeCurrent(hdc, _impl->context)) {
         DWORD dwError = GetLastError();
         if (dwError == (0xc0070000 | ERROR_INVALID_VERSION_ARB))
             EL_TRACE("WGL: Driver does not support OpenGL version");
@@ -115,30 +128,28 @@ bool PlatformWGL::create(void* window)
 
 void PlatformWGL::destroy()
 {
-    // NOTE: 
-    // if you make two consecutive wlgMakeCurrent(NULL, NULL) calls,
-    // An invalid handle error may occur.
-    // But it seems to work well.
     wglMakeCurrent(NULL, NULL);
-    if (_context) {
+    if (_impl->context) {
         wglDeleteContext(_context);
-        _context = NULL;
+        _impl->context = nullptr;
     }
-    if (_hwnd && _hdc) {
-        ReleaseDC(_hwnd, _hdc);
-        _hdc = NULL;
+    if (_impl->hwnd && _impl->hdc) {
+        ReleaseDC(_impl->hwnd, _impl->hdc);
+        _impl->hdc = NULL;
     }
-    _hwnd = NULL;
+    _impl->hwnd = NULL;
+    delete _impl;
+    _impl = nullptr;
 }
 
 void PlatformWGL::swapBuffer()
 {
-    SwapBuffers(_hdc);
+    SwapBuffers(_impl->hdc);
 }
 
 void PlatformWGL::makeCurrent()
 {
-    if (!wglMakeCurrent(_hdc, _context)) {
+    if (!wglMakeCurrent(_impl->hdc, _impl->context)) {
         // reportLastWindowsError();
         return;
     }
