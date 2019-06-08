@@ -14,6 +14,8 @@
 #include <el/platform.h>
 #include "platform_driver_wgl.h"
 
+#pragma comment(lib, "opengl32.lib")
+
 #if EL_PLAT_WINDOWS
 #define GLFW_EXPOSE_NATIVE_WIN32
 #elif EL_PLAT_OSX
@@ -59,13 +61,12 @@ void waits(GLFWwindow* window, el::PlatformDriverWGL* driver, el::Event* ev)
 {
     ev->wait();
     
-    while (!glfwWindowShouldClose(window))
     {
-        EL_ASSERT(driver->makeCurrent());
+        (driver->makeCurrent());
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         driver->swapBuffer();
-        glfwPollEvents();
+        wglMakeCurrent(0, nullptr);
     }
 }
 
@@ -75,16 +76,20 @@ bool TestApp()
         return false;
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(1024, 768, "Window Sample", nullptr, nullptr);
+    GLFWwindow* window[2];
+    window[0] = glfwCreateWindow(1024, 768, "Window Sample0", nullptr, nullptr);
+    window[1] = glfwCreateWindow(1024, 768, "Window Sample1", nullptr, nullptr);
 
-    void* windowHandle = nullptr;
+    void* windowHandle[2];
 
 #if defined(GLFW_EXPOSE_NATIVE_WIN32)
-    windowHandle = glfwGetWin32Window(window);
+    windowHandle[0] = glfwGetWin32Window(window[0]);
+    windowHandle[1] = glfwGetWin32Window(window[1]);
 #endif
 
-    el::PlatformDriverWGL driver;
-    EL_ASSERT(driver.create(windowHandle));
+    el::PlatformDriverWGL driver[2];
+    EL_ASSERT(driver[0].create(windowHandle[0]));
+    EL_ASSERT(driver[1].create(windowHandle[1]));
     EL_TRACE("%s\n%s\n%s\n%s\n",
         glGetString(GL_RENDERER),  // e.g. Intel HD Graphics 3000 OpenGL Engine
         glGetString(GL_VERSION),   // e.g. 3.2 INTEL-8.0.61
@@ -92,22 +97,24 @@ bool TestApp()
         glGetString(GL_SHADING_LANGUAGE_VERSION)  // e.g. 4.60 NVIDIA or 1.50 NVIDIA via Cg compiler
     );
 
-    el::Event ev;
-    std::thread t(waits, window, &driver, &ev);
-    std::chrono::seconds duration(2);
-    std::this_thread::sleep_for(duration);
-    ev.set();
+    driver[0].makeCurrent();
 
-    while (!glfwWindowShouldClose(window))
+    el::Event ev;
+
+    while (!glfwWindowShouldClose(window[0]))
     {
-        EL_ASSERT(driver.makeCurrent());
+        std::thread t(waits, window[1], &(driver[1]), &ev);
+        ev.set();
+
+        EL_ASSERT(driver[0].makeCurrent());
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        driver.swapBuffer();
+        driver[0].swapBuffer();
+        wglMakeCurrent(0, nullptr);
+        t.join();
         glfwPollEvents();
     }
-    glfwDestroyWindow(window);
-    t.join();
+    glfwDestroyWindow(window[0]);
 
     return true;
 }

@@ -25,7 +25,7 @@
             0, nullptr
         );
 
-        EL_TRACE("Windows error code: %d . %s\n", dwError, lpMessageBuffer);
+        EL_TRACE("Windows error code: %ld . %s\n", dwError, lpMessageBuffer);
         LocalFree(lpMessageBuffer);
     }
 
