@@ -88,7 +88,7 @@ void PlatformNSGL::swapBuffer()
 
 void PlatformNSGL::makeCurrent()
 {
-    [NSOpenGLContext makeCurrentContext];
+    [_impl->context makeCurrentContext];
 }
 
 } // namespace el

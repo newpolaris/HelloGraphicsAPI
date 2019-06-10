@@ -33,6 +33,8 @@
 
 #include <stdio.h>
 #include <memory>
+#include <dispatch/dispatch.h>
+
 
 namespace el {
 
@@ -61,11 +63,19 @@ private:
 };
 
 }
-
 bool TestWindow(el::Event* ev)
 {
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(1024, 768, "Window Sample", nullptr, nullptr);
+    __block GLFWwindow* window = nullptr;
+    
+    if ([NSThread isMainThread] == TRUE)
+    {
+        window = glfwCreateWindow(1024, 768, "Window Sample", nullptr, nullptr);
+    }
+    else {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            window = glfwCreateWindow(1024, 768, "Window Sample", nullptr, nullptr);
+        });
+    }
 
     void* windowHandle = nullptr;
 
@@ -121,6 +131,8 @@ bool TestApp()
     if (!glfwInit())
         return false;
 
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    
     el::Event ev;
     std::thread t(waits, &ev);
     ev.set();
