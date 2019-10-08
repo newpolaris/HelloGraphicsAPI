@@ -6,7 +6,7 @@ message(STATUS "Generating project file for example in ${SAMPLE_FOLDER}")
 
 set(SOURCE_LIST 
     ${SAMPLE_FOLDER}/platform.h
-    ${SAMPLE_FOLDER}/main.cpp)
+    ${SAMPLE_FOLDER}/main.mm)
 
 if(WIN32)
     set(SOURCE_LIST 
