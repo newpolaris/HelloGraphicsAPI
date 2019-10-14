@@ -18,6 +18,9 @@ struct PipelineState {
     {
         return !operator==(state);
     }
+
+    void* vertexFunction;
+    void* fragmentFunction;
 };
 
 template <typename StateType, 
@@ -25,31 +28,82 @@ template <typename StateType,
           typename StateCreator>
 struct StateCache
 {
-    typedef el::util::hash::MurmurHashFn<StateType> HashFn;
+    StateCache() = default;
 
-     MetalType getOrCreateState(void* metalDevice, const StateType& state)
+    StateCache(const StateCache&) = delete;
+    StateCache& operator=(const StateCache&) = delete;
+
+    ~StateCache() {
+        for (auto it : _cache) {
+            delete it.second;
+        }
+
+        assert(false);
+        // TODO: Test purpose
+        for (auto it = _cache.begin(); it != _cache.end(); ++it) {
+            delete it.value();
+        }
+
+        // TODO: remove
+        _cache.clear();
+    }
+
+    MetalType getOrCreateState(const StateType& state)
     {
+        // TODO: add likely
         auto it = _cache.find(state);
-        if (it == _cache.end()) 
+        if (it == _cache.end())
         {
-            StateCreator creator;
-            const auto& metalObject = creator(nullptr, state);
+            const auto& metalObject = creator(metalDevice, state);
             it = _cache.emplace_hint(it, state, metalObject);
         }
         return it->second;
     }
 
+    StateCreator creator;
+    void* metalDevice = nullptr;
+
+    using HashFn = el::util::hash::MurmurHashFn<StateType>;
     tsl::robin_map<StateType, MetalType, HashFn> _cache;
 };
 
-typedef uint32_t MetalType;
+typedef uint32_t* MetalType;
 
 struct PipelineStateCreator
 {
     MetalType operator()(void* device, const PipelineState& state) NOEXCEPT;
 };
 
-typedef StateCache<PipelineState, MetalType, PipelineStateCreator> PipelineStateCache;
+MetalType PipelineStateCreator::operator()(void* device, const PipelineState& state) NOEXCEPT
+{
+    return (MetalType)0;
+}
+
+using PipelineStateCache = StateCache<PipelineState, MetalType, PipelineStateCreator>;
+
+
+template <typename StateType>
+struct StateTracker 
+{
+    void invalidate() {
+        isStateDirty = true;
+    }
+    bool stateChanged() const {
+        return isStateDirty;
+    }
+
+    bool isStateDirty = true;
+    StateType currentState;
+};
+
+using PipelineStateTracker = StateTracker<PipelineState>;
+
+struct MetalContext
+{
+    void* mtlDevice = nullptr;
+    PipelineStateTracker pipelineStateTracker;
+    PipelineStateCache pipelineStateCache;
+};
 
 } // namespace el
 
@@ -57,9 +111,19 @@ int main()
 {
     using namespace el;
 
-    PipelineStateCache cache;
+    // NOTE: state clear
+    PipelineState currentState = {};
 
-    auto pipeline = cache.getOrCreateState(nullptr, PipelineState());
+    auto _context = std::make_unique<MetalContext>();
+
+    PipelineState state{
+        nullptr,
+        nullptr
+    };
+
+    if (_context->pipelineStateTracker.stateChanged()) {
+        auto pipeline = _context->pipelineStateCache.getOrCreateState(state);
+    }
 
     return 0;
 }

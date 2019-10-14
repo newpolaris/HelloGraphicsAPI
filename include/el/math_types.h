@@ -309,7 +309,6 @@ typedef TVec4<float> float4;
 static_assert(sizeof(float2) == sizeof(float) * 2, "ebo not supported");
 static_assert(sizeof(float3) == sizeof(float) * 3, "ebo not supported");
 static_assert(sizeof(float4) == sizeof(float) * 4, "ebo not supported");
-<<<<<<< HEAD
 
 typedef TVec2<uint8_t> ucvec2;
 typedef TVec3<uint8_t> ucvec3;
@@ -318,8 +317,6 @@ typedef TVec4<uint8_t> ucvec4;
 typedef TVec2<uint32_t> uvec2;
 typedef TVec3<uint32_t> uvec3;
 typedef TVec4<uint32_t> uvec4;
-=======
->>>>>>> f273a7c040ea9132fe36b41d1dd4a2765baefa50
 
 typedef float scalar;
 typedef TVec2<scalar> vec2;
@@ -336,7 +333,6 @@ struct TMat4x4
     typedef T& referrence;
     typedef T const& const_reference;
     typedef size_t size_type;
-<<<<<<< HEAD
 
     typedef TVec4<value_type> row_type;
     typedef TVec4<value_type> col_type;
@@ -348,19 +344,6 @@ struct TMat4x4
 
     col_type _data[NUM_COLS];
 
-=======
-
-    typedef TVec4<value_type> row_type;
-    typedef TVec4<value_type> col_type;
-
-    static const size_type ROW_SIZE = row_type::SIZE;
-    static const size_type COL_SIZE = col_type::SIZE;
-    static const size_type NUM_ROWS = ROW_SIZE;
-    static const size_type NUM_COLS = COL_SIZE;
-
-    col_type _data[NUM_COLS];
-
->>>>>>> f273a7c040ea9132fe36b41d1dd4a2765baefa50
     TMat4x4();
     explicit TMat4x4(EnumZero);
     explicit TMat4x4(EnumIdentity);
