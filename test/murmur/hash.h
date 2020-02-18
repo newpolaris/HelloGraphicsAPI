@@ -1,6 +1,9 @@
 #ifndef __EL_UTIL_HASH_H__
 #define __EL_UTIL_HASH_H__
 
+// https://enqueuezero.com/algorithms/murmur-hash.html
+// https://github.com/google/filament/blob/master/libs/utils/include/utils/Hash.h
+
 #include <stdint.h>
 
 namespace el {
